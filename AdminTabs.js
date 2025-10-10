@@ -1,26 +1,127 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { TouchableOpacity, Text, StyleSheet, Alert, View } from 'react-native';
+import { AuthContext } from './AuthContext';
 import HorsesScreen from './HorsesScreen';
 import FeedScreen from './FeedScreen';
 import LessonsScreen from './LessonsScreen';
 import ClientsScreen from './ClientsScreen';
 import WorkersScreen from './WorkersScreen';
 
-// Bottom tab navigation for the admin section.  Each tab displays a specific
-// administrative view such as horse management, feeding schedules, lessons,
-// client payments or worker directory.
 const Tab = createBottomTabNavigator();
 
 const AdminTabs = () => {
+  const { logOut } = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            await logOut();
+          },
+        },
+      ]
+    );
+  };
+
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Horses" component={HorsesScreen} />
-      <Tab.Screen name="Feeding" component={FeedScreen} />
-      <Tab.Screen name="Lessons" component={LessonsScreen} />
-      <Tab.Screen name="Clients" component={ClientsScreen} />
-      <Tab.Screen name="Workers" component={WorkersScreen} />
+    <Tab.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#1e293b',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+          fontSize: 18,
+        },
+        tabBarStyle: {
+          backgroundColor: '#1e293b',
+          borderTopColor: '#334155',
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: '#3b82f6',
+        tabBarInactiveTintColor: '#94a3b8',
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '600',
+        },
+        headerRight: () => (
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+            <Text style={styles.logoutIcon}>🚪</Text>
+          </TouchableOpacity>
+        ),
+      }}
+    >
+      <Tab.Screen
+        name="Horses"
+        component={HorsesScreen}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 24 }}>🐴</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Feeding"
+        component={FeedScreen}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 24 }}>🥕</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Lessons"
+        component={LessonsScreen}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 24 }}>📚</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Clients"
+        component={ClientsScreen}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 24 }}>👥</Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Workers"
+        component={WorkersScreen}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Text style={{ fontSize: 24 }}>👷</Text>
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  logoutButton: {
+    marginRight: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#334155',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logoutIcon: {
+    fontSize: 20,
+  },
+});
 
 export default AdminTabs;

@@ -1,23 +1,57 @@
 {
   "expo": {
-    "name": "Horse Stable App",
-    "slug": "horse-stable-app",
+    "name": "Al-Ameen Stable",
+    "slug": "al-ameen-stable",
     "version": "1.0.0",
-    "sdkVersion": "49.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#3498db"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.alameenstable.app",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "com.alameenstable.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#3498db"
+      },
+      "permissions": [
+        "INTERNET"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/icon.png",
+      "name": "Al-Ameen Stable Management",
+      "shortName": "Al-Ameen Stable",
+      "description": "Professional horse stable management system",
+      "backgroundColor": "#ffffff",
+      "themeColor": "#3498db"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "939c9966-159b-42c3-9963-fa0df80190a8"
+      }
     }
   }
 }

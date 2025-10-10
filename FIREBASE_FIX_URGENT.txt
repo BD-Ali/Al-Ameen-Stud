@@ -1,0 +1,59 @@
+🚨 URGENT: Fix Firebase Permission Errors NOW! 🚨
+
+You're seeing these errors:
+- "Error fetching clients: FirebaseError: Missing or insufficient permissions"
+- "Error fetching lessons: FirebaseError: Missing or insufficient permissions"
+- "Error fetching workers: FirebaseError: Missing or insufficient permissions"
+
+This is because your Firestore database doesn't have security rules set up yet.
+
+═══════════════════════════════════════════════════════════
+QUICK FIX (Takes 3 minutes)
+═══════════════════════════════════════════════════════════
+
+STEP 1: Open Firebase Console
+────────────────────────────────────────────────────────────
+Go to: https://console.firebase.google.com/project/al-ameen-stable/firestore
+
+STEP 2: Check if Database Exists
+────────────────────────────────────────────────────────────
+If you see "Create database" button:
+  → Click it
+  → Choose "Start in TEST MODE" (important for development!)
+  → Select region: us-central1 (or closest to you)
+  → Click "Enable"
+
+STEP 3: Set Security Rules
+────────────────────────────────────────────────────────────
+Go to: https://console.firebase.google.com/project/al-ameen-stable/firestore/rules
+
+Copy and paste this EXACTLY (replace everything):
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+
+STEP 4: Publish Rules
+────────────────────────────────────────────────────────────
+Click the "Publish" button at the top
+
+═══════════════════════════════════════════════════════════
+DONE! Your app will work immediately!
+═══════════════════════════════════════════════════════════
+
+⚠️  IMPORTANT NOTE:
+These rules allow anyone to read/write (good for development).
+Before going live, use the secure rules from DEPLOYMENT.md
+
+After fixing this:
+1. Reload your app (press 'r' in terminal)
+2. The errors will disappear
+3. You can start adding horses, lessons, etc!
+
+═══════════════════════════════════════════════════════════
+
