@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { DataContext } from './DataContext';
 
 /**
@@ -7,7 +7,7 @@ import { DataContext } from './DataContext';
  * add new workers.
  */
 const WorkersScreen = () => {
-  const { workers, addWorker } = useContext(DataContext);
+  const { workers, addWorker, removeWorker } = useContext(DataContext);
   const [name, setName] = useState('');
   const [role, setRole] = useState('');
   const [contact, setContact] = useState('');
@@ -20,48 +20,27 @@ const WorkersScreen = () => {
     setContact('');
   };
 
-  const AddWorkerForm = React.memo(() => (
-    <View style={styles.formSection}>
-      <Text style={styles.formTitle}>➕ Add New Worker</Text>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>👤 Name</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          placeholder="Worker name"
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>💼 Role</Text>
-        <TextInput
-          value={role}
-          onChangeText={setRole}
-          placeholder="e.g. Trainer, Groom, Manager"
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>📞 Contact</Text>
-        <TextInput
-          value={contact}
-          onChangeText={setContact}
-          placeholder="Phone or email"
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.addButton} onPress={handleAddWorker}>
-        <Text style={styles.addButtonText}>Add Worker</Text>
-      </TouchableOpacity>
-    </View>
-  ));
+  const handleRemoveWorker = (id, name) => {
+    Alert.alert(
+      'Remove Worker',
+      `Are you sure you want to remove ${name}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await removeWorker(id);
+            if (result.success) {
+              Alert.alert('Success', 'Worker removed successfully');
+            } else {
+              Alert.alert('Error', result.error || 'Failed to remove worker');
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -90,9 +69,56 @@ const WorkersScreen = () => {
               <Text style={styles.cardLabel}>📞 Contact:</Text>
               <Text style={styles.cardValue}>{item.contact || 'Not provided'}</Text>
             </View>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => handleRemoveWorker(item.id, item.name)}
+            >
+              <Text style={styles.removeButtonText}>Remove Worker</Text>
+            </TouchableOpacity>
           </View>
         )}
-        ListFooterComponent={<AddWorkerForm />}
+        ListFooterComponent={
+          <View style={styles.formSection}>
+            <Text style={styles.formTitle}>➕ Add New Worker</Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>👤 Name</Text>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                placeholder="Worker name"
+                placeholderTextColor="#64748b"
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>💼 Role</Text>
+              <TextInput
+                value={role}
+                onChangeText={setRole}
+                placeholder="e.g. Trainer, Groom, Manager"
+                placeholderTextColor="#64748b"
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>📞 Contact</Text>
+              <TextInput
+                value={contact}
+                onChangeText={setContact}
+                placeholder="Phone or email"
+                placeholderTextColor="#64748b"
+                style={styles.input}
+              />
+            </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={handleAddWorker}>
+              <Text style={styles.addButtonText}>Add Worker</Text>
+            </TouchableOpacity>
+          </View>
+        }
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -217,6 +243,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  removeButton: {
+    backgroundColor: '#ef4444',
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
   emptyState: {
     alignItems: 'center',
     paddingVertical: 60,
@@ -238,3 +276,4 @@ const styles = StyleSheet.create({
 });
 
 export default WorkersScreen;
+

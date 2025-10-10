@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { DataContext } from './DataContext';
 
 /**
@@ -7,121 +8,129 @@ import { DataContext } from './DataContext';
  * new lessons.
  */
 const LessonsScreen = () => {
-  const { lessons, addLesson, horses, clients, workers } = useContext(DataContext);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const { lessons, addLesson, removeLesson, horses, clients, workers } = useContext(DataContext);
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [horseId, setHorseId] = useState('');
   const [clientId, setClientId] = useState('');
   const [instructorId, setInstructorId] = useState('');
   const [price, setPrice] = useState('');
+  const [showHorsePicker, setShowHorsePicker] = useState(false);
+  const [showClientPicker, setShowClientPicker] = useState(false);
+  const [showInstructorPicker, setShowInstructorPicker] = useState(false);
 
-  const handleAddLesson = () => {
-    if (!date || !time || !horseId || !clientId || !instructorId) return;
+  const handleDateChange = (event, selectedDate) => {
+    if (Platform.OS === 'android' && event.type === 'dismissed') {
+      setShowDatePicker(false);
+      return;
+    }
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+  };
+
+  const handleTimeChange = (event, selectedTime) => {
+    if (Platform.OS === 'android' && event.type === 'dismissed') {
+      setShowTimePicker(false);
+      return;
+    }
+    if (selectedTime) {
+      setTime(selectedTime);
+    }
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+  };
+
+  const handleRemoveLesson = async (id) => {
+    Alert.alert(
+      'Delete Lesson',
+      'Are you sure you want to delete this lesson?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await removeLesson(id);
+            if (result.success) {
+              Alert.alert('Success', 'Lesson deleted successfully');
+            } else {
+              Alert.alert('Error', result.error || 'Failed to delete lesson');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatTime = (time) => {
+    const hours = String(time.getHours()).padStart(2, '0');
+    const minutes = String(time.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  const handleAddLesson = async () => {
+    if (!horseId || !clientId || !instructorId) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
     const numericPrice = price ? parseFloat(price) : 0;
-    addLesson({ date, time, horseId, clientId, instructorId, price: numericPrice });
-    setDate('');
-    setTime('');
-    setHorseId('');
-    setClientId('');
-    setInstructorId('');
-    setPrice('');
+    const formattedDate = formatDate(date);
+    const formattedTime = formatTime(time);
+
+    const result = await addLesson({
+      date: formattedDate,
+      time: formattedTime,
+      horseId,
+      clientId,
+      instructorId,
+      price: numericPrice
+    });
+
+    if (result.success) {
+      Alert.alert('Success', 'Lesson scheduled successfully');
+      setDate(new Date());
+      setTime(new Date());
+      setHorseId('');
+      setClientId('');
+      setInstructorId('');
+      setPrice('');
+    } else {
+      Alert.alert('Error', result.error || 'Failed to schedule lesson');
+    }
   };
 
   const getHorseName = (id) => horses.find((h) => h.id === id)?.name || id;
   const getClientName = (id) => clients.find((c) => c.id === id)?.name || id;
   const getWorkerName = (id) => workers.find((w) => w.id === id)?.name || id;
 
-  const AddLessonForm = React.memo(() => (
-    <View style={styles.formSection}>
-      <Text style={styles.formTitle}>➕ Schedule New Lesson</Text>
+  const getSelectedHorseName = () => {
+    const horse = horses.find(h => h.id === horseId);
+    return horse ? horse.name : 'Select a horse';
+  };
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>📅 Date (YYYY-MM-DD)</Text>
-        <TextInput
-          value={date}
-          onChangeText={setDate}
-          placeholder="2025-10-12"
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-      </View>
+  const getSelectedClientName = () => {
+    const client = clients.find(c => c.id === clientId);
+    return client ? client.name : 'Select a client';
+  };
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>⏰ Time (HH:MM)</Text>
-        <TextInput
-          value={time}
-          onChangeText={setTime}
-          placeholder="14:00"
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>🐴 Horse ID</Text>
-        <TextInput
-          value={horseId}
-          onChangeText={setHorseId}
-          placeholder={horses.length > 0 ? `e.g. ${horses[0].id}` : 'Add horses first'}
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-        {horses.length > 0 && (
-          <Text style={styles.helpText}>
-            Available: {horses.map((h) => `${h.id}:${h.name}`).join(', ')}
-          </Text>
-        )}
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>👤 Client ID</Text>
-        <TextInput
-          value={clientId}
-          onChangeText={setClientId}
-          placeholder={clients.length > 0 ? `e.g. ${clients[0].id}` : 'Add clients first'}
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-        {clients.length > 0 && (
-          <Text style={styles.helpText}>
-            Available: {clients.map((c) => `${c.id}:${c.name}`).join(', ')}
-          </Text>
-        )}
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>👨‍🏫 Instructor ID</Text>
-        <TextInput
-          value={instructorId}
-          onChangeText={setInstructorId}
-          placeholder={workers.length > 0 ? `e.g. ${workers[0].id}` : 'Add workers first'}
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-        {workers.length > 0 && (
-          <Text style={styles.helpText}>
-            Available: {workers.map((w) => `${w.id}:${w.name}`).join(', ')}
-          </Text>
-        )}
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>💰 Price (₪)</Text>
-        <TextInput
-          value={price}
-          onChangeText={setPrice}
-          placeholder="100"
-          keyboardType="numeric"
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.addButton} onPress={handleAddLesson}>
-        <Text style={styles.addButtonText}>Schedule Lesson</Text>
-      </TouchableOpacity>
-    </View>
-  ));
+  const getSelectedInstructorName = () => {
+    const instructor = workers.find(w => w.id === instructorId);
+    return instructor ? instructor.name : 'Select an instructor';
+  };
 
   return (
     <View style={styles.container}>
@@ -158,9 +167,239 @@ const LessonsScreen = () => {
               <Text style={styles.priceLabel}>Price:</Text>
               <Text style={styles.priceValue}>₪{item.price}</Text>
             </View>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => handleRemoveLesson(item.id)}
+            >
+              <Text style={styles.removeButtonText}>🗑️ Remove Lesson</Text>
+            </TouchableOpacity>
           </View>
         )}
-        ListFooterComponent={<AddLessonForm />}
+        ListFooterComponent={
+          <View style={styles.formSection}>
+            <Text style={styles.formTitle}>➕ Schedule New Lesson</Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>📅 Select Date</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={styles.pickerButtonText}>
+                  {formatDate(date)}
+                </Text>
+                <Text style={styles.dropdownArrow}>📅</Text>
+              </TouchableOpacity>
+
+              {showDatePicker && (
+                <>
+                  <DateTimePicker
+                    value={date}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleDateChange}
+                    minimumDate={new Date()}
+                  />
+                  {Platform.OS === 'ios' && (
+                    <TouchableOpacity
+                      style={styles.confirmButton}
+                      onPress={() => setShowDatePicker(false)}
+                    >
+                      <Text style={styles.confirmButtonText}>OK</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>⏰ Select Time</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowTimePicker(true)}
+              >
+                <Text style={styles.pickerButtonText}>
+                  {formatTime(time)}
+                </Text>
+                <Text style={styles.dropdownArrow}>⏰</Text>
+              </TouchableOpacity>
+
+              {showTimePicker && (
+                <>
+                  <DateTimePicker
+                    value={time}
+                    mode="time"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleTimeChange}
+                    is24Hour={true}
+                  />
+                  {Platform.OS === 'ios' && (
+                    <TouchableOpacity
+                      style={styles.confirmButton}
+                      onPress={() => setShowTimePicker(false)}
+                    >
+                      <Text style={styles.confirmButtonText}>OK</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>🐴 Select Horse</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => {
+                  setShowHorsePicker(!showHorsePicker);
+                  setShowClientPicker(false);
+                  setShowInstructorPicker(false);
+                }}
+              >
+                <Text style={[styles.pickerButtonText, !horseId && styles.placeholderText]}>
+                  {getSelectedHorseName()}
+                </Text>
+                <Text style={styles.dropdownArrow}>{showHorsePicker ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {showHorsePicker && horses.length > 0 && (
+                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                  {horses.map((horse) => (
+                    <TouchableOpacity
+                      key={horse.id}
+                      style={[
+                        styles.pickerOption,
+                        horseId === horse.id && styles.pickerOptionSelected
+                      ]}
+                      onPress={() => {
+                        setHorseId(horse.id);
+                        setShowHorsePicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.pickerOptionText,
+                        horseId === horse.id && styles.pickerOptionTextSelected
+                      ]}>
+                        {horse.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+
+              {horses.length === 0 && (
+                <Text style={styles.helpText}>Add horses first</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>👤 Select Client</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => {
+                  setShowClientPicker(!showClientPicker);
+                  setShowHorsePicker(false);
+                  setShowInstructorPicker(false);
+                }}
+              >
+                <Text style={[styles.pickerButtonText, !clientId && styles.placeholderText]}>
+                  {getSelectedClientName()}
+                </Text>
+                <Text style={styles.dropdownArrow}>{showClientPicker ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {showClientPicker && clients.length > 0 && (
+                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                  {clients.map((client) => (
+                    <TouchableOpacity
+                      key={client.id}
+                      style={[
+                        styles.pickerOption,
+                        clientId === client.id && styles.pickerOptionSelected
+                      ]}
+                      onPress={() => {
+                        setClientId(client.id);
+                        setShowClientPicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.pickerOptionText,
+                        clientId === client.id && styles.pickerOptionTextSelected
+                      ]}>
+                        {client.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+
+              {clients.length === 0 && (
+                <Text style={styles.helpText}>Add clients first</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>👨‍🏫 Select Instructor</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => {
+                  setShowInstructorPicker(!showInstructorPicker);
+                  setShowHorsePicker(false);
+                  setShowClientPicker(false);
+                }}
+              >
+                <Text style={[styles.pickerButtonText, !instructorId && styles.placeholderText]}>
+                  {getSelectedInstructorName()}
+                </Text>
+                <Text style={styles.dropdownArrow}>{showInstructorPicker ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {showInstructorPicker && workers.length > 0 && (
+                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                  {workers.map((worker) => (
+                    <TouchableOpacity
+                      key={worker.id}
+                      style={[
+                        styles.pickerOption,
+                        instructorId === worker.id && styles.pickerOptionSelected
+                      ]}
+                      onPress={() => {
+                        setInstructorId(worker.id);
+                        setShowInstructorPicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.pickerOptionText,
+                        instructorId === worker.id && styles.pickerOptionTextSelected
+                      ]}>
+                        {worker.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+
+              {workers.length === 0 && (
+                <Text style={styles.helpText}>Add workers first</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>💰 Price (₪)</Text>
+              <TextInput
+                value={price}
+                onChangeText={setPrice}
+                placeholder="100"
+                keyboardType="numeric"
+                placeholderTextColor="#64748b"
+                style={styles.input}
+              />
+            </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={handleAddLesson}>
+              <Text style={styles.addButtonText}>Schedule Lesson</Text>
+            </TouchableOpacity>
+          </View>
+        }
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -293,6 +532,52 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
   },
+  pickerButton: {
+    backgroundColor: '#0f172a',
+    borderWidth: 2,
+    borderColor: '#334155',
+    borderRadius: 12,
+    padding: 14,
+    fontSize: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pickerButtonText: {
+    fontSize: 16,
+    color: '#fff',
+  },
+  placeholderText: {
+    color: '#64748b',
+  },
+  dropdownArrow: {
+    color: '#64748b',
+    fontSize: 12,
+  },
+  pickerDropdown: {
+    backgroundColor: '#1e293b',
+    borderWidth: 2,
+    borderColor: '#334155',
+    borderRadius: 12,
+    marginTop: 8,
+    maxHeight: 200,
+  },
+  pickerOption: {
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#334155',
+  },
+  pickerOptionSelected: {
+    backgroundColor: '#8b5cf6',
+  },
+  pickerOptionText: {
+    fontSize: 16,
+    color: '#e2e8f0',
+  },
+  pickerOptionTextSelected: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
   helpText: {
     fontSize: 11,
     color: '#64748b',
@@ -329,6 +614,31 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#94a3b8',
   },
+  removeButton: {
+    backgroundColor: '#ef4444',
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  confirmButton: {
+    backgroundColor: '#8b5cf6',
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 8,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
 });
 
 export default LessonsScreen;
+

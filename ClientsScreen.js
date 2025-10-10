@@ -1,75 +1,70 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { DataContext } from './DataContext';
 
 /**
  * ClientsScreen shows all clients and their payment status.
  */
 const ClientsScreen = () => {
-  const { clients, updateClient } = useContext(DataContext);
+  const { clients, updateClient, removeClient } = useContext(DataContext);
   const [selectedClientId, setSelectedClientId] = useState('');
   const [paid, setPaid] = useState('');
   const [due, setDue] = useState('');
+  const [showClientPicker, setShowClientPicker] = useState(false);
 
-  const handleUpdate = () => {
-    if (!selectedClientId) return;
+  const handleUpdate = async () => {
+    if (!selectedClientId) {
+      Alert.alert('Error', 'Please select a client');
+      return;
+    }
+
+    const clientExists = clients.find(c => c.id === selectedClientId);
+    if (!clientExists) {
+      Alert.alert('Error', `Client with ID "${selectedClientId}" not found.\n\nAvailable clients:\n${clients.map(c => `${c.id}: ${c.name}`).join('\n')}`);
+      return;
+    }
+
     const paidNum = paid ? parseFloat(paid) : 0;
     const dueNum = due ? parseFloat(due) : 0;
-    updateClient(selectedClientId, { amountPaid: paidNum, amountDue: dueNum });
-    setSelectedClientId('');
-    setPaid('');
-    setDue('');
+
+    const result = await updateClient(selectedClientId, { amountPaid: paidNum, amountDue: dueNum });
+
+    if (result.success) {
+      Alert.alert('Success', `Payment updated for ${clientExists.name}`);
+      setSelectedClientId('');
+      setPaid('');
+      setDue('');
+    } else {
+      Alert.alert('Error', result.error || 'Failed to update payment');
+    }
   };
 
-  const UpdatePaymentForm = React.memo(() => (
-    <View style={styles.formSection}>
-      <Text style={styles.formTitle}>💰 Update Payment</Text>
+  const handleRemoveClient = (id, name) => {
+    Alert.alert(
+      'Remove Client',
+      `Are you sure you want to remove ${name}?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await removeClient(id);
+            if (result.success) {
+              Alert.alert('Success', 'Client removed successfully');
+            } else {
+              Alert.alert('Error', result.error || 'Failed to remove client');
+            }
+          }
+        }
+      ]
+    );
+  };
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>👤 Client ID</Text>
-        <TextInput
-          value={selectedClientId}
-          onChangeText={setSelectedClientId}
-          placeholder={clients.length > 0 ? `e.g. ${clients[0].id}` : 'No clients yet'}
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-        {clients.length > 0 && (
-          <Text style={styles.helpText}>
-            Available: {clients.map((c) => `${c.id}:${c.name}`).join(', ')}
-          </Text>
-        )}
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>💵 Amount Paid (₪)</Text>
-        <TextInput
-          value={paid}
-          onChangeText={setPaid}
-          placeholder="100"
-          keyboardType="numeric"
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>📋 Amount Due (₪)</Text>
-        <TextInput
-          value={due}
-          onChangeText={setDue}
-          placeholder="0"
-          keyboardType="numeric"
-          placeholderTextColor="#64748b"
-          style={styles.input}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.addButton} onPress={handleUpdate}>
-        <Text style={styles.addButtonText}>Update Payment</Text>
-      </TouchableOpacity>
-    </View>
-  ));
+  const getSelectedClientName = () => {
+    const client = clients.find(c => c.id === selectedClientId);
+    return client ? client.name : 'Select a client';
+  };
 
   return (
     <View style={styles.container}>
@@ -101,9 +96,89 @@ const ClientsScreen = () => {
                 <Text style={styles.dueAmount}>₪{item.amountDue || 0}</Text>
               </View>
             </View>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => handleRemoveClient(item.id, item.name)}
+            >
+              <Text style={styles.removeButtonText}>Remove Client</Text>
+            </TouchableOpacity>
           </View>
         )}
-        ListFooterComponent={<UpdatePaymentForm />}
+        ListFooterComponent={
+          <View style={styles.formSection}>
+            <Text style={styles.formTitle}>💰 Update Payment</Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>👤 Select Client</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowClientPicker(!showClientPicker)}
+              >
+                <Text style={[styles.pickerButtonText, !selectedClientId && styles.placeholderText]}>
+                  {getSelectedClientName()}
+                </Text>
+                <Text style={styles.dropdownArrow}>{showClientPicker ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {showClientPicker && clients.length > 0 && (
+                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                  {clients.map((client) => (
+                    <TouchableOpacity
+                      key={client.id}
+                      style={[
+                        styles.pickerOption,
+                        selectedClientId === client.id && styles.pickerOptionSelected
+                      ]}
+                      onPress={() => {
+                        setSelectedClientId(client.id);
+                        setShowClientPicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.pickerOptionText,
+                        selectedClientId === client.id && styles.pickerOptionTextSelected
+                      ]}>
+                        {client.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+
+              {clients.length === 0 && (
+                <Text style={styles.helpText}>No clients available yet</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>💵 Amount Paid (₪)</Text>
+              <TextInput
+                value={paid}
+                onChangeText={setPaid}
+                placeholder="100"
+                keyboardType="numeric"
+                placeholderTextColor="#64748b"
+                style={styles.input}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>📋 Amount Due (₪)</Text>
+              <TextInput
+                value={due}
+                onChangeText={setDue}
+                placeholder="0"
+                keyboardType="numeric"
+                placeholderTextColor="#64748b"
+                style={styles.input}
+              />
+            </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={handleUpdate}>
+              <Text style={styles.addButtonText}>Update Payment</Text>
+            </TouchableOpacity>
+          </View>
+        }
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -232,22 +307,50 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
   },
-  helpText: {
-    fontSize: 11,
-    color: '#64748b',
-    marginTop: 4,
-    fontStyle: 'italic',
-  },
-  addButton: {
-    backgroundColor: '#06b6d4',
-    padding: 16,
+  pickerButton: {
+    backgroundColor: '#0f172a',
+    borderWidth: 2,
+    borderColor: '#334155',
     borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  addButtonText: {
-    color: '#fff',
+    padding: 14,
     fontSize: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pickerButtonText: {
+    fontSize: 16,
+    color: '#fff',
+  },
+  placeholderText: {
+    color: '#64748b',
+  },
+  dropdownArrow: {
+    color: '#64748b',
+    fontSize: 12,
+  },
+  pickerDropdown: {
+    backgroundColor: '#1e293b',
+    borderWidth: 2,
+    borderColor: '#334155',
+    borderRadius: 12,
+    marginTop: 8,
+    maxHeight: 200,
+  },
+  pickerOption: {
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#334155',
+  },
+  pickerOptionSelected: {
+    backgroundColor: '#06b6d4',
+  },
+  pickerOptionText: {
+    fontSize: 16,
+    color: '#e2e8f0',
+  },
+  pickerOptionTextSelected: {
+    color: '#fff',
     fontWeight: 'bold',
   },
   emptyState: {
@@ -267,6 +370,18 @@ const styles = StyleSheet.create({
   emptySubtext: {
     fontSize: 14,
     color: '#94a3b8',
+  },
+  removeButton: {
+    marginTop: 12,
+    backgroundColor: '#ef4444',
+    borderRadius: 12,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

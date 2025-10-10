@@ -3,6 +3,7 @@ import {
   collection,
   addDoc,
   updateDoc,
+  deleteDoc,
   doc,
   onSnapshot,
   query,
@@ -185,19 +186,75 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Remove a horse from the stable.
+   */
+  const removeHorse = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'horses', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing horse:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Remove a client.
+   */
+  const removeClient = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'clients', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing client:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Remove a worker.
+   */
+  const removeWorker = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'workers', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing worker:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Remove a lesson.
+   */
+  const removeLesson = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'lessons', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing lesson:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   return (
     <DataContext.Provider
       value={{
         horses,
         addHorse,
         updateHorse,
+        removeHorse,
         clients,
         addClient,
         updateClient,
+        removeClient,
         workers,
         addWorker,
+        removeWorker,
         lessons,
         addLesson,
+        removeLesson,
         loading,
       }}
     >

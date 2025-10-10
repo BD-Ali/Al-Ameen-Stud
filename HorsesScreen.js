@@ -1,9 +1,9 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { DataContext } from './DataContext';
 
 const HorsesScreen = () => {
-  const { horses, addHorse } = useContext(DataContext);
+  const { horses, addHorse, removeHorse } = useContext(DataContext);
 
   const [name, setName] = useState('');
   const [breed, setBreed] = useState('');
@@ -22,73 +22,22 @@ const HorsesScreen = () => {
     setValue('');
   };
 
-  // Separate component for the form to prevent re-rendering issues
-  const AddHorseForm = React.memo(() => (
-    <View style={styles.formSection}>
-      <Text style={styles.formTitle}>➕ Add New Horse</Text>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>🐴 Horse Name</Text>
-        <TextInput
-          value={name}
-          onChangeText={setName}
-          style={styles.input}
-          placeholder="Enter horse name"
-          placeholderTextColor="#64748b"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>🏇 Breed</Text>
-        <TextInput
-          value={breed}
-          onChangeText={setBreed}
-          style={styles.input}
-          placeholder="Arabian, Quarter Horse, etc."
-          placeholderTextColor="#64748b"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>👤 Owner</Text>
-        <TextInput
-          value={owner}
-          onChangeText={setOwner}
-          style={styles.input}
-          placeholder="Owner name"
-          placeholderTextColor="#64748b"
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>🥕 Feeding Schedule</Text>
-        <TextInput
-          value={feedSchedule}
-          onChangeText={setFeedSchedule}
-          style={styles.input}
-          placeholder="e.g. 08:00 hay; 18:00 grain"
-          placeholderTextColor="#64748b"
-          multiline
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>💰 Value (₪)</Text>
-        <TextInput
-          value={value}
-          onChangeText={setValue}
-          style={styles.input}
-          placeholder="Horse value"
-          keyboardType="numeric"
-          placeholderTextColor="#64748b"
-        />
-      </View>
-
-      <TouchableOpacity style={styles.addButton} onPress={handleAddHorse}>
-        <Text style={styles.addButtonText}>Add Horse</Text>
-      </TouchableOpacity>
-    </View>
-  ));
+  const handleRemoveHorse = (id) => {
+    Alert.alert(
+      "Remove Horse",
+      "Are you sure you want to remove this horse?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "OK",
+          onPress: () => removeHorse(id)
+        }
+      ]
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -121,9 +70,77 @@ const HorsesScreen = () => {
               <Text style={styles.cardLabel}>🥕 Feed:</Text>
               <Text style={styles.cardValue}>{item.feedSchedule}</Text>
             </View>
+            <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveHorse(item.id)}>
+              <Text style={styles.removeButtonText}>Remove Horse</Text>
+            </TouchableOpacity>
           </View>
         )}
-        ListFooterComponent={<AddHorseForm />}
+        ListFooterComponent={
+          <View style={styles.formSection}>
+            <Text style={styles.formTitle}>➕ Add New Horse</Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>🐴 Horse Name</Text>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                style={styles.input}
+                placeholder="Enter horse name"
+                placeholderTextColor="#64748b"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>🏇 Breed</Text>
+              <TextInput
+                value={breed}
+                onChangeText={setBreed}
+                style={styles.input}
+                placeholder="Arabian, Quarter Horse, etc."
+                placeholderTextColor="#64748b"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>👤 Owner</Text>
+              <TextInput
+                value={owner}
+                onChangeText={setOwner}
+                style={styles.input}
+                placeholder="Owner name"
+                placeholderTextColor="#64748b"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>🥕 Feeding Schedule</Text>
+              <TextInput
+                value={feedSchedule}
+                onChangeText={setFeedSchedule}
+                style={styles.input}
+                placeholder="e.g. 08:00 hay; 18:00 grain"
+                placeholderTextColor="#64748b"
+                multiline
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>💰 Value (₪)</Text>
+              <TextInput
+                value={value}
+                onChangeText={setValue}
+                style={styles.input}
+                placeholder="Horse value"
+                keyboardType="numeric"
+                placeholderTextColor="#64748b"
+              />
+            </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={handleAddHorse}>
+              <Text style={styles.addButtonText}>Add Horse</Text>
+            </TouchableOpacity>
+          </View>
+        }
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -248,6 +265,18 @@ const styles = StyleSheet.create({
   addButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  removeButton: {
+    backgroundColor: '#ef4444',
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontSize: 14,
     fontWeight: 'bold',
   },
   emptyState: {
