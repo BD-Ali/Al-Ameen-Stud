@@ -15,13 +15,13 @@ const VisitorHomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.emoji}>🐴</Text>
-        <Text style={styles.heading}>Welcome to Al-Ameen Stable!</Text>
+        <Text style={styles.heading}>مرحباً بك في إسطبل الأمين!</Text>
         <Text style={styles.paragraph}>
-          We are proud to care for a variety of wonderful horses. Feel free to look around and learn about them.
+          نحن فخورون برعاية مجموعة متنوعة من الخيول الرائعة. لا تتردد في الاطلاع والتعرف عليها.
         </Text>
       </View>
 
-      <Text style={styles.subheading}>🏇 Our Horses</Text>
+      <Text style={styles.subheading}>🏇 خيولنا</Text>
       <FlatList
         data={horses}
         keyExtractor={(item) => item.id}
@@ -29,7 +29,7 @@ const VisitorHomeScreen = ({ navigation }) => {
           <View style={styles.card}>
             <Text style={styles.horseName}>{item.name}</Text>
             <View style={styles.breedRow}>
-              <Text style={styles.breedLabel}>Breed:</Text>
+              <Text style={styles.breedLabel}>السلالة:</Text>
               <Text style={styles.breedValue}>{item.breed}</Text>
             </View>
           </View>
@@ -37,7 +37,7 @@ const VisitorHomeScreen = ({ navigation }) => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🐴</Text>
-            <Text style={styles.emptyText}>No horses to display yet</Text>
+            <Text style={styles.emptyText}>لا توجد خيول لعرضها بعد</Text>
           </View>
         }
       />
@@ -46,7 +46,7 @@ const VisitorHomeScreen = ({ navigation }) => {
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
-        <Text style={styles.backButtonText}>← Back to Login</Text>
+        <Text style={styles.backButtonText}>→ العودة لتسجيل الدخول</Text>
       </TouchableOpacity>
     </View>
   );

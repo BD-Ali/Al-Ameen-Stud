@@ -14,13 +14,13 @@ const ClientsScreen = () => {
 
   const handleUpdate = async () => {
     if (!selectedClientId) {
-      Alert.alert('Error', 'Please select a client');
+      Alert.alert('خطأ', 'يرجى اختيار عميل');
       return;
     }
 
     const clientExists = clients.find(c => c.id === selectedClientId);
     if (!clientExists) {
-      Alert.alert('Error', `Client with ID "${selectedClientId}" not found.\n\nAvailable clients:\n${clients.map(c => `${c.id}: ${c.name}`).join('\n')}`);
+      Alert.alert('خطأ', `العميل بالمعرف "${selectedClientId}" غير موجود.\n\nالعملاء المتاحون:\n${clients.map(c => `${c.id}: ${c.name}`).join('\n')}`);
       return;
     }
 
@@ -30,30 +30,30 @@ const ClientsScreen = () => {
     const result = await updateClient(selectedClientId, { amountPaid: paidNum, amountDue: dueNum });
 
     if (result.success) {
-      Alert.alert('Success', `Payment updated for ${clientExists.name}`);
+      Alert.alert('نجح', `تم تحديث الدفع لـ ${clientExists.name}`);
       setSelectedClientId('');
       setPaid('');
       setDue('');
     } else {
-      Alert.alert('Error', result.error || 'Failed to update payment');
+      Alert.alert('خطأ', result.error || 'فشل تحديث الدفع');
     }
   };
 
   const handleRemoveClient = (id, name) => {
     Alert.alert(
-      'Remove Client',
-      `Are you sure you want to remove ${name}?`,
+      'حذف العميل',
+      `هل أنت متأكد أنك تريد حذف ${name}؟`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Remove',
+          text: 'حذف',
           style: 'destructive',
           onPress: async () => {
             const result = await removeClient(id);
             if (result.success) {
-              Alert.alert('Success', 'Client removed successfully');
+              Alert.alert('نجح', 'تم حذف العميل بنجاح');
             } else {
-              Alert.alert('Error', result.error || 'Failed to remove client');
+              Alert.alert('خطأ', result.error || 'فشل حذف العميل');
             }
           }
         }
@@ -63,7 +63,7 @@ const ClientsScreen = () => {
 
   const getSelectedClientName = () => {
     const client = clients.find(c => c.id === selectedClientId);
-    return client ? client.name : 'Select a client';
+    return client ? client.name : 'اختر عميلاً';
   };
 
   return (
@@ -73,7 +73,7 @@ const ClientsScreen = () => {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View style={styles.headerSection}>
-            <Text style={styles.pageTitle}>👥 Clients</Text>
+            <Text style={styles.pageTitle}>👥 العملاء</Text>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{clients.length}</Text>
             </View>
@@ -87,12 +87,12 @@ const ClientsScreen = () => {
             </View>
             <View style={styles.paymentRow}>
               <View style={styles.paymentItem}>
-                <Text style={styles.paymentLabel}>Paid</Text>
+                <Text style={styles.paymentLabel}>المدفوع</Text>
                 <Text style={styles.paidAmount}>₪{item.amountPaid || 0}</Text>
               </View>
               <View style={styles.paymentDivider} />
               <View style={styles.paymentItem}>
-                <Text style={styles.paymentLabel}>Due</Text>
+                <Text style={styles.paymentLabel}>المستحق</Text>
                 <Text style={styles.dueAmount}>₪{item.amountDue || 0}</Text>
               </View>
             </View>
@@ -100,16 +100,16 @@ const ClientsScreen = () => {
               style={styles.removeButton}
               onPress={() => handleRemoveClient(item.id, item.name)}
             >
-              <Text style={styles.removeButtonText}>Remove Client</Text>
+              <Text style={styles.removeButtonText}>حذف العميل</Text>
             </TouchableOpacity>
           </View>
         )}
         ListFooterComponent={
           <View style={styles.formSection}>
-            <Text style={styles.formTitle}>💰 Update Payment</Text>
+            <Text style={styles.formTitle}>💰 تحديث الدفع</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>👤 Select Client</Text>
+              <Text style={styles.label}>👤 اختر العميل</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setShowClientPicker(!showClientPicker)}
@@ -146,12 +146,12 @@ const ClientsScreen = () => {
               )}
 
               {clients.length === 0 && (
-                <Text style={styles.helpText}>No clients available yet</Text>
+                <Text style={styles.helpText}>لا يوجد عملاء متاحون بعد</Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>💵 Amount Paid (₪)</Text>
+              <Text style={styles.label}>💵 المبلغ المدفوع (₪)</Text>
               <TextInput
                 value={paid}
                 onChangeText={setPaid}
@@ -163,7 +163,7 @@ const ClientsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>📋 Amount Due (₪)</Text>
+              <Text style={styles.label}>📋 المبلغ المستحق (₪)</Text>
               <TextInput
                 value={due}
                 onChangeText={setDue}
@@ -175,7 +175,7 @@ const ClientsScreen = () => {
             </View>
 
             <TouchableOpacity style={styles.addButton} onPress={handleUpdate}>
-              <Text style={styles.addButtonText}>Update Payment</Text>
+              <Text style={styles.addButtonText}>تحديث الدفع</Text>
             </TouchableOpacity>
           </View>
         }
@@ -183,8 +183,8 @@ const ClientsScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>👥</Text>
-            <Text style={styles.emptyText}>No clients yet</Text>
-            <Text style={styles.emptySubtext}>Clients are added when they sign up</Text>
+            <Text style={styles.emptyText}>لا يوجد عملاء بعد</Text>
+            <Text style={styles.emptySubtext}>يتم إضافة العملاء عند التسجيل</Text>
           </View>
         }
       />

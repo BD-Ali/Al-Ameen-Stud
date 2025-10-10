@@ -22,19 +22,19 @@ const WorkersScreen = () => {
 
   const handleRemoveWorker = (id, name) => {
     Alert.alert(
-      'Remove Worker',
-      `Are you sure you want to remove ${name}?`,
+      'حذف العامل',
+      `هل أنت متأكد أنك تريد حذف ${name}؟`,
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Remove',
+          text: 'حذف',
           style: 'destructive',
           onPress: async () => {
             const result = await removeWorker(id);
             if (result.success) {
-              Alert.alert('Success', 'Worker removed successfully');
+              Alert.alert('نجح', 'تم حذف العامل بنجاح');
             } else {
-              Alert.alert('Error', result.error || 'Failed to remove worker');
+              Alert.alert('خطأ', result.error || 'فشل حذف العامل');
             }
           }
         }
@@ -49,7 +49,7 @@ const WorkersScreen = () => {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View style={styles.headerSection}>
-            <Text style={styles.pageTitle}>👷 Workers</Text>
+            <Text style={styles.pageTitle}>👷 العمال</Text>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{workers.length}</Text>
             </View>
@@ -62,60 +62,60 @@ const WorkersScreen = () => {
               <Text style={styles.workerEmoji}>👤</Text>
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.cardLabel}>💼 Role:</Text>
-              <Text style={styles.cardValue}>{item.role || 'Not specified'}</Text>
+              <Text style={styles.cardLabel}>💼 الوظيفة:</Text>
+              <Text style={styles.cardValue}>{item.role || 'غير محدد'}</Text>
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.cardLabel}>📞 Contact:</Text>
-              <Text style={styles.cardValue}>{item.contact || 'Not provided'}</Text>
+              <Text style={styles.cardLabel}>📞 التواصل:</Text>
+              <Text style={styles.cardValue}>{item.contact || 'غير متوفر'}</Text>
             </View>
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() => handleRemoveWorker(item.id, item.name)}
             >
-              <Text style={styles.removeButtonText}>Remove Worker</Text>
+              <Text style={styles.removeButtonText}>حذف العامل</Text>
             </TouchableOpacity>
           </View>
         )}
         ListFooterComponent={
           <View style={styles.formSection}>
-            <Text style={styles.formTitle}>➕ Add New Worker</Text>
+            <Text style={styles.formTitle}>➕ إضافة عامل جديد</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>👤 Name</Text>
+              <Text style={styles.label}>👤 الاسم</Text>
               <TextInput
                 value={name}
                 onChangeText={setName}
-                placeholder="Worker name"
+                placeholder="اسم العامل"
                 placeholderTextColor="#64748b"
                 style={styles.input}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>💼 Role</Text>
+              <Text style={styles.label}>💼 الوظيفة</Text>
               <TextInput
                 value={role}
                 onChangeText={setRole}
-                placeholder="e.g. Trainer, Groom, Manager"
+                placeholder="مثال: مدرب، سائس، مدير"
                 placeholderTextColor="#64748b"
                 style={styles.input}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>📞 Contact</Text>
+              <Text style={styles.label}>📞 التواصل</Text>
               <TextInput
                 value={contact}
                 onChangeText={setContact}
-                placeholder="Phone or email"
+                placeholder="هاتف أو بريد إلكتروني"
                 placeholderTextColor="#64748b"
                 style={styles.input}
               />
             </View>
 
             <TouchableOpacity style={styles.addButton} onPress={handleAddWorker}>
-              <Text style={styles.addButtonText}>Add Worker</Text>
+              <Text style={styles.addButtonText}>إضافة عامل</Text>
             </TouchableOpacity>
           </View>
         }
@@ -123,8 +123,8 @@ const WorkersScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>👷</Text>
-            <Text style={styles.emptyText}>No workers yet</Text>
-            <Text style={styles.emptySubtext}>Add your first worker below</Text>
+            <Text style={styles.emptyText}>لا يوجد عمال بعد</Text>
+            <Text style={styles.emptySubtext}>أضف أول عامل أدناه</Text>
           </View>
         }
       />
@@ -276,4 +276,3 @@ const styles = StyleSheet.create({
 });
 
 export default WorkersScreen;
-

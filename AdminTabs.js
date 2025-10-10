@@ -15,12 +15,12 @@ const AdminTabs = () => {
 
   const handleLogout = async () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      'تسجيل الخروج',
+      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Logout',
+          text: 'تسجيل الخروج',
           onPress: async () => {
             await logOut();
           },
@@ -64,6 +64,8 @@ const AdminTabs = () => {
         name="Horses"
         component={HorsesScreen}
         options={{
+          title: 'الخيول',
+          tabBarLabel: 'الخيول',
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 24 }}>🐴</Text>
           ),
@@ -73,6 +75,8 @@ const AdminTabs = () => {
         name="Feeding"
         component={FeedScreen}
         options={{
+          title: 'التغذية',
+          tabBarLabel: 'التغذية',
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 24 }}>🥕</Text>
           ),
@@ -82,6 +86,8 @@ const AdminTabs = () => {
         name="Lessons"
         component={LessonsScreen}
         options={{
+          title: 'الدروس',
+          tabBarLabel: 'الدروس',
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 24 }}>📚</Text>
           ),
@@ -91,6 +97,8 @@ const AdminTabs = () => {
         name="Clients"
         component={ClientsScreen}
         options={{
+          title: 'العملاء',
+          tabBarLabel: 'العملاء',
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 24 }}>👥</Text>
           ),
@@ -100,6 +108,8 @@ const AdminTabs = () => {
         name="Workers"
         component={WorkersScreen}
         options={{
+          title: 'العمال',
+          tabBarLabel: 'العمال',
           tabBarIcon: ({ color }) => (
             <Text style={{ fontSize: 24 }}>👷</Text>
           ),

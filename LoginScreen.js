@@ -28,12 +28,12 @@ const LoginScreen = ({ navigation }) => {
 
   const handleAuth = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
       return;
     }
 
     if (isSignUp && !name) {
-      Alert.alert('Error', 'Please enter your name');
+      Alert.alert('خطأ', 'يرجى إدخال اسمك');
       return;
     }
 
@@ -44,18 +44,18 @@ const LoginScreen = ({ navigation }) => {
         // Only allow client signups - admins must be added via Firebase
         const result = await signUp(email, password, name, 'client');
         if (result.success) {
-          Alert.alert('Success', 'Account created successfully!');
+          Alert.alert('نجح', 'تم إنشاء الحساب بنجاح!');
         } else {
-          Alert.alert('Error', result.error);
+          Alert.alert('خطأ', result.error);
         }
       } else {
         const result = await signIn(email, password);
         if (!result.success) {
-          Alert.alert('Error', result.error);
+          Alert.alert('خطأ', result.error);
         }
       }
     } catch (error) {
-      Alert.alert('Error', error.message);
+      Alert.alert('خطأ', error.message);
     } finally {
       setLoading(false);
     }
@@ -77,9 +77,9 @@ const LoginScreen = ({ navigation }) => {
         {/* Header with gradient */}
         <View style={styles.header}>
           <Text style={styles.emoji}>🐴</Text>
-          <Text style={styles.title}>Al-Ameen Stable</Text>
+          <Text style={styles.title}>إسطبل الأمين</Text>
           <Text style={styles.subtitle}>
-            {isSignUp ? 'Create Client Account' : 'Welcome Back'}
+            {isSignUp ? 'إنشاء حساب عميل' : 'مرحباً بعودتك'}
           </Text>
         </View>
 
@@ -87,12 +87,12 @@ const LoginScreen = ({ navigation }) => {
         <View style={styles.formCard}>
           {isSignUp && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Full Name</Text>
+              <Text style={styles.label}>الاسم الكامل</Text>
               <View style={styles.inputWrapper}>
                 <Text style={styles.inputIcon}>👤</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your name"
+                  placeholder="أدخل اسمك"
                   placeholderTextColor="#95a5a6"
                   value={name}
                   onChangeText={setName}
@@ -103,7 +103,7 @@ const LoginScreen = ({ navigation }) => {
           )}
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email Address</Text>
+            <Text style={styles.label}>البريد الإلكتروني</Text>
             <View style={styles.inputWrapper}>
               <Text style={styles.inputIcon}>✉️</Text>
               <TextInput
@@ -119,7 +119,7 @@ const LoginScreen = ({ navigation }) => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>كلمة المرور</Text>
             <View style={styles.inputWrapper}>
               <Text style={styles.inputIcon}>🔒</Text>
               <TextInput
@@ -144,9 +144,9 @@ const LoginScreen = ({ navigation }) => {
             ) : (
               <>
                 <Text style={styles.primaryButtonText}>
-                  {isSignUp ? 'Sign Up' : 'Sign In'}
+                  {isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول'}
                 </Text>
-                <Text style={styles.buttonArrow}>→</Text>
+                <Text style={styles.buttonArrow}>←</Text>
               </>
             )}
           </TouchableOpacity>
@@ -163,22 +163,22 @@ const LoginScreen = ({ navigation }) => {
           >
             <Text style={styles.switchButtonText}>
               {isSignUp
-                ? 'Already have an account? Sign In'
-                : "Don't have an account? Sign Up"}
+                ? 'هل لديك حساب؟ تسجيل الدخول'
+                : 'ليس لديك حساب؟ إنشاء حساب'}
             </Text>
           </TouchableOpacity>
 
           {isSignUp && (
             <View style={styles.infoBox}>
               <Text style={styles.infoText}>
-                ℹ️ Signing up creates a client account. Admin access must be granted by stable management.
+                ℹ️ التسجيل ينشئ حساب عميل. يجب منح صلاحية المسؤول من قبل إدارة الإسطبل.
               </Text>
             </View>
           )}
 
           <View style={styles.divider}>
             <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>OR</Text>
+            <Text style={styles.dividerText}>أو</Text>
             <View style={styles.dividerLine} />
           </View>
 
@@ -188,13 +188,13 @@ const LoginScreen = ({ navigation }) => {
             activeOpacity={0.8}
           >
             <Text style={styles.visitorEmoji}>👁️</Text>
-            <Text style={styles.visitorButtonText}>Continue as Visitor</Text>
+            <Text style={styles.visitorButtonText}>متابعة كزائر</Text>
           </TouchableOpacity>
         </View>
 
         {/* Footer */}
         <Text style={styles.footer}>
-          Professional Horse Stable Management
+          إدارة احترافية للإسطبلات
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>

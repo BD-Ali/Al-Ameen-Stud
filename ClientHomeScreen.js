@@ -21,12 +21,12 @@ const ClientHomeScreen = () => {
 
   const handleLogout = async () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      'تسجيل الخروج',
+      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Logout',
+          text: 'تسجيل الخروج',
           onPress: async () => {
             await logOut();
           },
@@ -40,8 +40,8 @@ const ClientHomeScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.greeting}>Hello,</Text>
-          <Text style={styles.userName}>{selectedClient?.name || 'Client'} 👋</Text>
+          <Text style={styles.greeting}>مرحباً،</Text>
+          <Text style={styles.userName}>{selectedClient?.name || 'عميل'} 👋</Text>
         </View>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Text style={styles.logoutIcon}>🚪</Text>
@@ -58,16 +58,16 @@ const ClientHomeScreen = () => {
               <View style={styles.paymentCard}>
                 <View style={styles.paymentHeader}>
                   <Text style={styles.paymentEmoji}>💰</Text>
-                  <Text style={styles.paymentTitle}>Payment Status</Text>
+                  <Text style={styles.paymentTitle}>حالة الدفع</Text>
                 </View>
                 <View style={styles.paymentRow}>
                   <View style={styles.paymentItem}>
-                    <Text style={styles.paymentLabel}>Paid</Text>
+                    <Text style={styles.paymentLabel}>المدفوع</Text>
                     <Text style={styles.paymentAmountPaid}>₪{selectedClient.amountPaid || 0}</Text>
                   </View>
                   <View style={styles.paymentDivider} />
                   <View style={styles.paymentItem}>
-                    <Text style={styles.paymentLabel}>Due</Text>
+                    <Text style={styles.paymentLabel}>المستحق</Text>
                     <Text style={styles.paymentAmountDue}>₪{selectedClient.amountDue || 0}</Text>
                   </View>
                 </View>
@@ -75,7 +75,7 @@ const ClientHomeScreen = () => {
 
               {/* Lessons Section */}
               <View style={styles.lessonsHeader}>
-                <Text style={styles.sectionTitle}>🗓️ Your Lessons</Text>
+                <Text style={styles.sectionTitle}>🗓️ دروسك</Text>
                 <View style={styles.lessonsBadge}>
                   <Text style={styles.lessonsBadgeText}>{clientLessons.length}</Text>
                 </View>
@@ -106,8 +106,8 @@ const ClientHomeScreen = () => {
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Text style={styles.emptyEmoji}>📭</Text>
-              <Text style={styles.emptyText}>No lessons scheduled yet</Text>
-              <Text style={styles.emptySubtext}>Contact us to book your first lesson!</Text>
+              <Text style={styles.emptyText}>لا توجد دروس مجدولة بعد</Text>
+              <Text style={styles.emptySubtext}>اتصل بنا لحجز درسك الأول!</Text>
             </View>
           }
           contentContainerStyle={styles.content}
@@ -115,7 +115,7 @@ const ClientHomeScreen = () => {
       ) : (
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingEmoji}>🔄</Text>
-          <Text style={styles.loadingText}>Loading your information...</Text>
+          <Text style={styles.loadingText}>جاري تحميل معلوماتك...</Text>
         </View>
       )}
     </View>
@@ -325,3 +325,4 @@ const styles = StyleSheet.create({
 });
 
 export default ClientHomeScreen;
+

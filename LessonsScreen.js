@@ -49,19 +49,19 @@ const LessonsScreen = () => {
 
   const handleRemoveLesson = async (id) => {
     Alert.alert(
-      'Delete Lesson',
-      'Are you sure you want to delete this lesson?',
+      'حذف الدرس',
+      'هل أنت متأكد أنك تريد حذف هذا الدرس؟',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'إلغاء', style: 'cancel' },
         {
-          text: 'Delete',
+          text: 'حذف',
           style: 'destructive',
           onPress: async () => {
             const result = await removeLesson(id);
             if (result.success) {
-              Alert.alert('Success', 'Lesson deleted successfully');
+              Alert.alert('نجح', 'تم حذف الدرس بنجاح');
             } else {
-              Alert.alert('Error', result.error || 'Failed to delete lesson');
+              Alert.alert('خطأ', result.error || 'فشل حذف الدرس');
             }
           }
         }
@@ -84,7 +84,7 @@ const LessonsScreen = () => {
 
   const handleAddLesson = async () => {
     if (!horseId || !clientId || !instructorId) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
       return;
     }
     const numericPrice = price ? parseFloat(price) : 0;
@@ -101,7 +101,7 @@ const LessonsScreen = () => {
     });
 
     if (result.success) {
-      Alert.alert('Success', 'Lesson scheduled successfully');
+      Alert.alert('نجح', 'تم جدولة الدرس بنجاح');
       setDate(new Date());
       setTime(new Date());
       setHorseId('');
@@ -109,7 +109,7 @@ const LessonsScreen = () => {
       setInstructorId('');
       setPrice('');
     } else {
-      Alert.alert('Error', result.error || 'Failed to schedule lesson');
+      Alert.alert('خطأ', result.error || 'فشل جدولة الدرس');
     }
   };
 
@@ -119,17 +119,17 @@ const LessonsScreen = () => {
 
   const getSelectedHorseName = () => {
     const horse = horses.find(h => h.id === horseId);
-    return horse ? horse.name : 'Select a horse';
+    return horse ? horse.name : 'اختر حصاناً';
   };
 
   const getSelectedClientName = () => {
     const client = clients.find(c => c.id === clientId);
-    return client ? client.name : 'Select a client';
+    return client ? client.name : 'اختر عميلاً';
   };
 
   const getSelectedInstructorName = () => {
     const instructor = workers.find(w => w.id === instructorId);
-    return instructor ? instructor.name : 'Select an instructor';
+    return instructor ? instructor.name : 'اختر مدرباً';
   };
 
   return (
@@ -139,7 +139,7 @@ const LessonsScreen = () => {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View style={styles.headerSection}>
-            <Text style={styles.pageTitle}>📚 Lessons</Text>
+            <Text style={styles.pageTitle}>📚 الدروس</Text>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{lessons.length}</Text>
             </View>
@@ -152,35 +152,35 @@ const LessonsScreen = () => {
               <Text style={styles.lessonTime}>⏰ {item.time}</Text>
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.cardLabel}>🐴 Horse:</Text>
+              <Text style={styles.cardLabel}>🐴 الحصان:</Text>
               <Text style={styles.cardValue}>{getHorseName(item.horseId)}</Text>
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.cardLabel}>👤 Client:</Text>
+              <Text style={styles.cardLabel}>👤 العميل:</Text>
               <Text style={styles.cardValue}>{getClientName(item.clientId)}</Text>
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.cardLabel}>👨‍🏫 Instructor:</Text>
+              <Text style={styles.cardLabel}>👨‍🏫 المدرب:</Text>
               <Text style={styles.cardValue}>{getWorkerName(item.instructorId)}</Text>
             </View>
             <View style={styles.priceContainer}>
-              <Text style={styles.priceLabel}>Price:</Text>
+              <Text style={styles.priceLabel}>السعر:</Text>
               <Text style={styles.priceValue}>₪{item.price}</Text>
             </View>
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() => handleRemoveLesson(item.id)}
             >
-              <Text style={styles.removeButtonText}>🗑️ Remove Lesson</Text>
+              <Text style={styles.removeButtonText}>🗑️ حذف الدرس</Text>
             </TouchableOpacity>
           </View>
         )}
         ListFooterComponent={
           <View style={styles.formSection}>
-            <Text style={styles.formTitle}>➕ Schedule New Lesson</Text>
+            <Text style={styles.formTitle}>➕ جدولة درس جديد</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>📅 Select Date</Text>
+              <Text style={styles.label}>📅 اختر التاريخ</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setShowDatePicker(true)}
@@ -205,7 +205,7 @@ const LessonsScreen = () => {
                       style={styles.confirmButton}
                       onPress={() => setShowDatePicker(false)}
                     >
-                      <Text style={styles.confirmButtonText}>OK</Text>
+                      <Text style={styles.confirmButtonText}>موافق</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -213,7 +213,7 @@ const LessonsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>⏰ Select Time</Text>
+              <Text style={styles.label}>⏰ اختر الوقت</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setShowTimePicker(true)}
@@ -238,7 +238,7 @@ const LessonsScreen = () => {
                       style={styles.confirmButton}
                       onPress={() => setShowTimePicker(false)}
                     >
-                      <Text style={styles.confirmButtonText}>OK</Text>
+                      <Text style={styles.confirmButtonText}>موافق</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -246,7 +246,7 @@ const LessonsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>🐴 Select Horse</Text>
+              <Text style={styles.label}>🐴 اختر الحصان</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => {
@@ -287,12 +287,12 @@ const LessonsScreen = () => {
               )}
 
               {horses.length === 0 && (
-                <Text style={styles.helpText}>Add horses first</Text>
+                <Text style={styles.helpText}>أضف خيولاً أولاً</Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>👤 Select Client</Text>
+              <Text style={styles.label}>👤 اختر العميل</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => {
@@ -333,12 +333,12 @@ const LessonsScreen = () => {
               )}
 
               {clients.length === 0 && (
-                <Text style={styles.helpText}>Add clients first</Text>
+                <Text style={styles.helpText}>أضف عملاء أولاً</Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>👨‍🏫 Select Instructor</Text>
+              <Text style={styles.label}>👨‍🏫 اختر المدرب</Text>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => {
@@ -379,12 +379,12 @@ const LessonsScreen = () => {
               )}
 
               {workers.length === 0 && (
-                <Text style={styles.helpText}>Add workers first</Text>
+                <Text style={styles.helpText}>أضف عمال أولاً</Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>💰 Price (₪)</Text>
+              <Text style={styles.label}>💰 السعر (₪)</Text>
               <TextInput
                 value={price}
                 onChangeText={setPrice}
@@ -396,7 +396,7 @@ const LessonsScreen = () => {
             </View>
 
             <TouchableOpacity style={styles.addButton} onPress={handleAddLesson}>
-              <Text style={styles.addButtonText}>Schedule Lesson</Text>
+              <Text style={styles.addButtonText}>جدولة درس</Text>
             </TouchableOpacity>
           </View>
         }
@@ -404,8 +404,8 @@ const LessonsScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>📚</Text>
-            <Text style={styles.emptyText}>No lessons scheduled</Text>
-            <Text style={styles.emptySubtext}>Schedule your first lesson below</Text>
+            <Text style={styles.emptyText}>لا توجد دروس مجدولة</Text>
+            <Text style={styles.emptySubtext}>جدول أول درس أدناه</Text>
           </View>
         }
       />
@@ -641,4 +641,3 @@ const styles = StyleSheet.create({
 });
 
 export default LessonsScreen;
-

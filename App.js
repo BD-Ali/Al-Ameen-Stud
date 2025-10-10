@@ -8,7 +8,11 @@ import LoginScreen from './LoginScreen';
 import AdminTabs from './AdminTabs';
 import ClientHomeScreen from './ClientHomeScreen';
 import VisitorHomeScreen from './VisitorHomeScreen';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, I18nManager } from 'react-native';
+
+// Enable RTL for Arabic
+I18nManager.allowRTL(true);
+I18nManager.forceRTL(true);
 
 const Stack = createNativeStackNavigator();
 
@@ -42,7 +46,7 @@ function AppNavigator() {
               component={VisitorHomeScreen}
               options={{
                 headerShown: true,
-                title: 'Visitor Area',
+                title: 'منطقة الزوار',
                 headerStyle: { backgroundColor: '#1e293b' },
                 headerTintColor: '#fff',
               }}

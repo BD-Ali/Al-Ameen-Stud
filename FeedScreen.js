@@ -15,7 +15,7 @@ const FeedScreen = () => {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View style={styles.headerSection}>
-            <Text style={styles.pageTitle}>🥕 Feeding Schedule</Text>
+            <Text style={styles.pageTitle}>🥕 جدول التغذية</Text>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{horses.length}</Text>
             </View>
@@ -28,9 +28,9 @@ const FeedScreen = () => {
               <Text style={styles.horseEmoji}>🐴</Text>
             </View>
             <View style={styles.scheduleContainer}>
-              <Text style={styles.scheduleLabel}>📋 Feeding Times:</Text>
+              <Text style={styles.scheduleLabel}>📋 أوقات التغذية:</Text>
               <Text style={styles.scheduleValue}>
-                {item.feedSchedule || 'No schedule set'}
+                {item.feedSchedule || 'لا يوجد جدول محدد'}
               </Text>
             </View>
           </View>
@@ -39,8 +39,8 @@ const FeedScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyEmoji}>🥕</Text>
-            <Text style={styles.emptyText}>No feeding schedules</Text>
-            <Text style={styles.emptySubtext}>Add horses to set feed schedules</Text>
+            <Text style={styles.emptyText}>لا توجد جداول تغذية</Text>
+            <Text style={styles.emptySubtext}>أضف خيولاً لتعيين جداول التغذية</Text>
           </View>
         }
       />
