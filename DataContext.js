@@ -22,6 +22,7 @@ export const DataProvider = ({ children }) => {
   const [clients, setClients] = useState([]);
   const [workers, setWorkers] = useState([]);
   const [lessons, setLessons] = useState([]);
+  const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Subscribe to horses collection
@@ -85,6 +86,22 @@ export const DataProvider = ({ children }) => {
       setLessons(lessonsData);
     }, (error) => {
       console.error('Error fetching lessons:', error);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // Subscribe to reminders collection
+  useEffect(() => {
+    const q = query(collection(db, 'reminders'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const remindersData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setReminders(remindersData);
+    }, (error) => {
+      console.error('Error fetching reminders:', error);
     });
 
     return unsubscribe;
@@ -187,6 +204,38 @@ export const DataProvider = ({ children }) => {
   };
 
   /**
+   * Add a new reminder for a horse.
+   */
+  const addReminder = async (reminder) => {
+    try {
+      await addDoc(collection(db, 'reminders'), {
+        ...reminder,
+        createdAt: serverTimestamp()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error adding reminder:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Update an existing reminder.
+   */
+  const updateReminder = async (id, updates) => {
+    try {
+      await updateDoc(doc(db, 'reminders', id), {
+        ...updates,
+        updatedAt: serverTimestamp()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating reminder:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
    * Remove a horse from the stable.
    */
   const removeHorse = async (id) => {
@@ -238,6 +287,19 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Remove a reminder.
+   */
+  const removeReminder = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'reminders', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing reminder:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -255,6 +317,10 @@ export const DataProvider = ({ children }) => {
         lessons,
         addLesson,
         removeLesson,
+        reminders,
+        addReminder,
+        updateReminder,
+        removeReminder,
         loading,
       }}
     >

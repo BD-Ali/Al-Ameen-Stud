@@ -16,7 +16,6 @@ const LessonsScreen = () => {
   const [horseId, setHorseId] = useState('');
   const [clientId, setClientId] = useState('');
   const [instructorId, setInstructorId] = useState('');
-  const [price, setPrice] = useState('');
   const [showHorsePicker, setShowHorsePicker] = useState(false);
   const [showClientPicker, setShowClientPicker] = useState(false);
   const [showInstructorPicker, setShowInstructorPicker] = useState(false);
@@ -87,7 +86,6 @@ const LessonsScreen = () => {
       Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
       return;
     }
-    const numericPrice = price ? parseFloat(price) : 0;
     const formattedDate = formatDate(date);
     const formattedTime = formatTime(time);
 
@@ -96,8 +94,7 @@ const LessonsScreen = () => {
       time: formattedTime,
       horseId,
       clientId,
-      instructorId,
-      price: numericPrice
+      instructorId
     });
 
     if (result.success) {
@@ -107,7 +104,6 @@ const LessonsScreen = () => {
       setHorseId('');
       setClientId('');
       setInstructorId('');
-      setPrice('');
     } else {
       Alert.alert('خطأ', result.error || 'فشل جدولة الدرس');
     }
@@ -162,10 +158,6 @@ const LessonsScreen = () => {
             <View style={styles.cardRow}>
               <Text style={styles.cardLabel}>👨‍🏫 المدرب:</Text>
               <Text style={styles.cardValue}>{getWorkerName(item.instructorId)}</Text>
-            </View>
-            <View style={styles.priceContainer}>
-              <Text style={styles.priceLabel}>السعر:</Text>
-              <Text style={styles.priceValue}>₪{item.price}</Text>
             </View>
             <TouchableOpacity
               style={styles.removeButton}
@@ -383,18 +375,6 @@ const LessonsScreen = () => {
               )}
             </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>💰 السعر (₪)</Text>
-              <TextInput
-                value={price}
-                onChangeText={setPrice}
-                placeholder="100"
-                keyboardType="numeric"
-                placeholderTextColor="#64748b"
-                style={styles.input}
-              />
-            </View>
-
             <TouchableOpacity style={styles.addButton} onPress={handleAddLesson}>
               <Text style={styles.addButtonText}>جدولة درس</Text>
             </TouchableOpacity>
@@ -482,25 +462,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: '#e2e8f0',
-  },
-  priceContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#334155',
-  },
-  priceLabel: {
-    fontSize: 14,
-    color: '#94a3b8',
-    marginRight: 8,
-  },
-  priceValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#10b981',
   },
   formSection: {
     backgroundColor: '#1e293b',

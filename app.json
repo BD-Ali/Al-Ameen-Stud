@@ -37,8 +37,11 @@
         "backgroundColor": "#3498db"
       },
       "permissions": [
-        "INTERNET"
-      ]
+        "INTERNET",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ],
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/icon.png",
@@ -52,6 +55,16 @@
       "eas": {
         "projectId": "939c9966-159b-42c3-9963-fa0df80190a8"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#3498db",
+          "sounds": []
+        }
+      ]
+    ]
   }
 }

@@ -98,9 +98,6 @@ const ClientHomeScreen = () => {
                   <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
                 </View>
               </View>
-              <View style={styles.lessonFooter}>
-                <Text style={styles.lessonPrice}>₪{item.price}</Text>
-              </View>
             </View>
           )}
           ListEmptyComponent={
@@ -280,15 +277,10 @@ const styles = StyleSheet.create({
     color: '#e2e8f0',
   },
   lessonFooter: {
-    borderTopWidth: 1,
-    borderTopColor: '#334155',
-    paddingTop: 12,
-    alignItems: 'flex-end',
+    display: 'none',
   },
   lessonPrice: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#10b981',
+    display: 'none',
   },
   emptyState: {
     alignItems: 'center',
@@ -325,4 +317,3 @@ const styles = StyleSheet.create({
 });
 
 export default ClientHomeScreen;
-

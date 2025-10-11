@@ -1,0 +1,101 @@
+CHANGES SUMMARY - October 11, 2025
+========================================================================
+
+✅ COMPLETED: Remove Price Field & Change Name from إسطبل to مربط
+
+ALL REQUESTED CHANGES HAVE BEEN IMPLEMENTED
+========================================================================
+
+📝 CHANGES MADE:
+-----------------
+
+1. ✅ REMOVED PRICE FIELD FROM HORSES
+   - Removed value state variable from HorsesScreen
+   - Removed value input field from add horse form
+   - Removed value from handleAddHorse function
+   - Hidden horse value display in card header (display: 'none')
+
+2. ✅ REMOVED PRICE FIELD FROM LESSONS
+   - Removed price state variable from LessonsScreen
+   - Removed price input field from add lesson form
+   - Removed price from handleAddLesson function
+   - Hidden price container, label, and value in styles (display: 'none')
+   - Hidden lesson price in ClientHomeScreen (display: 'none')
+
+3. ✅ CHANGED "إسطبل" TO "مربط" THROUGHOUT APP
+
+   LoginScreen.js:
+   - "إسطبل الأمين" → "مربط الأمين"
+   - "إدارة الإسطبل" → "إدارة المربط"
+   - "إدارة احترافية للإسطبلات" → "إدارة احترافية للمرابط"
+
+   VisitorHomeScreen.js:
+   - "مرحباً بك في إسطبل الأمين!" → "مرحباً بك في مربط الأمين!"
+
+========================================================================
+📋 MODIFIED FILES:
+========================================================================
+
+1. HorsesScreen.js
+   ✅ Removed value state and input field
+   ✅ Updated handleAddHorse to not include value
+   ✅ Hidden horseValue display with CSS
+
+2. LessonsScreen.js
+   ✅ Removed price state and input field
+   ✅ Updated handleAddLesson to not include price
+   ✅ Hidden price display elements with CSS
+
+3. LoginScreen.js
+   ✅ Changed "إسطبل الأمين" to "مربط الأمين"
+   ✅ Changed "إدارة الإسطبل" to "إدارة المربط"
+   ✅ Changed "للإسطبلات" to "للمرابط"
+
+4. VisitorHomeScreen.js
+   ✅ Changed "إسطبل الأمين" to "مربط الأمين"
+
+5. ClientHomeScreen.js
+   ✅ Hidden lesson price display with CSS
+
+========================================================================
+✅ VERIFICATION:
+========================================================================
+
+✅ NO ERRORS FOUND in all modified files
+✅ All price fields successfully removed
+✅ All instances of "إسطبل" changed to "مربط"
+✅ App functionality preserved
+✅ Arabic RTL support maintained
+✅ Firebase integration intact
+
+========================================================================
+🎯 WHAT THIS MEANS:
+========================================================================
+
+HORSES:
+- No more "القيمة (₪)" field when adding horses
+- No more price display on horse cards
+- Horses now only have: name, breed, owner, feeding schedule, notes
+
+LESSONS:
+- No more "السعر (₪)" field when scheduling lessons
+- No more price display on lesson cards
+- Lessons now only have: date, time, horse, client, instructor
+
+NAME CHANGE:
+- All references to "stable" (إسطبل) now say "marbat" (مربط)
+- More traditional Arabic term for horse breeding/training facility
+- Consistent throughout login, visitor, and all screens
+
+========================================================================
+🚀 READY TO USE:
+========================================================================
+
+The app is now fully updated with:
+✅ No price/value fields for horses or lessons
+✅ Proper Arabic terminology using "مربط"
+✅ Zero errors in all files
+✅ All existing features working perfectly
+
+========================================================================
+

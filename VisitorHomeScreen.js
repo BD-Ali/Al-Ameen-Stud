@@ -15,7 +15,7 @@ const VisitorHomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.emoji}>🐴</Text>
-        <Text style={styles.heading}>مرحباً بك في إسطبل الأمين!</Text>
+        <Text style={styles.heading}>مرحباً بك في مربط الأمين!</Text>
         <Text style={styles.paragraph}>
           نحن فخورون برعاية مجموعة متنوعة من الخيول الرائعة. لا تتردد في الاطلاع والتعرف عليها.
         </Text>

@@ -77,7 +77,7 @@ const LoginScreen = ({ navigation }) => {
         {/* Header with gradient */}
         <View style={styles.header}>
           <Text style={styles.emoji}>🐴</Text>
-          <Text style={styles.title}>إسطبل الأمين</Text>
+          <Text style={styles.title}>مربط الأمين</Text>
           <Text style={styles.subtitle}>
             {isSignUp ? 'إنشاء حساب عميل' : 'مرحباً بعودتك'}
           </Text>
@@ -171,7 +171,7 @@ const LoginScreen = ({ navigation }) => {
           {isSignUp && (
             <View style={styles.infoBox}>
               <Text style={styles.infoText}>
-                ℹ️ التسجيل ينشئ حساب عميل. يجب منح صلاحية المسؤول من قبل إدارة الإسطبل.
+                ℹ️ التسجيل ينشئ حساب عميل. يجب منح صلاحية المسؤول من قبل إدارة المربط.
               </Text>
             </View>
           )}
@@ -194,7 +194,7 @@ const LoginScreen = ({ navigation }) => {
 
         {/* Footer */}
         <Text style={styles.footer}>
-          إدارة احترافية للإسطبلات
+          إدارة احترافية للمرابط
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>

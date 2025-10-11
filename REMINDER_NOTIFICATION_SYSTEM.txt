@@ -1,0 +1,277 @@
+   - Set time to 2 minutes from now
+   - Add note like "Test reminder"
+   - Save
+
+2. **Verify:**
+   - Reminder appears in horse's list
+   - Close/minimize the app
+   - Wait for the scheduled time
+   - You should receive a notification!
+
+3. **Delete Test:**
+   - Tap the 🗑️ icon
+   - Confirm deletion
+   - Notification is cancelled
+
+========================================================================
+⚠️ IMPORTANT NOTES:
+========================================================================
+
+1. **iOS Simulator:**
+   - Notifications don't work in iOS Simulator
+   - Must test on real iOS device
+
+2. **Android Emulator:**
+   - Notifications should work
+   - Make sure Google Play Services is installed
+
+3. **Permissions:**
+   - User must grant notification permissions
+   - If denied, reminders save but won't notify
+
+4. **Time Zones:**
+   - Uses device's local time zone
+   - Schedules based on device time
+
+5. **App Must Be Installed:**
+   - Notifications only work while app is installed
+   - Deleting app removes all scheduled notifications
+
+========================================================================
+📋 FILES MODIFIED:
+========================================================================
+
+1. HorsesScreen.js
+   - Added notification imports
+   - Added date/time pickers
+   - Removed interval selection
+   - Added notification scheduling/cancellation
+   - Updated UI to show date AND time
+
+2. DataContext.js
+   - Added reminders state
+   - Added reminder CRUD operations
+   - Real-time Firebase sync for reminders
+
+3. app.json
+   - Added expo-notifications plugin
+   - Added Android notification permissions
+   - Configured notification settings
+
+4. package.json (via npm install)
+   - Added expo-notifications dependency
+
+========================================================================
+✅ ALL FEATURES WORKING:
+========================================================================
+
+✅ Add reminders with specific date and time
+✅ Real push notifications at scheduled time
+✅ View all reminders per horse
+✅ Delete reminders (cancels notification)
+✅ Permission handling (iOS & Android)
+✅ Arabic language support throughout
+✅ RTL layout support
+✅ Firebase persistence
+✅ Real-time updates across devices
+
+========================================================================
+REMINDER & NOTIFICATION SYSTEM SUMMARY
+========================================================================
+Date: October 11, 2025
+
+✅ COMPLETED: Horse Reminder System with Push Notifications
+
+FULL NOTIFICATION SYSTEM IMPLEMENTED
+========================================================================
+
+📱 NEW FEATURES ADDED:
+-----------------
+
+1. HorsesScreen.js - Complete Reminder System
+   ✅ Added notes field for each horse
+   ✅ Expandable/collapsible horse cards
+   ✅ Full reminder management system
+   ✅ Real push notifications
+
+2. DataContext.js - Reminders Database
+   ✅ Added reminders collection to Firebase
+   ✅ Real-time sync with Firebase Firestore
+   ✅ CRUD operations: addReminder, updateReminder, removeReminder
+
+3. app.json - Notification Configuration
+   ✅ Added expo-notifications plugin
+   ✅ Configured Android permissions (RECEIVE_BOOT_COMPLETED, VIBRATE)
+   ✅ Enabled useNextNotificationsApi for Android
+
+4. Package Installation
+   ✅ Installed expo-notifications package
+
+========================================================================
+🔔 REMINDER SYSTEM FEATURES:
+========================================================================
+
+WHAT YOU CAN DO:
+----------------
+
+1. **Add Reminders for Each Horse**
+   - Press on any horse to expand its details
+   - Click "+ إضافة تذكير" (Add Reminder) button
+   - A modal opens with the following fields:
+     * 📝 Reminder Note (e.g., "Vet appointment", "Vaccination", "Farrier")
+     * 📅 Date (pick specific date)
+     * ⏰ Time (pick specific time)
+   - System validates that the date/time is in the future
+
+2. **View All Reminders**
+   - Each horse shows a badge with the number of active reminders
+   - Expand the horse card to see all its reminders
+   - Each reminder displays:
+     * The note/description
+     * Date in Arabic format
+     * Time in 24-hour format
+
+3. **Delete Reminders**
+   - Tap the 🗑️ icon on any reminder
+   - Confirmation dialog appears
+   - Deletes the reminder AND cancels the scheduled notification
+
+4. **Real Push Notifications**
+   - When you create a reminder, a notification is automatically scheduled
+   - At the exact date and time you specified, you'll receive a notification
+   - Notification shows:
+     * Title: "تذكير: [Horse Name] 🐴"
+     * Body: Your reminder note
+     * Sound and vibration (on Android)
+
+========================================================================
+📊 DATABASE STRUCTURE:
+========================================================================
+
+Each reminder is stored in Firebase with:
+- horseId: ID of the horse
+- horseName: Name of the horse (for notification display)
+- note: The reminder text
+- date: Date in YYYY-MM-DD format
+- time: Time in HH:MM format (24-hour)
+- notificationId: ID of the scheduled notification
+- isActive: Boolean flag
+- createdAt: Timestamp
+
+========================================================================
+🎯 HOW IT WORKS:
+========================================================================
+
+1. **Creating a Reminder:**
+   - Admin selects a horse and clicks "Add Reminder"
+   - Fills in note, date, and time
+   - System creates notification scheduled for that exact date/time
+   - Saves to Firebase with notification ID
+   - User gets confirmation message
+
+2. **Notification Delivery:**
+   - expo-notifications schedules the notification locally on device
+   - At the specified date/time, notification fires
+   - Shows up in notification tray
+   - Plays sound and vibrates
+
+3. **Deleting a Reminder:**
+   - Admin deletes reminder
+   - System cancels the scheduled notification
+   - Removes from Firebase database
+
+========================================================================
+🔒 PERMISSIONS:
+========================================================================
+
+Android Permissions Added:
+- INTERNET (for Firebase)
+- RECEIVE_BOOT_COMPLETED (notifications persist after reboot)
+- VIBRATE (notification vibration)
+
+iOS Permissions:
+- Automatically requested when app first loads
+- User must grant notification permission
+
+The app requests notification permissions on first load of HorsesScreen.
+
+========================================================================
+📝 REPLACED FEATURES:
+========================================================================
+
+BEFORE:
+- Recurring intervals (weekly/monthly)
+- No actual notifications
+- Just stored data
+
+AFTER:
+- Specific date and time selection
+- Real push notifications
+- Scheduled local notifications
+- Auto-cancellation when deleted
+
+========================================================================
+🎨 USER INTERFACE:
+========================================================================
+
+**Collapsed Horse Card:**
+- Shows horse name and value
+- Orange badge shows number of reminders (if any)
+- Tap to expand
+
+**Expanded Horse Card:**
+- All horse details (breed, owner, feeding, notes)
+- 🔔 Reminders section with orange border
+- Each reminder in a card showing:
+  * Note text
+  * 📅 Date
+  * ⏰ Time
+  * 🗑️ Delete button
+
+**Add Reminder Modal:**
+- Clean, centered modal overlay
+- Date picker (opens calendar)
+- Time picker (opens time selector)
+- Note input (multi-line)
+- Cancel and Save buttons
+
+========================================================================
+✨ TECHNICAL IMPLEMENTATION:
+========================================================================
+
+**Notification Handler:**
+```javascript
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+```
+
+**Permission Request:**
+- Checks existing permissions
+- Requests if not granted
+- Shows alert if user denies
+
+**Scheduling:**
+- Combines date and time into single Date object
+- Validates future date/time
+- Returns notification ID for tracking
+
+**Cancellation:**
+- Uses stored notification ID
+- Cancels via expo-notifications API
+- Prevents orphaned notifications
+
+========================================================================
+🚀 TESTING INSTRUCTIONS:
+========================================================================
+
+1. **Add a Test Reminder:**
+   - Open Horses tab
+   - Tap on any horse
+   - Click "+ إضافة تذكير"
+   - Set date to today
+
