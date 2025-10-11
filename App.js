@@ -2,12 +2,12 @@ import 'react-native-gesture-handler';
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { AuthProvider, AuthContext } from './AuthContext';
-import { DataProvider } from './DataContext';
-import LoginScreen from './LoginScreen';
-import AdminTabs from './AdminTabs';
-import ClientHomeScreen from './ClientHomeScreen';
-import VisitorHomeScreen from './VisitorHomeScreen';
+import { AuthProvider, AuthContext } from './src/context/AuthContext';
+import { DataProvider } from './src/context/DataContext';
+import LoginScreen from './src/screens/LoginScreen';
+import AdminTabs from './src/components/AdminTabs';
+import ClientHomeScreen from './src/screens/ClientHomeScreen';
+import VisitorHomeScreen from './src/screens/VisitorHomeScreen';
 import { ActivityIndicator, View, StyleSheet, I18nManager } from 'react-native';
 
 // Enable RTL for Arabic

@@ -1,152 +1,156 @@
-# Al-Ameen Stable - Quick Start Guide
+# Al-Ameen Stable Management System
 
-## 🎯 Quick Setup (5 minutes)
+A professional React Native application for managing horse stable operations, built with Expo and Firebase.
 
-### Step 1: Set up Firebase
-
-1. **Go to Firebase Console**: https://console.firebase.google.com/
-2. **Create a new project** called "al-ameen-stable"
-3. **Enable Email/Password Authentication**:
-   - Go to Build > Authentication
-   - Click "Get Started"
-   - Enable "Email/Password"
-   
-4. **Create Firestore Database**:
-   - Go to Build > Firestore Database
-   - Click "Create database"
-   - Start in **production mode**
-   - Choose your region
-
-5. **Copy your Firebase config**:
-   - Click ⚙️ (Settings) > Project settings
-   - Scroll to "Your apps"
-   - Click Web icon `</>`
-   - Copy the firebaseConfig object
-   - **Replace the config in `firebaseConfig.js`**
-
-### Step 2: Update Firebase Config
-
-Open `firebaseConfig.js` and replace with your actual config:
-
-```javascript
-const firebaseConfig = {
-  apiKey: "YOUR_ACTUAL_API_KEY",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abc123"
-};
-```
-
-### Step 3: Set Firestore Rules
-
-In Firebase Console > Firestore > Rules tab, paste:
+## 🏗️ Project Structure
 
 ```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    match /clients/{clientId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-    match /horses/{horseId} {
-      allow read: if true;
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-    match /lessons/{lessonId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-    match /workers/{workerId} {
-      allow read, write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
-    }
-  }
-}
+Al-Ameen-Stable/
+├── App.js                    # Main app entry point with navigation setup
+├── app.json                  # Expo configuration
+├── package.json              # Dependencies and scripts
+├── babel.config.js           # Babel configuration
+├── metro.config.js           # Metro bundler configuration
+├── eas.json                  # EAS Build configuration
+│
+├── assets/                   # Static assets
+│   ├── icon.png             # App icon
+│   └── splash.png           # Splash screen
+│
+└── src/                     # Source code (organized)
+    │
+    ├── components/          # Reusable UI components
+    │   └── AdminTabs.js    # Admin navigation tabs
+    │
+    ├── config/             # Configuration files
+    │   ├── firebaseConfig.js      # Firebase initialization
+    │   └── initializeData.js      # Data initialization helpers
+    │
+    ├── context/            # React Context providers
+    │   ├── AuthContext.js # Authentication state management
+    │   └── DataContext.js # Application data management
+    │
+    └── screens/            # Application screens
+        ├── LoginScreen.js         # User authentication
+        ├── VisitorHomeScreen.js   # Public visitor view
+        ├── ClientHomeScreen.js    # Client dashboard
+        ├── HorsesScreen.js        # Horse management (Admin)
+        ├── FeedScreen.js          # Feeding schedules (Admin)
+        ├── LessonsScreen.js       # Lesson scheduling (Admin)
+        ├── ClientsScreen.js       # Client management (Admin)
+        └── WorkersScreen.js       # Staff management (Admin)
 ```
 
-### Step 4: Run the App
+## 🎯 Features
 
+### For Administrators
+- **Horse Management**: Add, edit, and track horses with detailed information
+- **Reminder System**: Schedule notifications for horse care tasks
+- **Lesson Scheduling**: Coordinate lessons between clients, horses, and instructors
+- **Client Management**: Track client payments and lesson history
+- **Staff Management**: Manage workers and their roles
+- **Feeding Schedule**: Maintain feeding plans for all horses
+
+### For Clients
+- View upcoming and past lessons
+- Check payment status
+- See assigned horses and instructors
+
+### For Visitors
+- Browse available horses
+- View horse breeds (public information only)
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+- Expo CLI
+- Firebase account
+
+### Installation
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Configure Firebase:
+   - Update `src/config/firebaseConfig.js` with your Firebase credentials
+
+3. Start the development server:
 ```bash
 npm start
 ```
 
-Press `w` for web browser testing.
-
-### Step 5: Create Your First Admin Account
-
-1. Click "Sign Up"
-2. Enter your email and password
-3. Enter your name
-4. Select **"Admin"** role
-5. Click "Sign Up"
-
-🎉 **Done!** You're ready to use the app!
-
-## 📱 Features Now Available
-
-✅ **User Authentication**
-- Sign up with email/password
-- Sign in to existing accounts
-- Role-based access (Admin/Client/Visitor)
-
-✅ **Cloud Database**
-- All data stored in Firebase Firestore
-- Real-time synchronization
-- Accessible from anywhere
-
-✅ **Admin Features**
-- Manage horses
-- Track feeding schedules
-- Schedule lessons
-- Manage clients and payments
-- Manage workers
-
-✅ **Client Features**
-- View scheduled lessons
-- Check payment status
-- See instructor assignments
-
-✅ **Visitor Features**
-- Browse public stable information
-- No login required
-
-## 🌐 Deploy Online
-
-### For Web (Free):
+4. Run on platform:
 ```bash
-npm install -g firebase-tools
-firebase login
-firebase init
-npx expo export:web
-firebase deploy
+npm run ios        # iOS simulator
+npm run android    # Android emulator
+npm run web        # Web browser
 ```
 
-Your app will be live at: `https://your-project.web.app`
+## 📱 Build Commands
 
-### For Mobile Apps:
+### Development Builds
 ```bash
-npm install -g eas-cli
-eas build --platform android
-eas build --platform ios
+npm run build:dev:ios       # iOS development build
+npm run build:dev:android   # Android development build
 ```
 
-## 🔐 Security
+### Start with Dev Client
+```bash
+npm run start:dev           # Start with development client
+npm run ios:dev            # iOS with dev client
+```
 
-- All passwords are encrypted
-- Role-based access control
-- Firestore security rules enforced
-- User data protected
+## 🔐 User Roles
 
-## 📞 Need Help?
+- **Admin**: Full access to all management features
+- **Client**: View personal lessons and payment status
+- **Visitor**: Public access to basic horse information
 
-Check `DEPLOYMENT.md` for detailed instructions.
+## 🛠️ Tech Stack
+
+- **Framework**: React Native (Expo)
+- **Navigation**: React Navigation
+- **Backend**: Firebase (Firestore + Authentication)
+- **UI**: Custom styled components with RTL support for Arabic
+- **Notifications**: Expo Notifications
+- **State Management**: React Context API
+
+## 📂 Code Organization
+
+The project follows a clean architecture pattern:
+
+- **`src/components/`**: Shared UI components and navigation
+- **`src/config/`**: App configuration and initialization
+- **`src/context/`**: Global state management with Context API
+- **`src/screens/`**: Individual screen components organized by feature
+
+## 🌐 RTL Support
+
+The app fully supports Right-to-Left (RTL) layout for Arabic language.
+
+## 📝 Notes
+
+- All dates are displayed in YYYY-MM-DD format for consistency
+- Firebase real-time synchronization ensures data is always up-to-date
+- Notifications require proper permissions on both iOS and Android
+
+## 👨‍💻 Development
+
+To add a new screen:
+1. Create the screen file in `src/screens/`
+2. Import required contexts from `src/context/`
+3. Update navigation in `App.js` or `src/components/AdminTabs.js`
+
+To add a new data collection:
+1. Update `src/context/DataContext.js` with CRUD operations
+2. Ensure proper Firebase Firestore structure
 
 ---
 
-**Your stable management system is now production-ready! 🐴**
+**Version**: 1.0.0  
+**Last Updated**: October 2025
 
