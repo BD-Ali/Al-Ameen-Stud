@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ScrollView, TextInput, Modal } from 'react-native';
 import { DataContext } from '../context/DataContext';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 
 /**
  * ScheduleScreen allows admin to organize worker schedules from 12pm to 12am
@@ -8,10 +9,12 @@ import { DataContext } from '../context/DataContext';
 const ScheduleScreen = () => {
   const { workers, schedules, addSchedule, removeSchedule, updateSchedule } = useContext(DataContext);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  const [showWorkerPicker, setShowWorkerPicker] = useState(null); // null or hour index
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [selectedWorker, setSelectedWorker] = useState(null);
+  const [workDescription, setWorkDescription] = useState('');
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const [currentSchedule, setCurrentSchedule] = useState(null);
-  const [workDescription, setWorkDescription] = useState('');
 
   // Generate time slots from 12pm to 12am (24-hour format: 12:00 to 00:00)
   const timeSlots = [
@@ -19,14 +22,10 @@ const ScheduleScreen = () => {
     '18:00', '19:00', '20:00', '21:00', '22:00', '23:00', '00:00'
   ];
 
-  // Convert 24-hour format to 12-hour format with AM/PM
+  // Convert 24-hour format to simple hour:00 format without AM/PM
   const formatTime = (time) => {
     const [hour] = time.split(':');
-    const h = parseInt(hour);
-    if (h === 0) return '12:00 صباحاً';
-    if (h === 12) return '12:00 ظهراً';
-    if (h > 12) return `${h - 12}:00 مساءً`;
-    return `${h}:00 صباحاً`;
+    return `${parseInt(hour)}:00`;
   };
 
   // Get schedule for a specific date and time
@@ -41,25 +40,41 @@ const ScheduleScreen = () => {
     return worker ? worker.name : 'غير معروف';
   };
 
+  // Open add worker modal
+  const handleOpenAddModal = (timeSlot) => {
+    setSelectedTimeSlot(timeSlot);
+    setSelectedWorker(null);
+    setWorkDescription('');
+    setShowAddModal(true);
+  };
+
   // Add worker to time slot with description
-  const handleAddWorkerToSlot = async (timeSlot, workerId) => {
-    if (!workerId) {
+  const handleAddWorkerToSlot = async () => {
+    if (!selectedWorker) {
       Alert.alert('خطأ', 'يرجى اختيار عامل');
+      return;
+    }
+
+    if (!workDescription.trim()) {
+      Alert.alert('خطأ', 'يرجى إدخال وصف العمل');
       return;
     }
 
     const newSchedule = {
       date: selectedDate,
-      timeSlot: timeSlot,
-      workerId: workerId,
-      description: '',
+      timeSlot: selectedTimeSlot,
+      workerId: selectedWorker,
+      description: workDescription.trim(),
     };
 
     const result = await addSchedule(newSchedule);
 
     if (result.success) {
-      Alert.alert('نجح', 'تم إضافة العامل إلى الجدول');
-      setShowWorkerPicker(null);
+      Alert.alert('نجح', 'تم إضافة العامل والعمل إلى الجدول بنجاح');
+      setShowAddModal(false);
+      setSelectedWorker(null);
+      setWorkDescription('');
+      setSelectedTimeSlot(null);
     } else {
       Alert.alert('خطأ', result.error || 'فشل إضافة العامل');
     }
@@ -142,30 +157,14 @@ const ScheduleScreen = () => {
     return dateStr === today;
   };
 
-  // Get time slot color based on index
-  const getTimeSlotColor = (index) => {
-    const colors = [
-      { bg: '#3b82f6', light: '#60a5fa' }, // Blue
-      { bg: '#8b5cf6', light: '#a78bfa' }, // Purple
-      { bg: '#ec4899', light: '#f472b6' }, // Pink
-      { bg: '#f59e0b', light: '#fbbf24' }, // Amber
-      { bg: '#10b981', light: '#34d399' }, // Green
-      { bg: '#06b6d4', light: '#22d3ee' }, // Cyan
-      { bg: '#6366f1', light: '#818cf8' }, // Indigo
-    ];
-    return colors[index % colors.length];
-  };
-
   // Render time slot row
-  const renderTimeSlot = (timeSlot, index) => {
+  const renderTimeSlot = (timeSlot) => {
     const assignedWorkers = getScheduleForTimeSlot(selectedDate, timeSlot);
-    const isPickerOpen = showWorkerPicker === index;
-    const slotColor = getTimeSlotColor(index);
 
     return (
-      <View key={timeSlot} style={[styles.timeSlotCard, { borderLeftColor: slotColor.bg }]}>
+      <View key={timeSlot} style={styles.timeSlotCard}>
         <View style={styles.timeSlotHeader}>
-          <View style={[styles.timeIconBadge, { backgroundColor: slotColor.bg }]}>
+          <View style={styles.timeIconBadge}>
             <Text style={styles.timeIconText}>🕐</Text>
           </View>
           <View style={styles.timeSlotHeaderCenter}>
@@ -173,54 +172,21 @@ const ScheduleScreen = () => {
             <Text style={styles.timeSlotSubtext}>{assignedWorkers.length} عامل</Text>
           </View>
           <TouchableOpacity
-            style={[styles.addWorkerButton, { backgroundColor: slotColor.bg }]}
-            onPress={() => setShowWorkerPicker(isPickerOpen ? null : index)}
+            style={styles.addWorkerButton}
+            onPress={() => handleOpenAddModal(timeSlot)}
           >
-            <Text style={styles.addWorkerButtonText}>
-              {isPickerOpen ? '✕' : '➕'}
-            </Text>
+            <Text style={styles.addWorkerButtonText}>➕</Text>
           </TouchableOpacity>
         </View>
-
-        {/* Worker Picker */}
-        {isPickerOpen && (
-          <View style={styles.workerPicker}>
-            <Text style={styles.workerPickerTitle}>اختر عامل</Text>
-            <ScrollView style={styles.workerPickerScroll} nestedScrollEnabled={true}>
-              {workers.length > 0 ? (
-                workers.map((worker) => (
-                  <TouchableOpacity
-                    key={worker.id}
-                    style={styles.workerOption}
-                    onPress={() => handleAddWorkerToSlot(timeSlot, worker.id)}
-                  >
-                    <View style={styles.workerOptionLeft}>
-                      <View style={styles.workerAvatar}>
-                        <Text style={styles.workerAvatarText}>👷</Text>
-                      </View>
-                      <View>
-                        <Text style={styles.workerOptionText}>{worker.name}</Text>
-                        <Text style={styles.workerOptionRole}>{worker.role || 'عامل'}</Text>
-                      </View>
-                    </View>
-                    <Text style={styles.addIcon}>+</Text>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.noWorkersText}>لا يوجد عمال متاحون</Text>
-              )}
-            </ScrollView>
-          </View>
-        )}
 
         {/* Assigned Workers */}
         {assignedWorkers.length > 0 ? (
           <View style={styles.assignedWorkersContainer}>
             {assignedWorkers.map((schedule) => (
-              <View key={schedule.id} style={[styles.workerCard, { borderColor: slotColor.light }]}>
+              <View key={schedule.id} style={styles.workerCard}>
                 <View style={styles.workerCardHeader}>
                   <View style={styles.workerCardLeft}>
-                    <View style={[styles.workerCardAvatar, { backgroundColor: slotColor.bg }]}>
+                    <View style={styles.workerCardAvatar}>
                       <Text style={styles.workerCardAvatarText}>👷</Text>
                     </View>
                     <View style={styles.workerCardInfo}>
@@ -235,7 +201,7 @@ const ScheduleScreen = () => {
                   <View style={styles.workerCardActions}>
                     <TouchableOpacity
                       onPress={() => handleOpenDescriptionModal(schedule)}
-                      style={[styles.iconButton, { backgroundColor: slotColor.bg }]}
+                      style={styles.iconButton}
                     >
                       <Text style={styles.iconButtonText}>✏️</Text>
                     </TouchableOpacity>
@@ -267,7 +233,7 @@ const ScheduleScreen = () => {
       {/* Enhanced Date Selector */}
       <View style={styles.dateSelector}>
         <TouchableOpacity style={styles.dateButton} onPress={() => changeDate(-1)}>
-          <Text style={styles.dateButtonText}>‹</Text>
+          <Text style={styles.dateButtonText}>→</Text>
         </TouchableOpacity>
 
         <View style={styles.dateDisplayCard}>
@@ -287,7 +253,7 @@ const ScheduleScreen = () => {
         </View>
 
         <TouchableOpacity style={styles.dateButton} onPress={() => changeDate(1)}>
-          <Text style={styles.dateButtonText}>›</Text>
+          <Text style={styles.dateButtonText}>←</Text>
         </TouchableOpacity>
       </View>
 
@@ -303,7 +269,7 @@ const ScheduleScreen = () => {
               <Text style={styles.headerIcon}>📅</Text>
             </View>
             <Text style={styles.pageTitle}>Work Schedule</Text>
-            <Text style={styles.pageSubtitle}>12:00 PM - 12:00 AM</Text>
+            <Text style={styles.pageSubtitle}>12:00 - 0:00</Text>
           </View>
         }
         ListEmptyComponent={
@@ -314,7 +280,99 @@ const ScheduleScreen = () => {
         }
       />
 
-      {/* Description Modal */}
+      {/* Add Worker Modal */}
+      <Modal
+        visible={showAddModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowAddModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>إضافة عامل للجدول</Text>
+              <TouchableOpacity onPress={() => setShowAddModal(false)}>
+                <Text style={styles.modalCloseButton}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <View style={styles.modalTimeInfo}>
+                <Text style={styles.modalTimeIcon}>🕐</Text>
+                <Text style={styles.modalTimeText}>{selectedTimeSlot && formatTime(selectedTimeSlot)}</Text>
+              </View>
+
+              <Text style={styles.modalLabel}>اختر العامل</Text>
+              <ScrollView style={styles.workerSelectList} nestedScrollEnabled={true}>
+                {workers.length > 0 ? (
+                  workers.map((worker) => (
+                    <TouchableOpacity
+                      key={worker.id}
+                      style={[
+                        styles.workerSelectOption,
+                        selectedWorker === worker.id && styles.workerSelectOptionSelected
+                      ]}
+                      onPress={() => setSelectedWorker(worker.id)}
+                    >
+                      <View style={styles.workerSelectLeft}>
+                        <View style={[
+                          styles.workerSelectAvatar,
+                          selectedWorker === worker.id && styles.workerSelectAvatarSelected
+                        ]}>
+                          <Text style={styles.workerSelectAvatarText}>👷</Text>
+                        </View>
+                        <View>
+                          <Text style={[
+                            styles.workerSelectName,
+                            selectedWorker === worker.id && styles.workerSelectNameSelected
+                          ]}>
+                            {worker.name}
+                          </Text>
+                          <Text style={styles.workerSelectRole}>{worker.role || 'عامل'}</Text>
+                        </View>
+                      </View>
+                      {selectedWorker === worker.id && (
+                        <Text style={styles.workerSelectCheck}>✓</Text>
+                      )}
+                    </TouchableOpacity>
+                  ))
+                ) : (
+                  <Text style={styles.noWorkersText}>لا يوجد عمال متاحون</Text>
+                )}
+              </ScrollView>
+
+              <Text style={styles.modalLabel}>وصف العمل المطلوب</Text>
+              <TextInput
+                style={styles.modalTextArea}
+                value={workDescription}
+                onChangeText={setWorkDescription}
+                placeholder="مثال: تنظيف الإسطبلات، إطعام الخيول، صيانة المعدات..."
+                placeholderTextColor="#64748b"
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalCancelButton]}
+                  onPress={() => setShowAddModal(false)}
+                >
+                  <Text style={styles.modalCancelButtonText}>إلغاء</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.modalSaveButton]}
+                  onPress={handleAddWorkerToSlot}
+                >
+                  <Text style={styles.modalSaveButtonText}>إضافة</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Edit Description Modal */}
       <Modal
         visible={showDescriptionModal}
         transparent={true}
@@ -324,7 +382,7 @@ const ScheduleScreen = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>وصف العمل</Text>
+              <Text style={styles.modalTitle}>تعديل وصف العمل</Text>
               <TouchableOpacity onPress={() => setShowDescriptionModal(false)}>
                 <Text style={styles.modalCloseButton}>✕</Text>
               </TouchableOpacity>
@@ -339,7 +397,7 @@ const ScheduleScreen = () => {
                   <Text style={styles.modalWorkerName}>{getWorkerName(currentSchedule.workerId)}</Text>
                 </View>
 
-                <Text style={styles.modalLabel}>اكتب وصف المهمة أو العمل المطلوب</Text>
+                <Text style={styles.modalLabel}>وصف المهمة أو العمل المطلوب</Text>
                 <TextInput
                   style={styles.modalTextArea}
                   value={workDescription}
@@ -377,197 +435,198 @@ const ScheduleScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0e1a',
+    backgroundColor: colors.background.primary,
   },
   contentContainer: {
-    padding: 16,
+    padding: spacing.base,
   },
   headerSection: {
-    marginBottom: 24,
+    marginBottom: spacing.lg,
     alignItems: 'center',
   },
   headerIconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#1e293b',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: colors.surface.elevated,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
-    borderWidth: 3,
-    borderColor: '#3b82f6',
+    marginBottom: spacing.md,
+    borderWidth: 2,
+    borderColor: colors.primary.main,
   },
   headerIcon: {
-    fontSize: 40,
+    fontSize: 32,
   },
   pageTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 8,
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   pageSubtitle: {
-    fontSize: 16,
-    color: '#94a3b8',
-    fontWeight: '600',
+    fontSize: typography.size.base,
+    color: colors.text.tertiary,
+    fontWeight: typography.weight.semibold,
   },
   dateSelector: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
-    backgroundColor: '#1e293b',
-    borderBottomWidth: 2,
-    borderBottomColor: '#334155',
+    padding: spacing.base,
+    backgroundColor: colors.background.secondary,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
   },
   dateButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#334155',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.background.tertiary,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.sm,
   },
   dateButtonText: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
+    color: colors.text.primary,
+    fontSize: typography.size.xl,
+    fontWeight: typography.weight.bold,
   },
   dateDisplayCard: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0f172a',
-    borderRadius: 16,
-    padding: 12,
-    marginHorizontal: 12,
-    borderWidth: 2,
-    borderColor: '#3b82f6',
+    backgroundColor: colors.surface.elevated,
+    borderRadius: borderRadius.md,
+    padding: spacing.sm,
+    marginHorizontal: spacing.md,
+    borderWidth: 1.5,
+    borderColor: colors.primary.main,
   },
   dateCalendarIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 12,
-    backgroundColor: '#3b82f6',
+    width: 50,
+    height: 50,
+    borderRadius: borderRadius.sm,
+    backgroundColor: colors.primary.main,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   calendarMonth: {
     color: '#fff',
-    fontSize: 12,
-    fontWeight: 'bold',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
     textTransform: 'uppercase',
   },
   calendarDay: {
     color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: typography.size.xl,
+    fontWeight: typography.weight.bold,
   },
   dateInfo: {
     flex: 1,
   },
   dateText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    marginBottom: 2,
   },
   dateYear: {
-    fontSize: 14,
-    color: '#94a3b8',
+    fontSize: typography.size.xs,
+    color: colors.text.tertiary,
   },
   todayBadge: {
-    backgroundColor: '#10b981',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    backgroundColor: colors.status.success,
+    borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
   todayBadgeText: {
     color: '#fff',
-    fontSize: 11,
-    fontWeight: 'bold',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
   },
   timeSlotCard: {
-    backgroundColor: '#1e293b',
-    borderRadius: 20,
-    padding: 18,
-    marginBottom: 16,
-    borderLeftWidth: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.lg,
+    padding: spacing.base,
+    marginBottom: spacing.md,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary.main,
+    ...shadows.md,
   },
   timeSlotHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.md,
   },
   timeIconBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primary.main,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   timeIconText: {
-    fontSize: 24,
+    fontSize: 20,
   },
   timeSlotHeaderCenter: {
     flex: 1,
   },
   timeSlotTime: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
   },
   timeSlotSubtext: {
-    fontSize: 13,
-    color: '#94a3b8',
+    fontSize: typography.size.xs,
+    color: colors.text.tertiary,
   },
   addWorkerButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primary.main,
     alignItems: 'center',
     justifyContent: 'center',
+    ...shadows.sm,
   },
   addWorkerButtonText: {
     color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
   },
   workerPicker: {
-    backgroundColor: '#0f172a',
-    borderRadius: 16,
-    marginBottom: 16,
-    borderWidth: 2,
-    borderColor: '#3b82f6',
+    backgroundColor: colors.surface.elevated,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+    borderWidth: 1.5,
+    borderColor: colors.primary.main,
     overflow: 'hidden',
   },
   workerPickerTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-    padding: 16,
-    backgroundColor: '#1e293b',
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    padding: spacing.md,
+    backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: colors.border.light,
   },
   workerPickerScroll: {
-    maxHeight: 250,
+    maxHeight: 200,
   },
   workerOption: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#334155',
+    borderBottomColor: colors.border.light,
   },
   workerOptionLeft: {
     flexDirection: 'row',
@@ -575,46 +634,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   workerAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#334155',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.background.tertiary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   workerAvatarText: {
-    fontSize: 20,
+    fontSize: 18,
   },
   workerOptionText: {
-    fontSize: 16,
-    color: '#e2e8f0',
-    fontWeight: '600',
+    fontSize: typography.size.base,
+    color: colors.text.secondary,
+    fontWeight: typography.weight.semibold,
     marginBottom: 2,
   },
   workerOptionRole: {
-    fontSize: 13,
-    color: '#94a3b8',
+    fontSize: typography.size.xs,
+    color: colors.text.tertiary,
   },
   addIcon: {
-    fontSize: 24,
-    color: '#3b82f6',
-    fontWeight: 'bold',
+    fontSize: typography.size.xl,
+    color: colors.primary.main,
+    fontWeight: typography.weight.bold,
   },
   noWorkersText: {
-    fontSize: 14,
-    color: '#64748b',
+    fontSize: typography.size.sm,
+    color: colors.text.muted,
     textAlign: 'center',
-    padding: 24,
+    padding: spacing.lg,
   },
   assignedWorkersContainer: {
-    gap: 12,
+    gap: spacing.sm,
   },
   workerCard: {
-    backgroundColor: '#0f172a',
-    borderRadius: 16,
-    padding: 14,
-    borderWidth: 2,
+    backgroundColor: colors.surface.elevated,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    borderWidth: 1.5,
   },
   workerCardHeader: {
     flexDirection: 'row',
@@ -627,182 +686,267 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   workerCardAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  workerCardAvatarText: {
-    fontSize: 22,
-  },
-  workerCardInfo: {
-    flex: 1,
-  },
-  workerCardName: {
-    fontSize: 16,
-    color: '#fff',
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  workerCardDescription: {
-    fontSize: 13,
-    color: '#94a3b8',
-    lineHeight: 18,
-  },
-  workerCardActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  iconButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: spacing.sm,
+  },
+  workerCardAvatarText: {
+    fontSize: 20,
+  },
+  workerCardInfo: {
+    flex: 1,
+  },
+  workerCardName: {
+    fontSize: typography.size.base,
+    color: colors.text.primary,
+    fontWeight: typography.weight.bold,
+    marginBottom: spacing.xs,
+  },
+  workerCardDescription: {
+    fontSize: typography.size.xs,
+    color: colors.text.tertiary,
+    lineHeight: 16,
+  },
+  workerCardActions: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  iconButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...shadows.sm,
   },
   removeIconButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: colors.status.error,
   },
   iconButtonText: {
-    fontSize: 16,
+    fontSize: 14,
   },
   emptySlot: {
-    padding: 20,
-    backgroundColor: '#0f172a',
-    borderRadius: 12,
+    padding: spacing.base,
+    backgroundColor: colors.surface.elevated,
+    borderRadius: borderRadius.sm,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#334155',
+    borderWidth: 1.5,
+    borderColor: colors.border.light,
     borderStyle: 'dashed',
   },
   emptySlotIcon: {
-    fontSize: 32,
-    marginBottom: 8,
+    fontSize: 28,
+    marginBottom: spacing.sm,
   },
   emptySlotText: {
-    fontSize: 13,
-    color: '#64748b',
+    fontSize: typography.size.xs,
+    color: colors.text.muted,
     fontStyle: 'italic',
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingVertical: spacing.xxxl,
   },
   emptyEmoji: {
-    fontSize: 64,
-    marginBottom: 16,
+    fontSize: 48,
+    marginBottom: spacing.md,
   },
   emptyText: {
-    fontSize: 18,
-    color: '#e2e8f0',
-    fontWeight: '600',
+    fontSize: typography.size.md,
+    color: colors.text.secondary,
+    fontWeight: typography.weight.semibold,
   },
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    backgroundColor: colors.background.overlay,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
   },
   modalContent: {
-    backgroundColor: '#1e293b',
-    borderRadius: 24,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.lg,
     width: '100%',
     maxWidth: 500,
     overflow: 'hidden',
+    ...shadows.lg,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#0f172a',
-    borderBottomWidth: 2,
-    borderBottomColor: '#334155',
+    padding: spacing.base,
+    backgroundColor: colors.surface.elevated,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
   },
   modalTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
   },
   modalCloseButton: {
-    fontSize: 24,
-    color: '#94a3b8',
-    fontWeight: 'bold',
+    fontSize: typography.size.xl,
+    color: colors.text.tertiary,
+    fontWeight: typography.weight.bold,
   },
   modalBody: {
-    padding: 20,
+    padding: spacing.base,
   },
   modalWorkerInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
-    padding: 16,
-    backgroundColor: '#0f172a',
-    borderRadius: 16,
+    marginBottom: spacing.base,
+    padding: spacing.md,
+    backgroundColor: colors.surface.elevated,
+    borderRadius: borderRadius.md,
   },
   modalWorkerAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#3b82f6',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.primary.main,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
+    marginRight: spacing.md,
   },
   modalWorkerAvatarText: {
-    fontSize: 28,
+    fontSize: 24,
   },
   modalWorkerName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
   },
   modalLabel: {
-    fontSize: 15,
-    color: '#e2e8f0',
-    marginBottom: 12,
-    fontWeight: '600',
+    fontSize: typography.size.sm,
+    color: colors.text.secondary,
+    marginBottom: spacing.sm,
+    fontWeight: typography.weight.semibold,
   },
   modalTextArea: {
-    backgroundColor: '#0f172a',
-    borderWidth: 2,
-    borderColor: '#334155',
-    borderRadius: 16,
-    padding: 16,
-    fontSize: 15,
-    color: '#fff',
-    minHeight: 120,
-    marginBottom: 20,
+    backgroundColor: colors.background.primary,
+    borderWidth: 1.5,
+    borderColor: colors.border.light,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    fontSize: typography.size.base,
+    color: colors.text.primary,
+    minHeight: 100,
+    marginBottom: spacing.base,
   },
   modalActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: spacing.md,
   },
   modalButton: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: spacing.md,
+    borderRadius: borderRadius.md,
     alignItems: 'center',
+    ...shadows.sm,
   },
   modalCancelButton: {
-    backgroundColor: '#334155',
+    backgroundColor: colors.background.tertiary,
   },
   modalCancelButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    color: colors.text.secondary,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
   },
   modalSaveButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: colors.primary.main,
+    ...shadows.sm,
   },
   modalSaveButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+  },
+  // Worker Selection Styles for Add Modal
+  modalTimeInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.base,
+    padding: spacing.md,
+    backgroundColor: colors.primary.subtle,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.primary.main,
+  },
+  modalTimeIcon: {
+    fontSize: 24,
+    marginRight: spacing.sm,
+  },
+  modalTimeText: {
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
+    color: colors.primary.main,
+  },
+  workerSelectList: {
+    maxHeight: 200,
+    marginBottom: spacing.base,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    backgroundColor: colors.surface.elevated,
+  },
+  workerSelectOption: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+  },
+  workerSelectOptionSelected: {
+    backgroundColor: colors.primary.subtle,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.primary.main,
+  },
+  workerSelectLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  workerSelectAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.background.tertiary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  workerSelectAvatarSelected: {
+    backgroundColor: colors.primary.main,
+  },
+  workerSelectAvatarText: {
+    fontSize: 20,
+  },
+  workerSelectName: {
+    fontSize: typography.size.base,
+    color: colors.text.primary,
+    fontWeight: typography.weight.semibold,
+    marginBottom: 2,
+  },
+  workerSelectNameSelected: {
+    color: colors.primary.main,
+    fontWeight: typography.weight.bold,
+  },
+  workerSelectRole: {
+    fontSize: typography.size.xs,
+    color: colors.text.tertiary,
+  },
+  workerSelectCheck: {
+    fontSize: typography.size.xl,
+    color: colors.primary.main,
+    fontWeight: typography.weight.bold,
   },
 });
 
