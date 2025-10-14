@@ -7,7 +7,7 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
  * ScheduleScreen allows admin to organize worker schedules from 12pm to 12am
  */
 const ScheduleScreen = () => {
-  const { workers, schedules, addSchedule, removeSchedule, updateSchedule } = useContext(DataContext);
+  const { workers, schedules, addSchedule, removeSchedule, updateSchedule, workerUsers } = useContext(DataContext);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -36,7 +36,10 @@ const ScheduleScreen = () => {
 
   // Get worker name by ID
   const getWorkerName = (workerId) => {
-    const worker = workers.find(w => w.id === workerId);
+    // Try to find in workerUsers first, then fall back to workers
+    const workerUser = workerUsers?.find(w => w.id === workerId);
+    if (workerUser) return workerUser.name;
+    const worker = workers?.find(w => w.id === workerId);
     return worker ? worker.name : 'غير معروف';
   };
 
@@ -304,8 +307,8 @@ const ScheduleScreen = () => {
 
               <Text style={styles.modalLabel}>اختر العامل</Text>
               <ScrollView style={styles.workerSelectList} nestedScrollEnabled={true}>
-                {workers.length > 0 ? (
-                  workers.map((worker) => (
+                {workerUsers && workerUsers.length > 0 ? (
+                  workerUsers.map((worker) => (
                     <TouchableOpacity
                       key={worker.id}
                       style={[
@@ -328,7 +331,7 @@ const ScheduleScreen = () => {
                           ]}>
                             {worker.name}
                           </Text>
-                          <Text style={styles.workerSelectRole}>{worker.role || 'عامل'}</Text>
+                          <Text style={styles.workerSelectRole}>{worker.email || 'عامل'}</Text>
                         </View>
                       </View>
                       {selectedWorker === worker.id && (
@@ -337,7 +340,11 @@ const ScheduleScreen = () => {
                     </TouchableOpacity>
                   ))
                 ) : (
-                  <Text style={styles.noWorkersText}>لا يوجد عمال متاحون</Text>
+                  <View style={styles.emptyWorkerList}>
+                    <Text style={styles.emptyWorkerIcon}>👷</Text>
+                    <Text style={styles.emptyWorkerText}>لا يوجد عمال متاحون</Text>
+                    <Text style={styles.emptyWorkerSubtext}>أضف مستخدمين بدور "worker" أولاً</Text>
+                  </View>
                 )}
               </ScrollView>
 
@@ -947,6 +954,25 @@ const styles = StyleSheet.create({
     fontSize: typography.size.xl,
     color: colors.primary.main,
     fontWeight: typography.weight.bold,
+  },
+  emptyWorkerList: {
+    padding: spacing.md,
+    alignItems: 'center',
+  },
+  emptyWorkerIcon: {
+    fontSize: 36,
+    marginBottom: spacing.sm,
+  },
+  emptyWorkerText: {
+    fontSize: typography.size.sm,
+    color: colors.text.muted,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  emptyWorkerSubtext: {
+    fontSize: typography.size.xs,
+    color: colors.text.tertiary,
+    textAlign: 'center',
   },
 });
 

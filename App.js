@@ -7,6 +7,7 @@ import { DataProvider } from './src/context/DataContext';
 import LoginScreen from './src/screens/LoginScreen';
 import AdminTabs from './src/components/AdminTabs';
 import ClientHomeScreen from './src/screens/ClientHomeScreen';
+import WorkerHomeScreen from './src/screens/WorkerHomeScreen';
 import VisitorHomeScreen from './src/screens/VisitorHomeScreen';
 import { ActivityIndicator, View, StyleSheet, I18nManager } from 'react-native';
 
@@ -59,6 +60,17 @@ function AppNavigator() {
               name="AdminTabs"
               component={AdminTabs}
               options={{ headerShown: false }}
+            />
+          </>
+        ) : userRole === 'worker' ? (
+          // Worker user - show worker home
+          <>
+            <Stack.Screen
+              name="WorkerHome"
+              component={WorkerHomeScreen}
+              options={{
+                headerShown: false,
+              }}
             />
           </>
         ) : userRole === 'client' ? (
