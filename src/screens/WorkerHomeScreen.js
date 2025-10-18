@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Alert, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -10,7 +10,7 @@ import CompactHeader from '../components/CompactHeader';
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
  */
 const WorkerHomeScreen = () => {
-  const { schedules, horses, workers, lessons, clients, weeklySchedules } = useContext(DataContext);
+  const { schedules, horses, workers, lessons, clients, weeklySchedules, loading } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
 
   // Find worker by matching user ID
@@ -125,156 +125,159 @@ const WorkerHomeScreen = () => {
     return `${h - 12} PM`;
   };
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Compact Header */}
-      <CompactHeader
-        userName={currentWorker?.name}
-        userRole="worker"
-        onLogout={logOut}
-        loading={!currentWorker}
-      />
+  // Create sections data for FlatList
+  const sections = [
+    { id: 'announcements', type: 'announcements' },
+    { id: 'schedule', type: 'schedule' },
+    { id: 'lessons', type: 'lessons' },
+    { id: 'info', type: 'info' },
+  ];
 
-      <ScrollView style={styles.content}>
-        {/* Announcements Feed */}
-        <AnnouncementsFeed userRole="worker" />
+  const renderSection = ({ item }) => {
+    switch (item.type) {
+      case 'announcements':
+        return <AnnouncementsFeed userRole="worker" />;
 
-        {/* Today's Schedule from Weekly Schedule */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionIcon}>📅</Text>
-            <Text style={styles.sectionTitle}>جدول اليوم</Text>
+      case 'schedule':
+        return (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionIcon}>📅</Text>
+              <Text style={styles.sectionTitle}>جدول اليوم</Text>
+            </View>
+
+            {allTodaySchedules.length > 0 ? (
+              <View style={styles.cardContainer}>
+                {/* Current Tasks */}
+                {currentTasks.length > 0 && (
+                  <View style={styles.taskGroup}>
+                    <Text style={styles.taskGroupTitle}>⏰ المهمة الحالية</Text>
+                    {currentTasks.map((schedule) => (
+                      <View key={schedule.id} style={[styles.scheduleCard, styles.currentTaskCard]}>
+                        <View style={styles.scheduleHeader}>
+                          <View style={[styles.timeBadge, styles.currentTimeBadge]}>
+                            <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                          </View>
+                        </View>
+                        <Text style={styles.scheduleDescription}>{schedule.description}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {/* Upcoming Tasks */}
+                {upcomingTasks.length > 0 && (
+                  <View style={styles.taskGroup}>
+                    <Text style={styles.taskGroupTitle}>📋 المهام القادمة ({upcomingTasks.length})</Text>
+                    {upcomingTasks.map((schedule) => (
+                      <View key={schedule.id} style={styles.scheduleCard}>
+                        <View style={styles.scheduleHeader}>
+                          <View style={styles.timeBadge}>
+                            <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                          </View>
+                        </View>
+                        <Text style={styles.scheduleDescription}>{schedule.description}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {/* Past Tasks */}
+                {pastTasks.length > 0 && (
+                  <View style={styles.taskGroup}>
+                    <Text style={styles.taskGroupTitle}>✅ المهام المكتملة ({pastTasks.length})</Text>
+                    {pastTasks.map((schedule) => (
+                      <View key={schedule.id} style={[styles.scheduleCard, styles.pastTaskCard]}>
+                        <View style={styles.scheduleHeader}>
+                          <View style={[styles.timeBadge, styles.pastTimeBadge]}>
+                            <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                          </View>
+                        </View>
+                        <Text style={[styles.scheduleDescription, styles.pastTaskText]}>{schedule.description}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyEmoji}>📋</Text>
+                <Text style={styles.emptyText}>لا توجد مهام مجدولة لليوم</Text>
+              </View>
+            )}
           </View>
+        );
 
-          {allTodaySchedules.length > 0 ? (
-            <View style={styles.cardContainer}>
-              {/* Current Tasks */}
-              {currentTasks.length > 0 && (
-                <View style={styles.taskGroup}>
-                  <Text style={styles.taskGroupTitle}>⏰ المهمة الحالية</Text>
-                  {currentTasks.map((schedule) => (
-                    <View key={schedule.id} style={[styles.scheduleCard, styles.currentTaskCard]}>
-                      <View style={styles.scheduleHeader}>
-                        <View style={[styles.timeBadge, styles.currentTimeBadge]}>
-                          <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
-                        </View>
-                      </View>
-                      <Text style={styles.scheduleDescription}>{schedule.description}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-
-              {/* Upcoming Tasks */}
-              {upcomingTasks.length > 0 && (
-                <View style={styles.taskGroup}>
-                  <Text style={styles.taskGroupTitle}>📋 المهام القادمة ({upcomingTasks.length})</Text>
-                  {upcomingTasks.map((schedule) => (
-                    <View key={schedule.id} style={styles.scheduleCard}>
-                      <View style={styles.scheduleHeader}>
-                        <View style={styles.timeBadge}>
-                          <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
-                        </View>
-                      </View>
-                      <Text style={styles.scheduleDescription}>{schedule.description}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-
-              {/* Past Tasks */}
-              {pastTasks.length > 0 && (
-                <View style={styles.taskGroup}>
-                  <Text style={styles.taskGroupTitle}>✅ المهام المكتملة ({pastTasks.length})</Text>
-                  {pastTasks.map((schedule) => (
-                    <View key={schedule.id} style={[styles.scheduleCard, styles.pastTaskCard]}>
-                      <View style={styles.scheduleHeader}>
-                        <View style={[styles.timeBadge, styles.pastTimeBadge]}>
-                          <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
-                        </View>
-                      </View>
-                      <Text style={[styles.scheduleDescription, styles.pastTaskText]}>{schedule.description}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
+      case 'lessons':
+        return (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionIcon}>📚</Text>
+              <Text style={styles.sectionTitle}>دروسي</Text>
             </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>📋</Text>
-              <Text style={styles.emptyText}>لا توجد مهام مجدولة لليوم</Text>
-            </View>
-          )}
-        </View>
 
-        {/* My Lessons */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionIcon}>📚</Text>
-            <Text style={styles.sectionTitle}>دروسي</Text>
+            {myLessons.length > 0 ? (
+              <View style={styles.cardContainer}>
+                {/* Today's Lessons */}
+                {todayLessons.length > 0 && (
+                  <View style={styles.lessonGroup}>
+                    <Text style={styles.lessonGroupTitle}>دروس اليوم</Text>
+                    {todayLessons.map((lesson) => (
+                      <View key={lesson.id} style={styles.lessonCard}>
+                        <View style={styles.lessonHeader}>
+                          <Text style={styles.lessonTime}>⏰ {lesson.time}</Text>
+                        </View>
+                        <View style={styles.lessonDetails}>
+                          <View style={styles.lessonInfoRow}>
+                            <Text style={styles.lessonLabel}>👤 العميل:</Text>
+                            <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
+                          </View>
+                          <View style={styles.lessonInfoRow}>
+                            <Text style={styles.lessonLabel}>🐴 الحصان:</Text>
+                            <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {/* Upcoming Lessons */}
+                {upcomingLessons.length > 0 && (
+                  <View style={styles.lessonGroup}>
+                    <Text style={styles.lessonGroupTitle}>الدروس القادمة</Text>
+                    {upcomingLessons.map((lesson) => (
+                      <View key={lesson.id} style={styles.lessonCard}>
+                        <View style={styles.lessonHeader}>
+                          <Text style={styles.lessonDate}>📅 {lesson.date}</Text>
+                          <Text style={styles.lessonTime}>⏰ {lesson.time}</Text>
+                        </View>
+                        <View style={styles.lessonDetails}>
+                          <View style={styles.lessonInfoRow}>
+                            <Text style={styles.lessonLabel}>👤 العميل:</Text>
+                            <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
+                          </View>
+                          <View style={styles.lessonInfoRow}>
+                            <Text style={styles.lessonLabel}>🐴 الحصان:</Text>
+                            <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
+                          </View>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            ) : (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyEmoji}>📖</Text>
+                <Text style={styles.emptyText}>لا توجد دروس مضافة</Text>
+              </View>
+            )}
           </View>
+        );
 
-          {myLessons.length > 0 ? (
-            <View style={styles.cardContainer}>
-              {/* Today's Lessons */}
-              {todayLessons.length > 0 && (
-                <View style={styles.lessonGroup}>
-                  <Text style={styles.lessonGroupTitle}>دروس اليوم</Text>
-                  {todayLessons.map((lesson) => (
-                    <View key={lesson.id} style={styles.lessonCard}>
-                      <View style={styles.lessonHeader}>
-                        <Text style={styles.lessonTime}>⏰ {lesson.time}</Text>
-                      </View>
-                      <View style={styles.lessonDetails}>
-                        <View style={styles.lessonInfoRow}>
-                          <Text style={styles.lessonLabel}>👤 العميل:</Text>
-                          <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
-                        </View>
-                        <View style={styles.lessonInfoRow}>
-                          <Text style={styles.lessonLabel}>🐴 الحصان:</Text>
-                          <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
-                        </View>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              )}
-
-              {/* Upcoming Lessons */}
-              {upcomingLessons.length > 0 && (
-                <View style={styles.lessonGroup}>
-                  <Text style={styles.lessonGroupTitle}>الدروس القادمة</Text>
-                  {upcomingLessons.map((lesson) => (
-                    <View key={lesson.id} style={styles.lessonCard}>
-                      <View style={styles.lessonHeader}>
-                        <Text style={styles.lessonDate}>📅 {lesson.date}</Text>
-                        <Text style={styles.lessonTime}>⏰ {lesson.time}</Text>
-                      </View>
-                      <View style={styles.lessonDetails}>
-                        <View style={styles.lessonInfoRow}>
-                          <Text style={styles.lessonLabel}>👤 العميل:</Text>
-                          <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
-                        </View>
-                        <View style={styles.lessonInfoRow}>
-                          <Text style={styles.lessonLabel}>🐴 الحصان:</Text>
-                          <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
-                        </View>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </View>
-          ) : (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>📖</Text>
-              <Text style={styles.emptyText}>لا توجد دروس مضافة</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Worker Info */}
-        {currentWorker && (
+      case 'info':
+        return currentWorker ? (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionIcon}>ℹ️</Text>
@@ -294,8 +297,29 @@ const WorkerHomeScreen = () => {
               )}
             </View>
           </View>
-        )}
-      </ScrollView>
+        ) : null;
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Compact Header */}
+      <CompactHeader
+        userName={currentWorker?.name || user?.email || 'عامل'}
+        userRole="worker"
+        onLogout={logOut}
+        loading={loading}
+      />
+
+      <FlatList
+        style={styles.content}
+        data={sections}
+        keyExtractor={(item) => item.id}
+        renderItem={renderSection}
+      />
     </SafeAreaView>
   );
 };

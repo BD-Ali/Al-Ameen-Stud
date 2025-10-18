@@ -15,6 +15,8 @@ import {
 import { db } from '../config/firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebaseConfig';
+import notificationService from '../services/notificationService';
+import lessonReminderService from '../services/lessonReminderService';
 
 /**
  * DataContext stores all of the core stable data and syncs with Firebase Firestore.
@@ -332,15 +334,18 @@ export const DataProvider = ({ children }) => {
 
   /**
    * Add a new lesson.
-   * Automatically creates a schedule entry and mission for the assigned worker.
+   * Automatically creates a schedule entry, mission, and schedules reminder notifications.
    */
   const addLesson = async (lesson) => {
     try {
       // Add the lesson
       const lessonRef = await addDoc(collection(db, 'lessons'), {
         ...lesson,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        remindersSent: false,
       });
+
+      const lessonWithId = { ...lesson, id: lessonRef.id };
 
       // Automatically create a schedule entry for the instructor
       await addDoc(collection(db, 'schedules'), {
@@ -368,9 +373,83 @@ export const DataProvider = ({ children }) => {
         createdAt: serverTimestamp()
       });
 
-      return { success: true };
+      // Schedule automatic lesson reminder notifications for the client
+      const client = clients.find(c => c.id === lesson.clientId);
+      if (client) {
+        await lessonReminderService.scheduleLessonReminders(lessonWithId, client);
+      }
+
+      return { success: true, id: lessonRef.id };
     } catch (error) {
       console.error('Error adding lesson:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Update an existing lesson.
+   * Reschedules reminder notifications if date/time changed.
+   */
+  const updateLesson = async (id, updates) => {
+    try {
+      const currentLesson = lessons.find(l => l.id === id);
+      if (!currentLesson) {
+        return { success: false, error: 'Lesson not found' };
+      }
+
+      // Check if date or time changed
+      const dateChanged = updates.date && updates.date !== currentLesson.date;
+      const timeChanged = updates.time && updates.time !== currentLesson.time;
+
+      await updateDoc(doc(db, 'lessons', id), {
+        ...updates,
+        updatedAt: serverTimestamp()
+      });
+
+      // If date or time changed, reschedule reminders
+      if (dateChanged || timeChanged) {
+        const updatedLesson = { ...currentLesson, ...updates, id };
+        const client = clients.find(c => c.id === updatedLesson.clientId);
+
+        if (client) {
+          await lessonReminderService.rescheduleLessonReminders(id, updatedLesson, client);
+        }
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating lesson:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Remove a lesson.
+   * Also removes associated schedule entries, missions, and cancels reminder notifications.
+   */
+  const removeLesson = async (id) => {
+    try {
+      // Cancel lesson reminder notifications
+      await lessonReminderService.cancelLessonReminders(id);
+
+      // Remove the lesson
+      await deleteDoc(doc(db, 'lessons', id));
+
+      // Remove associated schedules
+      const associatedSchedules = schedules.filter(s => s.lessonId === id);
+      for (const schedule of associatedSchedules) {
+        await deleteDoc(doc(db, 'schedules', schedule.id));
+      }
+
+      // Remove associated missions
+      const associatedMissions = missions.filter(m => m.lessonId === id);
+      for (const mission of associatedMissions) {
+        await deleteDoc(doc(db, 'missions', mission.id));
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing lesson:', error);
       return { success: false, error: error.message };
     }
   };
@@ -403,6 +482,19 @@ export const DataProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Error updating reminder:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Remove a reminder.
+   */
+  const removeReminder = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'reminders', id));
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing reminder:', error);
       return { success: false, error: error.message };
     }
   };
@@ -456,6 +548,26 @@ export const DataProvider = ({ children }) => {
   };
 
   /**
+   * Remove a schedule entry.
+   */
+  const removeSchedule = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'schedules', id));
+
+      // Remove associated missions
+      const associatedMissions = missions.filter(m => m.scheduleId === id);
+      for (const mission of associatedMissions) {
+        await deleteDoc(doc(db, 'missions', mission.id));
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error removing schedule:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
    * Remove a horse from the stable.
    */
   const removeHorse = async (id) => {
@@ -495,64 +607,17 @@ export const DataProvider = ({ children }) => {
   };
 
   /**
-   * Remove a lesson.
-   * Also removes associated schedule entries and missions.
+   * Add a new mission manually.
    */
-  const removeLesson = async (id) => {
+  const addMission = async (mission) => {
     try {
-      // Remove the lesson
-      await deleteDoc(doc(db, 'lessons', id));
-
-      // Remove associated schedules
-      const associatedSchedules = schedules.filter(s => s.lessonId === id);
-      for (const schedule of associatedSchedules) {
-        await deleteDoc(doc(db, 'schedules', schedule.id));
-      }
-
-      // Remove associated missions
-      const associatedMissions = missions.filter(m => m.lessonId === id);
-      for (const mission of associatedMissions) {
-        await deleteDoc(doc(db, 'missions', mission.id));
-      }
-
+      await addDoc(collection(db, 'missions'), {
+        ...mission,
+        createdAt: serverTimestamp()
+      });
       return { success: true };
     } catch (error) {
-      console.error('Error removing lesson:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  /**
-   * Remove a reminder.
-   */
-  const removeReminder = async (id) => {
-    try {
-      await deleteDoc(doc(db, 'reminders', id));
-      return { success: true };
-    } catch (error) {
-      console.error('Error removing reminder:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  /**
-   * Remove a schedule entry.
-   * Also removes associated mission.
-   */
-  const removeSchedule = async (id) => {
-    try {
-      // Remove the schedule
-      await deleteDoc(doc(db, 'schedules', id));
-
-      // Remove associated mission
-      const associatedMission = missions.find(m => m.scheduleId === id);
-      if (associatedMission) {
-        await deleteDoc(doc(db, 'missions', associatedMission.id));
-      }
-
-      return { success: true };
-    } catch (error) {
-      console.error('Error removing schedule:', error);
+      console.error('Error adding mission:', error);
       return { success: false, error: error.message };
     }
   };
@@ -569,22 +634,6 @@ export const DataProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Error updating mission:', error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  /**
-   * Add a new mission manually.
-   */
-  const addMission = async (mission) => {
-    try {
-      await addDoc(collection(db, 'missions'), {
-        ...mission,
-        createdAt: serverTimestamp()
-      });
-      return { success: true };
-    } catch (error) {
-      console.error('Error adding mission:', error);
       return { success: false, error: error.message };
     }
   };
@@ -643,6 +692,130 @@ export const DataProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Error removing weekly schedule:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Automatically generate schedule for a new week based on the previous week.
+   * This function is idempotent - it won't create duplicates if called multiple times.
+   * @param {string} weekId - The week ID (e.g., "2025-W42")
+   * @param {string} weekStart - The ISO date string for the week start (e.g., "2025-10-18")
+   * @returns {Promise<{success: boolean, message?: string, error?: string, count?: number}>}
+   */
+  const autoGenerateWeekSchedule = async (weekId, weekStart) => {
+    try {
+      // Check if this week already has schedules (prevent duplicates)
+      const existingSchedules = weeklySchedules?.filter(s => s.weekId === weekId) || [];
+      if (existingSchedules.length > 0) {
+        return { success: true, message: 'Schedule already exists', count: existingSchedules.length };
+      }
+
+      // Calculate previous week
+      const currentWeekDate = new Date(weekStart);
+      const previousWeekDate = new Date(currentWeekDate);
+      previousWeekDate.setDate(previousWeekDate.getDate() - 7);
+      const previousWeekStart = previousWeekDate.toISOString().split('T')[0];
+
+      // Calculate previous week ID
+      const previousWeekNum = getWeekNumberFromDate(previousWeekDate);
+      const previousYear = previousWeekDate.getFullYear();
+      const previousWeekId = `${previousYear}-W${String(previousWeekNum).padStart(2, '0')}`;
+
+      // Get previous week's schedules
+      const previousWeekSchedules = weeklySchedules?.filter(s => s.weekId === previousWeekId) || [];
+
+      if (previousWeekSchedules.length === 0) {
+        return { success: true, message: 'No previous week to copy from', count: 0 };
+      }
+
+      // Copy schedules from previous week to new week with updated dates
+      let copiedCount = 0;
+      const batch = writeBatch(db);
+
+      for (const schedule of previousWeekSchedules) {
+        const newScheduleRef = doc(collection(db, 'weeklySchedules'));
+        batch.set(newScheduleRef, {
+          weekId,
+          weekStart,
+          day: schedule.day,
+          timeSlot: schedule.timeSlot,
+          workerId: schedule.workerId,
+          description: schedule.description,
+          autoGenerated: true,
+          generatedFrom: previousWeekId,
+          createdAt: serverTimestamp()
+        });
+        copiedCount++;
+      }
+
+      await batch.commit();
+      return { success: true, message: 'Schedule generated from previous week', count: copiedCount };
+    } catch (error) {
+      console.error('Error auto-generating week schedule:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Helper function to calculate week number from date
+   */
+  const getWeekNumberFromDate = (date) => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  };
+
+  /**
+   * Update a weekly schedule with option to apply to future weeks
+   * @param {string} id - Schedule ID to update
+   * @param {object} updates - Updates to apply
+   * @param {boolean} applyToFuture - Whether to apply changes to this and all future weeks
+   */
+  const updateWeeklyScheduleWithFuture = async (id, updates, applyToFuture = false) => {
+    try {
+      // Find the schedule being updated
+      const scheduleToUpdate = weeklySchedules?.find(s => s.id === id);
+      if (!scheduleToUpdate) {
+        return { success: false, error: 'Schedule not found' };
+      }
+
+      // Update current schedule
+      await updateDoc(doc(db, 'weeklySchedules', id), {
+        ...updates,
+        updatedAt: serverTimestamp()
+      });
+
+      if (applyToFuture) {
+        // Find all future weeks with matching day/timeSlot/workerId
+        const currentWeekDate = new Date(scheduleToUpdate.weekStart);
+        const futureSchedules = weeklySchedules?.filter(s => {
+          const scheduleDate = new Date(s.weekStart);
+          return scheduleDate > currentWeekDate &&
+                 s.day === scheduleToUpdate.day &&
+                 s.timeSlot === scheduleToUpdate.timeSlot &&
+                 s.workerId === scheduleToUpdate.workerId;
+        }) || [];
+
+        // Update all future matching schedules
+        const batch = writeBatch(db);
+        for (const futureSchedule of futureSchedules) {
+          const scheduleRef = doc(db, 'weeklySchedules', futureSchedule.id);
+          batch.update(scheduleRef, {
+            ...updates,
+            updatedAt: serverTimestamp()
+          });
+        }
+        await batch.commit();
+
+        return { success: true, message: `Updated ${futureSchedules.length + 1} schedules` };
+      }
+
+      return { success: true, message: 'Schedule updated' };
+    } catch (error) {
+      console.error('Error updating weekly schedule:', error);
       return { success: false, error: error.message };
     }
   };
@@ -1015,11 +1188,36 @@ export const DataProvider = ({ children }) => {
    */
   const addAnnouncement = async (announcement) => {
     try {
-      await addDoc(collection(db, 'announcements'), {
+      const docRef = await addDoc(collection(db, 'announcements'), {
         ...announcement,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
+        notificationSentAt: null,
       });
-      return { success: true };
+
+      // Send notification if status is published and sendNotification is true
+      if (announcement.status === 'published' && announcement.sendNotification !== false) {
+        const announcementWithId = { ...announcement, id: docRef.id };
+
+        // If scheduled for future, schedule notification
+        if (announcement.scheduledDate && new Date(announcement.scheduledDate) > new Date()) {
+          await notificationService.scheduleAnnouncementNotification(
+            announcementWithId,
+            announcement.scheduledDate
+          );
+        } else {
+          // Send immediately
+          const result = await notificationService.sendAnnouncementNotification(announcementWithId, true);
+
+          // Update announcement with notification status
+          await updateDoc(doc(db, 'announcements', docRef.id), {
+            notificationSentAt: serverTimestamp(),
+            notificationSentCount: result.sent || 0,
+            notificationSkippedCount: result.skipped || 0,
+          });
+        }
+      }
+
+      return { success: true, id: docRef.id };
     } catch (error) {
       console.error('Error adding announcement:', error);
       return { success: false, error: error.message };
@@ -1031,10 +1229,47 @@ export const DataProvider = ({ children }) => {
    */
   const updateAnnouncement = async (id, updates) => {
     try {
+      // Get the current announcement to check status change
+      const currentAnnouncement = announcements.find(a => a.id === id);
+      const wasPublished = currentAnnouncement?.status === 'published';
+      const isNowPublished = updates.status === 'published';
+
       await updateDoc(doc(db, 'announcements', id), {
         ...updates,
         updatedAt: serverTimestamp()
       });
+
+      // Send notification if:
+      // 1. Status changed from draft/scheduled to published
+      // 2. sendNotification is not false
+      // 3. Not already sent
+      if (!wasPublished && isNowPublished && updates.sendNotification !== false && !currentAnnouncement?.notificationSentAt) {
+        const announcementData = { ...currentAnnouncement, ...updates, id };
+
+        // If scheduled for future, schedule notification
+        if (updates.scheduledDate && new Date(updates.scheduledDate) > new Date()) {
+          await notificationService.scheduleAnnouncementNotification(
+            announcementData,
+            updates.scheduledDate
+          );
+        } else {
+          // Send immediately
+          const result = await notificationService.sendAnnouncementNotification(announcementData, true);
+
+          // Update announcement with notification status
+          await updateDoc(doc(db, 'announcements', id), {
+            notificationSentAt: serverTimestamp(),
+            notificationSentCount: result.sent || 0,
+            notificationSkippedCount: result.skipped || 0,
+          });
+        }
+      }
+
+      // Cancel scheduled notification if unpublished or expired
+      if (wasPublished && !isNowPublished) {
+        await notificationService.cancelScheduledNotification(id);
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Error updating announcement:', error);
@@ -1047,6 +1282,9 @@ export const DataProvider = ({ children }) => {
    */
   const deleteAnnouncement = async (id) => {
     try {
+      // Cancel any scheduled notifications
+      await notificationService.cancelScheduledNotification(id);
+
       await deleteDoc(doc(db, 'announcements', id));
       return { success: true };
     } catch (error) {
@@ -1072,6 +1310,7 @@ export const DataProvider = ({ children }) => {
         workerUsers,
         lessons,
         addLesson,
+        updateLesson,
         removeLesson,
         reminders,
         addReminder,
@@ -1091,6 +1330,7 @@ export const DataProvider = ({ children }) => {
         addWeeklySchedule,
         updateWeeklySchedule,
         removeWeeklySchedule,
+        autoGenerateWeekSchedule,
         createDefaultWeekSchedule,
         saveScheduleAsDefault,
         loadDefaultSchedule,
@@ -1107,3 +1347,4 @@ export const DataProvider = ({ children }) => {
     </DataContext.Provider>
   );
 };
+

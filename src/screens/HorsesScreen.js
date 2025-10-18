@@ -452,7 +452,7 @@ const HorsesScreen = () => {
                   onPress={() => setShowDatePicker(true)}
                 >
                   <Text style={styles.datePickerText}>
-                    {reminderDate.toLocaleDateString('ar-SA')}
+                    {reminderDate.toLocaleDateString('en-US')}
                   </Text>
                   <Text style={styles.datePickerIcon}>📅</Text>
                 </TouchableOpacity>

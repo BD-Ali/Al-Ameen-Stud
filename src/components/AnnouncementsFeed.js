@@ -10,20 +10,26 @@ import {
   Animated,
   Linking,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
+import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import notificationService from '../services/notificationService';
 
 /**
  * AnnouncementsFeed - Displays announcements to users based on their role
- * Features: Filtering by audience, pinned posts, pagination, detail view
+ * Features: Filtering by audience, pinned posts, pagination, detail view, image display, unread tracking
  */
-const AnnouncementsFeed = ({ userRole = 'visitor' }) => {
+const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
   const { announcements, loading } = useContext(DataContext);
+  const { user } = useContext(AuthContext);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [displayCount, setDisplayCount] = useState(10);
   const fadeAnim = new Animated.Value(0);
+  const [unreadIds, setUnreadIds] = useState([]);
+  const highlightAnim = new Animated.Value(1);
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -31,7 +37,46 @@ const AnnouncementsFeed = ({ userRole = 'visitor' }) => {
       duration: 300,
       useNativeDriver: true,
     }).start();
+
+    // Load unread announcement IDs
+    loadUnreadIds();
   }, []);
+
+  // Handle deep link - open announcement if highlightId provided
+  useEffect(() => {
+    if (highlightId && announcements.length > 0) {
+      const announcement = announcements.find(a => a.id === highlightId);
+      if (announcement) {
+        openDetail(announcement);
+        // Highlight animation
+        Animated.sequence([
+          Animated.timing(highlightAnim, { toValue: 1.1, duration: 200, useNativeDriver: true }),
+          Animated.timing(highlightAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
+        ]).start();
+      }
+    }
+  }, [highlightId, announcements]);
+
+  const loadUnreadIds = async () => {
+    if (user) {
+      const ids = await notificationService.getUnreadIds(user.uid);
+      setUnreadIds(ids);
+    }
+  };
+
+  const markAsRead = async (announcementId) => {
+    if (user) {
+      await notificationService.markAsRead(user.uid, announcementId);
+      setUnreadIds(prev => prev.filter(id => id !== announcementId));
+    }
+  };
+
+  const markAllAsRead = async () => {
+    if (user) {
+      await notificationService.markAllAsRead(user.uid);
+      setUnreadIds([]);
+    }
+  };
 
   const getTagEmoji = (tag) => {
     const emojis = {
@@ -107,7 +152,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor' }) => {
   const formatDate = (date) => {
     if (!date) return '';
     const d = date.toDate ? date.toDate() : new Date(date);
-    return d.toLocaleDateString('ar-SA', {
+    return d.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -117,6 +162,8 @@ const AnnouncementsFeed = ({ userRole = 'visitor' }) => {
   const openDetail = (announcement) => {
     setSelectedAnnouncement(announcement);
     setDetailModalVisible(true);
+    // Mark as read when opening
+    markAsRead(announcement.id);
   };
 
   const handleLinkPress = async (url) => {
@@ -173,10 +220,12 @@ const AnnouncementsFeed = ({ userRole = 'visitor' }) => {
             {item.title}
           </Text>
 
-          {item.imageUrl && (
-            <View style={styles.imagePlaceholder}>
-              <Text style={styles.imagePlaceholderText}>🖼️</Text>
-            </View>
+          {item.imageUri && (
+            <Image
+              source={{ uri: item.imageUri }}
+              style={styles.cardImage}
+              resizeMode="cover"
+            />
           )}
 
           <Text style={styles.cardContent} numberOfLines={3}>
@@ -275,13 +324,12 @@ const AnnouncementsFeed = ({ userRole = 'visitor' }) => {
 
                   <Text style={styles.modalTitle}>{selectedAnnouncement.title}</Text>
 
-                  {selectedAnnouncement.imageUrl && (
-                    <View style={styles.modalImagePlaceholder}>
-                      <Text style={styles.modalImageText}>🖼️ صورة</Text>
-                      <Text style={styles.modalImageUrl} numberOfLines={1}>
-                        {selectedAnnouncement.imageUrl}
-                      </Text>
-                    </View>
+                  {selectedAnnouncement.imageUri && (
+                    <Image
+                      source={{ uri: selectedAnnouncement.imageUri }}
+                      style={styles.modalImage}
+                      resizeMode="cover"
+                    />
                   )}
 
                   <Text style={styles.modalText}>{selectedAnnouncement.content}</Text>
@@ -391,16 +439,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     lineHeight: 22,
   },
-  imagePlaceholder: {
+  cardImage: {
     height: 120,
+    width: '100%',
     backgroundColor: colors.background.tertiary,
     borderRadius: borderRadius.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: spacing.sm,
-  },
-  imagePlaceholderText: {
-    fontSize: 32,
   },
   cardContent: {
     fontSize: typography.size.base,
@@ -506,22 +550,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.base,
     lineHeight: 28,
   },
-  modalImagePlaceholder: {
+  modalImage: {
     height: 200,
+    width: '100%',
     backgroundColor: colors.background.secondary,
     borderRadius: borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: spacing.base,
-    padding: spacing.md,
-  },
-  modalImageText: {
-    fontSize: 48,
-    marginBottom: spacing.sm,
-  },
-  modalImageUrl: {
-    fontSize: typography.size.xs,
-    color: colors.text.tertiary,
   },
   modalText: {
     fontSize: typography.size.base,
