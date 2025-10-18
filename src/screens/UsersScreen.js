@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   Alert,
   Animated,
-  ActivityIndicator
+  ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -503,152 +505,154 @@ const UsersScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header with Tabs */}
-      <View style={styles.header}>
-        <Text style={styles.pageTitle}>👥 المستخدمين</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        {/* Header with Tabs */}
+        <View style={styles.header}>
+          <Text style={styles.pageTitle}>👥 المستخدمين</Text>
 
-        {/* Tab Selector */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'clients' && styles.tabActive]}
-            onPress={() => switchTab('clients')}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabText, activeTab === 'clients' && styles.tabTextActive]}>
-              العملاء ({clients.length})
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === 'workers' && styles.tabActive]}
-            onPress={() => switchTab('workers')}
-            activeOpacity={0.7}
-          >
-            <Text style={[styles.tabText, activeTab === 'workers' && styles.tabTextActive]}>
-              العمال ({(workerUsers || workers).length})
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Text style={styles.searchIcon}>🔍</Text>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="ابحث بالاسم أو البريد أو الهاتف..."
-            placeholderTextColor={colors.text.muted}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
-              <Text style={styles.clearButtonText}>✕</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
-
-      {/* User List */}
-      <FlatList
-        data={currentData}
-        keyExtractor={(item) => item.id}
-        renderItem={renderUserCard}
-        contentContainerStyle={styles.contentContainer}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>{activeTab === 'clients' ? '👥' : '👷'}</Text>
-            <Text style={styles.emptyText}>
-              {searchQuery ? 'لا توجد نتائج' : `لا يوجد ${activeTab === 'clients' ? 'عملاء' : 'عمال'} بعد`}
-            </Text>
-            <Text style={styles.emptySubtext}>
-              {searchQuery ? 'جرب البحث بكلمات أخرى' : `أضف أول ${activeTab === 'clients' ? 'عميل' : 'عامل'} أدناه`}
-            </Text>
-          </View>
-        }
-        ListFooterComponent={
-          <View style={styles.formSection}>
-            {/* Add New User Form */}
-            <View style={styles.newUserForm}>
-              <Text style={styles.formTitle}>
-                ➕ إضافة {activeTab === 'clients' ? 'عميل' : 'عامل'} جديد
+          {/* Tab Selector */}
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'clients' && styles.tabActive]}
+              onPress={() => switchTab('clients')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabText, activeTab === 'clients' && styles.tabTextActive]}>
+                العملاء ({clients.length})
               </Text>
-              <Text style={styles.formSubtitle}>سيتم إنشاء حساب تلقائياً مع رقم الهاتف ككلمة مرور</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.tab, activeTab === 'workers' && styles.tabActive]}
+              onPress={() => switchTab('workers')}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.tabText, activeTab === 'workers' && styles.tabTextActive]}>
+                العمال ({(workerUsers || workers).length})
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>👤 الاسم</Text>
-                <TextInput
-                  value={newUserForm.name}
-                  onChangeText={(text) => setNewUserForm({...newUserForm, name: text})}
-                  placeholder={`أدخل اسم ${activeTab === 'clients' ? 'العميل' : 'العامل'}`}
-                  placeholderTextColor="#64748b"
-                  style={styles.input}
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>📧 البريد الإلكتروني</Text>
-                <TextInput
-                  value={newUserForm.email}
-                  onChangeText={(text) => setNewUserForm({...newUserForm, email: text})}
-                  placeholder="example@email.com"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  placeholderTextColor="#64748b"
-                  style={styles.input}
-                />
-              </View>
-
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>📞 رقم الهاتف</Text>
-                <TextInput
-                  value={newUserForm.phone}
-                  onChangeText={(text) => setNewUserForm({...newUserForm, phone: text})}
-                  placeholder="أدخل رقم الهاتف"
-                  keyboardType="phone-pad"
-                  placeholderTextColor="#64748b"
-                  style={styles.input}
-                />
-              </View>
-
-              <TouchableOpacity
-                style={[styles.addButton, activeTab === 'workers' && styles.addButtonWorker]}
-                onPress={handleAddNewUser}
-                disabled={isAddingUser}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.addButtonText}>
-                  {isAddingUser ? 'جاري الإضافة...' : `➕ إضافة ${activeTab === 'clients' ? 'عميل' : 'عامل'}`}
-                </Text>
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+            <Text style={styles.searchIcon}>🔍</Text>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="ابحث بالاسم أو البريد أو الهاتف..."
+              placeholderTextColor={colors.text.muted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+                <Text style={styles.clearButtonText}>✕</Text>
               </TouchableOpacity>
+            )}
+          </View>
+        </View>
+
+        {/* User List */}
+        <FlatList
+          data={currentData}
+          keyExtractor={(item) => item.id}
+          renderItem={renderUserCard}
+          contentContainerStyle={styles.contentContainer}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyEmoji}>{activeTab === 'clients' ? '👥' : '👷'}</Text>
+              <Text style={styles.emptyText}>
+                {searchQuery ? 'لا توجد نتائج' : `لا يوجد ${activeTab === 'clients' ? 'عملاء' : 'عمال'} بعد`}
+              </Text>
+              <Text style={styles.emptySubtext}>
+                {searchQuery ? 'جرب البحث بكلمات أخرى' : `أضف أول ${activeTab === 'clients' ? 'عميل' : 'عامل'} أدناه`}
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            <View style={styles.formSection}>
+              {/* Add New User Form */}
+              <View style={styles.newUserForm}>
+                <Text style={styles.formTitle}>
+                  ➕ إضافة {activeTab === 'clients' ? 'عميل' : 'عامل'} جديد
+                </Text>
+                <Text style={styles.formSubtitle}>سيتم إنشاء حساب تلقائياً مع رقم الهاتف ككلمة مرور</Text>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>👤 الاسم</Text>
+                  <TextInput
+                    value={newUserForm.name}
+                    onChangeText={(text) => setNewUserForm({...newUserForm, name: text})}
+                    placeholder={`أدخل اسم ${activeTab === 'clients' ? 'العميل' : 'العامل'}`}
+                    placeholderTextColor="#64748b"
+                    style={styles.input}
+                  />
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>📧 البريد الإلكتروني</Text>
+                  <TextInput
+                    value={newUserForm.email}
+                    onChangeText={(text) => setNewUserForm({...newUserForm, email: text})}
+                    placeholder="example@email.com"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    placeholderTextColor="#64748b"
+                    style={styles.input}
+                  />
+                </View>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>📞 رقم الهاتف</Text>
+                  <TextInput
+                    value={newUserForm.phone}
+                    onChangeText={(text) => setNewUserForm({...newUserForm, phone: text})}
+                    placeholder="أدخل رقم الهاتف"
+                    keyboardType="phone-pad"
+                    placeholderTextColor="#64748b"
+                    style={styles.input}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  style={[styles.addButton, activeTab === 'workers' && styles.addButtonWorker]}
+                  onPress={handleAddNewUser}
+                  disabled={isAddingUser}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.addButtonText}>
+                    {isAddingUser ? 'جاري الإضافة...' : `➕ إضافة ${activeTab === 'clients' ? 'عميل' : 'عامل'}`}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          }
+        />
+
+        {/* Loading Overlay */}
+        {isLoading && (
+          <View style={styles.loadingOverlay}>
+            <View style={styles.loadingCard}>
+              <ActivityIndicator size="large" color={colors.accent.purple} />
+              <Text style={styles.loadingText}>{loadingMessage}</Text>
             </View>
           </View>
-        }
-      />
+        )}
 
-      {/* Loading Overlay */}
-      {isLoading && (
-        <View style={styles.loadingOverlay}>
-          <View style={styles.loadingCard}>
-            <ActivityIndicator size="large" color={colors.accent.purple} />
-            <Text style={styles.loadingText}>{loadingMessage}</Text>
-          </View>
-        </View>
-      )}
-
-      {/* Toast Notification */}
-      {showToast && (
-        <Animated.View
-          style={[
-            styles.toast,
-            toastType === 'success' && styles.toastSuccess,
-            toastType === 'error' && styles.toastError,
-            { opacity: fadeAnim }
-          ]}
-        >
-          <Text style={styles.toastText}>{toastMessage}</Text>
-        </Animated.View>
-      )}
-    </View>
+        {/* Toast Notification */}
+        {showToast && (
+          <Animated.View
+            style={[
+              styles.toast,
+              toastType === 'success' && styles.toastSuccess,
+              toastType === 'error' && styles.toastError,
+              { opacity: fadeAnim }
+            ]}
+          >
+            <Text style={styles.toastText}>{toastMessage}</Text>
+          </Animated.View>
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

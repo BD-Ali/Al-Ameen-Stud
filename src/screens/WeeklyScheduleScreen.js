@@ -9,6 +9,11 @@ import {
   Alert,
   ActivityIndicator,
   FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
@@ -423,75 +428,83 @@ const WeeklyScheduleScreen = () => {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.modalBody}>
-              {/* Selected Time Info */}
-              <View style={styles.selectedTimeInfo}>
-                <Text style={styles.selectedTimeLabel}>الوقت المحدد:</Text>
-                <Text style={styles.selectedTimeText}>
-                  {editMode
-                    ? selectedSlots[0]
-                    : selectedSlots.sort().join(', ')}
-                </Text>
-              </View>
-
-              {/* Worker Selection - Using FlatList */}
-              <Text style={styles.inputLabel}>اختر العامل</Text>
-              <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.workerSelector}
-                data={workerUsers || []}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item: worker }) => (
-                  <TouchableOpacity
-                    onPress={() => setSelectedWorker(worker.id)}
-                    style={[
-                      styles.workerCard,
-                      selectedWorker === worker.id && styles.workerCardSelected,
-                    ]}
-                  >
-                    <Text style={styles.workerIcon}>👤</Text>
-                    <Text
-                      style={[
-                        styles.workerCardName,
-                        selectedWorker === worker.id && styles.workerCardNameSelected,
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {worker.name}
+            <KeyboardAvoidingView
+              style={styles.keyboardAvoidingView}
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+            >
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <ScrollView contentContainerStyle={styles.modalBody}>
+                  {/* Selected Time Info */}
+                  <View style={styles.selectedTimeInfo}>
+                    <Text style={styles.selectedTimeLabel}>الوقت المحدد:</Text>
+                    <Text style={styles.selectedTimeText}>
+                      {editMode
+                        ? selectedSlots[0]
+                        : selectedSlots.sort().join(', ')}
                     </Text>
+                  </View>
+
+                  {/* Worker Selection - Using FlatList */}
+                  <Text style={styles.inputLabel}>اختر العامل</Text>
+                  <FlatList
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    style={styles.workerSelector}
+                    data={workerUsers || []}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item: worker }) => (
+                      <TouchableOpacity
+                        onPress={() => setSelectedWorker(worker.id)}
+                        style={[
+                          styles.workerCard,
+                          selectedWorker === worker.id && styles.workerCardSelected,
+                        ]}
+                      >
+                        <Text style={styles.workerIcon}>👤</Text>
+                        <Text
+                          style={[
+                            styles.workerCardName,
+                            selectedWorker === worker.id && styles.workerCardNameSelected,
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {worker.name}
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  />
+
+                  {/* Work Description */}
+                  <Text style={styles.inputLabel}>وصف العمل</Text>
+                  <TextInput
+                    style={styles.textArea}
+                    placeholder="مثال: رعاية الخيول، تنظيف الإسطبل، إطعام..."
+                    placeholderTextColor={colors.text.muted}
+                    value={workDescription}
+                    onChangeText={setWorkDescription}
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                  />
+
+                  {/* Save Button */}
+                  <TouchableOpacity
+                    onPress={handleSaveSchedule}
+                    style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={styles.saveButtonText}>
+                        {editMode ? 'تحديث' : 'حفظ'}
+                      </Text>
+                    )}
                   </TouchableOpacity>
-                )}
-              />
-
-              {/* Work Description */}
-              <Text style={styles.inputLabel}>وصف العمل</Text>
-              <TextInput
-                style={styles.textArea}
-                placeholder="مثال: رعاية الخيول، تنظيف الإسطبل، إطعام..."
-                placeholderTextColor={colors.text.muted}
-                value={workDescription}
-                onChangeText={setWorkDescription}
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-              />
-
-              {/* Save Button */}
-              <TouchableOpacity
-                onPress={handleSaveSchedule}
-                style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-                disabled={loading}
-              >
-                {loading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.saveButtonText}>
-                    {editMode ? 'تحديث' : 'حفظ'}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
+                </ScrollView>
+              </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
           </View>
         </View>
       </Modal>

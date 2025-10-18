@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';
 import { DataContext } from '../context/DataContext';
@@ -424,110 +424,112 @@ const HorsesScreen = () => {
         transparent={true}
         onRequestClose={() => setReminderModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={styles.modalTitle}>
-                🔔 إضافة تذكير لـ {selectedHorseForReminder?.name}
-              </Text>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <Text style={styles.modalTitle}>
+                  🔔 إضافة تذكير لـ {selectedHorseForReminder?.name}
+                </Text>
 
-              <View style={styles.modalInputGroup}>
-                <Text style={styles.modalLabel}>📝 ملاحظة التذكير</Text>
-                <TextInput
-                  value={reminderNote}
-                  onChangeText={setReminderNote}
-                  style={[styles.modalInput, styles.modalNotesInput]}
-                  placeholder="مثال: موعد الطبيب البيطري، تطعيم، فحص..."
-                  placeholderTextColor="#64748b"
-                  multiline
-                  numberOfLines={3}
-                  textAlignVertical="top"
-                />
-              </View>
+                <View style={styles.modalInputGroup}>
+                  <Text style={styles.modalLabel}>📝 ملاحظة التذكير</Text>
+                  <TextInput
+                    value={reminderNote}
+                    onChangeText={setReminderNote}
+                    style={[styles.modalInput, styles.modalNotesInput]}
+                    placeholder="مثال: موعد الطبيب البيطري، تطعيم، فحص..."
+                    placeholderTextColor="#64748b"
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                  />
+                </View>
 
-              <View style={styles.modalInputGroup}>
-                <Text style={styles.modalLabel}>📅 التاريخ</Text>
-                <TouchableOpacity
-                  style={styles.datePickerButton}
-                  onPress={() => setShowDatePicker(true)}
-                >
-                  <Text style={styles.datePickerText}>
-                    {reminderDate.toLocaleDateString('en-US')}
-                  </Text>
-                  <Text style={styles.datePickerIcon}>📅</Text>
-                </TouchableOpacity>
+                <View style={styles.modalInputGroup}>
+                  <Text style={styles.modalLabel}>📅 التاريخ</Text>
+                  <TouchableOpacity
+                    style={styles.datePickerButton}
+                    onPress={() => setShowDatePicker(true)}
+                  >
+                    <Text style={styles.datePickerText}>
+                      {reminderDate.toLocaleDateString('en-US')}
+                    </Text>
+                    <Text style={styles.datePickerIcon}>📅</Text>
+                  </TouchableOpacity>
 
-                {showDatePicker && (
-                  <>
-                    <DateTimePicker
-                      value={reminderDate}
-                      mode="date"
-                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                      onChange={handleDateChange}
-                      minimumDate={new Date()}
-                    />
-                    {Platform.OS === 'ios' && (
-                      <TouchableOpacity
-                        style={styles.confirmButton}
-                        onPress={() => setShowDatePicker(false)}
-                      >
-                        <Text style={styles.confirmButtonText}>موافق</Text>
-                      </TouchableOpacity>
-                    )}
-                  </>
-                )}
-              </View>
+                  {showDatePicker && (
+                    <>
+                      <DateTimePicker
+                        value={reminderDate}
+                        mode="date"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={handleDateChange}
+                        minimumDate={new Date()}
+                      />
+                      {Platform.OS === 'ios' && (
+                        <TouchableOpacity
+                          style={styles.confirmButton}
+                          onPress={() => setShowDatePicker(false)}
+                        >
+                          <Text style={styles.confirmButtonText}>موافق</Text>
+                        </TouchableOpacity>
+                      )}
+                    </>
+                  )}
+                </View>
 
-              <View style={styles.modalInputGroup}>
-                <Text style={styles.modalLabel}>⏰ الوقت</Text>
-                <TouchableOpacity
-                  style={styles.datePickerButton}
-                  onPress={() => setShowTimePicker(true)}
-                >
-                  <Text style={styles.datePickerText}>
-                    {`${String(reminderTime.getHours()).padStart(2, '0')}:${String(reminderTime.getMinutes()).padStart(2, '0')}`}
-                  </Text>
-                  <Text style={styles.datePickerIcon}>⏰</Text>
-                </TouchableOpacity>
+                <View style={styles.modalInputGroup}>
+                  <Text style={styles.modalLabel}>⏰ الوقت</Text>
+                  <TouchableOpacity
+                    style={styles.datePickerButton}
+                    onPress={() => setShowTimePicker(true)}
+                  >
+                    <Text style={styles.datePickerText}>
+                      {`${String(reminderTime.getHours()).padStart(2, '0')}:${String(reminderTime.getMinutes()).padStart(2, '0')}`}
+                    </Text>
+                    <Text style={styles.datePickerIcon}>⏰</Text>
+                  </TouchableOpacity>
 
-                {showTimePicker && (
-                  <>
-                    <DateTimePicker
-                      value={reminderTime}
-                      mode="time"
-                      display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                      onChange={handleTimeChange}
-                      is24Hour={true}
-                    />
-                    {Platform.OS === 'ios' && (
-                      <TouchableOpacity
-                        style={styles.confirmButton}
-                        onPress={() => setShowTimePicker(false)}
-                      >
-                        <Text style={styles.confirmButtonText}>موافق</Text>
-                      </TouchableOpacity>
-                    )}
-                  </>
-                )}
-              </View>
+                  {showTimePicker && (
+                    <>
+                      <DateTimePicker
+                        value={reminderTime}
+                        mode="time"
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={handleTimeChange}
+                        is24Hour={true}
+                      />
+                      {Platform.OS === 'ios' && (
+                        <TouchableOpacity
+                          style={styles.confirmButton}
+                          onPress={() => setShowTimePicker(false)}
+                        >
+                          <Text style={styles.confirmButtonText}>موافق</Text>
+                        </TouchableOpacity>
+                      )}
+                    </>
+                  )}
+                </View>
 
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={styles.modalCancelButton}
-                  onPress={() => setReminderModalVisible(false)}
-                >
-                  <Text style={styles.modalCancelButtonText}>إلغاء</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.modalSaveButton}
-                  onPress={handleAddReminder}
-                >
-                  <Text style={styles.modalSaveButtonText}>حفظ التذكير</Text>
-                </TouchableOpacity>
-              </View>
-            </ScrollView>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={styles.modalCancelButton}
+                    onPress={() => setReminderModalVisible(false)}
+                  >
+                    <Text style={styles.modalCancelButtonText}>إلغاء</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.modalSaveButton}
+                    onPress={handleAddReminder}
+                  >
+                    <Text style={styles.modalSaveButtonText}>حفظ التذكير</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );

@@ -11,6 +11,8 @@ import {
   Platform,
   ScrollView,
   Image,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -68,144 +70,150 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
       >
-        {/* Header with gradient */}
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Image
-              source={require('../../assets/icon.png')}
-              style={styles.logo}
-              resizeMode="contain"
-            />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header with gradient */}
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Image
+                source={require('../../assets/icon.png')}
+                style={styles.logo}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.title}>مربط الأمين</Text>
+            <Text style={styles.subtitle}>
+              {isSignUp ? 'إنشاء حساب عميل' : 'مرحباً بعودتك'}
+            </Text>
           </View>
-          <Text style={styles.title}>مربط الأمين</Text>
-          <Text style={styles.subtitle}>
-            {isSignUp ? 'إنشاء حساب عميل' : 'مرحباً بعودتك'}
-          </Text>
-        </View>
 
-        {/* Form Card */}
-        <View style={styles.formCard}>
-          {isSignUp && (
+          {/* Form Card */}
+          <View style={styles.formCard}>
+            {isSignUp && (
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>الاسم الكامل</Text>
+                <View style={styles.inputWrapper}>
+                  <Text style={styles.inputIcon}>👤</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="أدخل اسمك"
+                    placeholderTextColor="#95a5a6"
+                    value={name}
+                    onChangeText={setName}
+                    autoCapitalize="words"
+                    returnKeyType="next"
+                  />
+                </View>
+              </View>
+            )}
+
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>الاسم الكامل</Text>
+              <Text style={styles.label}>البريد الإلكتروني</Text>
               <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>👤</Text>
+                <Text style={styles.inputIcon}>✉️</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="أدخل اسمك"
+                  placeholder="your@email.com"
                   placeholderTextColor="#95a5a6"
-                  value={name}
-                  onChangeText={setName}
-                  autoCapitalize="words"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  returnKeyType="next"
                 />
               </View>
             </View>
-          )}
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>البريد الإلكتروني</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.inputIcon}>✉️</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="your@email.com"
-                placeholderTextColor="#95a5a6"
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-              />
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>كلمة المرور</Text>
+              <View style={styles.inputWrapper}>
+                <Text style={styles.inputIcon}>🔒</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor="#95a5a6"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  returnKeyType="done"
+                  onSubmitEditing={handleAuth}
+                />
+              </View>
             </View>
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>كلمة المرور</Text>
-            <View style={styles.inputWrapper}>
-              <Text style={styles.inputIcon}>🔒</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="••••••••"
-                placeholderTextColor="#95a5a6"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-              />
-            </View>
-          </View>
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={handleAuth}
+              disabled={loading}
+              activeOpacity={0.8}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <>
+                  <Text style={styles.primaryButtonText}>
+                    {isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول'}
+                  </Text>
+                  <Text style={styles.buttonArrow}>←</Text>
+                </>
+              )}
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={handleAuth}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <>
-                <Text style={styles.primaryButtonText}>
-                  {isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول'}
-                </Text>
-                <Text style={styles.buttonArrow}>←</Text>
-              </>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.switchButton}
-            onPress={() => {
-              setIsSignUp(!isSignUp);
-              setEmail('');
-              setPassword('');
-              setName('');
-            }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.switchButtonText}>
-              {isSignUp
-                ? 'هل لديك حساب؟ تسجيل الدخول'
-                : 'ليس لديك حساب؟ إنشاء حساب'}
-            </Text>
-          </TouchableOpacity>
-
-          {isSignUp && (
-            <View style={styles.infoBox}>
-              <Text style={styles.infoText}>
-                ℹ️ التسجيل ينشئ حساب عميل. يجب منح صلاحية المسؤول من قبل إدارة المربط.
+            <TouchableOpacity
+              style={styles.switchButton}
+              onPress={() => {
+                setIsSignUp(!isSignUp);
+                setEmail('');
+                setPassword('');
+                setName('');
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.switchButtonText}>
+                {isSignUp
+                  ? 'هل لديك حساب؟ تسجيل الدخول'
+                  : 'ليس لديك حساب؟ إنشاء حساب'}
               </Text>
-            </View>
-          )}
+            </TouchableOpacity>
 
-          <View style={styles.divider}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>أو</Text>
-            <View style={styles.dividerLine} />
+            {isSignUp && (
+              <View style={styles.infoBox}>
+                <Text style={styles.infoText}>
+                  ℹ️ التسجيل ينشئ حساب عميل. يجب منح صلاحية المسؤول من قبل إدارة المربط.
+                </Text>
+              </View>
+            )}
+
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>أو</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            <TouchableOpacity
+              style={styles.visitorButton}
+              onPress={handleVisitorAccess}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.visitorEmoji}>👁️</Text>
+              <Text style={styles.visitorButtonText}>متابعة كزائر</Text>
+            </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={styles.visitorButton}
-            onPress={handleVisitorAccess}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.visitorEmoji}>👁️</Text>
-            <Text style={styles.visitorButtonText}>متابعة كزائر</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Footer */}
-        <Text style={styles.footer}>
-          إدارة احترافية للمرابط
-        </Text>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {/* Footer */}
+          <Text style={styles.footer}>
+            إدارة احترافية للمرابط
+          </Text>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -374,3 +382,4 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
+
