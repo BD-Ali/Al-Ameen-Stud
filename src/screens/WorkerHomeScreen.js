@@ -8,17 +8,89 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
  */
 const WorkerHomeScreen = () => {
-  const { schedules, horses, workers, lessons, clients } = useContext(DataContext);
+  const { schedules, horses, workers, lessons, clients, weeklySchedules, workerUsers } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
 
   // Find worker by matching user ID
   const currentWorker = workers?.find((w) => w.id === user?.uid);
 
-  // Get today's date
+  // Get today's date and day of week
   const today = new Date().toISOString().split('T')[0];
+  const currentHour = new Date().getHours();
 
-  // Filter schedules and lessons for this worker (with safety checks)
-  const mySchedules = schedules?.filter((s) => s.workerId === user?.uid && s.date === today) || [];
+  // Get current day name (saturday, sunday, etc.)
+  const getDayName = () => {
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    return dayNames[new Date().getDay()];
+  };
+
+  // Get week start (Saturday)
+  const getWeekStart = (date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = day === 6 ? 0 : (day + 1) % 7;
+    d.setDate(d.getDate() - diff);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString().split('T')[0];
+  };
+
+  // Get week identifier
+  const getWeekId = (weekStart) => {
+    const date = new Date(weekStart);
+    const year = date.getFullYear();
+    const weekNum = getWeekNumber(date);
+    return `${year}-W${String(weekNum).padStart(2, '0')}`;
+  };
+
+  // Get week number in year
+  const getWeekNumber = (date) => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  };
+
+  const currentWeekStart = getWeekStart(new Date());
+  const currentWeekId = getWeekId(currentWeekStart);
+  const currentDayName = getDayName();
+
+  // Filter weekly schedules for this worker for today
+  const myTodayWeeklySchedules = weeklySchedules?.filter((s) =>
+    s.workerId === user?.uid &&
+    s.weekId === currentWeekId &&
+    s.day === currentDayName
+  ) || [];
+
+  // Filter daily schedules for this worker for today (from ScheduleScreen)
+  const myTodayDailySchedules = schedules?.filter((s) =>
+    s.workerId === user?.uid &&
+    s.date === today
+  ) || [];
+
+  // Combine both schedule types
+  const allTodaySchedules = [
+    ...myTodayWeeklySchedules.map(s => ({ ...s, source: 'weekly' })),
+    ...myTodayDailySchedules.map(s => ({ ...s, source: 'daily' }))
+  ];
+
+  // Separate current, upcoming and past tasks
+  const currentTasks = allTodaySchedules.filter((s) => {
+    const taskHour = parseInt(s.timeSlot.split(':')[0]);
+    return taskHour === currentHour;
+  });
+
+  const upcomingTasks = allTodaySchedules.filter((s) => {
+    const taskHour = parseInt(s.timeSlot.split(':')[0]);
+    return taskHour > currentHour;
+  }).sort((a, b) => a.timeSlot.localeCompare(b.timeSlot));
+
+  const pastTasks = allTodaySchedules.filter((s) => {
+    const taskHour = parseInt(s.timeSlot.split(':')[0]);
+    return taskHour < currentHour;
+  }).sort((a, b) => b.timeSlot.localeCompare(a.timeSlot));
+
+  // Filter lessons for this worker
   const myLessons = lessons?.filter((l) => l.instructorId === user?.uid) || [];
   const todayLessons = myLessons.filter((l) => l.date === today);
   const upcomingLessons = myLessons.filter((l) => l.date > today).slice(0, 5);
@@ -44,7 +116,11 @@ const WorkerHomeScreen = () => {
 
   const formatTime = (time) => {
     const [hour] = time.split(':');
-    return `${parseInt(hour)}:00`;
+    const h = parseInt(hour);
+    if (h === 0) return '12 AM';
+    if (h < 12) return `${h} AM`;
+    if (h === 12) return '12 PM';
+    return `${h - 12} PM`;
   };
 
   return (
@@ -63,25 +139,65 @@ const WorkerHomeScreen = () => {
       </View>
 
       <ScrollView style={styles.content}>
-        {/* Today's Schedule */}
+        {/* Today's Schedule from Weekly Schedule */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionIcon}>📅</Text>
             <Text style={styles.sectionTitle}>جدول اليوم</Text>
           </View>
 
-          {mySchedules.length > 0 ? (
+          {allTodaySchedules.length > 0 ? (
             <View style={styles.cardContainer}>
-              {mySchedules.map((schedule) => (
-                <View key={schedule.id} style={styles.scheduleCard}>
-                  <View style={styles.scheduleHeader}>
-                    <View style={styles.timeBadge}>
-                      <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+              {/* Current Tasks */}
+              {currentTasks.length > 0 && (
+                <View style={styles.taskGroup}>
+                  <Text style={styles.taskGroupTitle}>⏰ المهمة الحالية</Text>
+                  {currentTasks.map((schedule) => (
+                    <View key={schedule.id} style={[styles.scheduleCard, styles.currentTaskCard]}>
+                      <View style={styles.scheduleHeader}>
+                        <View style={[styles.timeBadge, styles.currentTimeBadge]}>
+                          <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                        </View>
+                      </View>
+                      <Text style={styles.scheduleDescription}>{schedule.description}</Text>
                     </View>
-                  </View>
-                  <Text style={styles.scheduleDescription}>{schedule.description}</Text>
+                  ))}
                 </View>
-              ))}
+              )}
+
+              {/* Upcoming Tasks */}
+              {upcomingTasks.length > 0 && (
+                <View style={styles.taskGroup}>
+                  <Text style={styles.taskGroupTitle}>📋 المهام القادمة ({upcomingTasks.length})</Text>
+                  {upcomingTasks.map((schedule) => (
+                    <View key={schedule.id} style={styles.scheduleCard}>
+                      <View style={styles.scheduleHeader}>
+                        <View style={styles.timeBadge}>
+                          <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                        </View>
+                      </View>
+                      <Text style={styles.scheduleDescription}>{schedule.description}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {/* Past Tasks */}
+              {pastTasks.length > 0 && (
+                <View style={styles.taskGroup}>
+                  <Text style={styles.taskGroupTitle}>✅ المهام المكتملة ({pastTasks.length})</Text>
+                  {pastTasks.map((schedule) => (
+                    <View key={schedule.id} style={[styles.scheduleCard, styles.pastTaskCard]}>
+                      <View style={styles.scheduleHeader}>
+                        <View style={[styles.timeBadge, styles.pastTimeBadge]}>
+                          <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                        </View>
+                      </View>
+                      <Text style={[styles.scheduleDescription, styles.pastTaskText]}>{schedule.description}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           ) : (
             <View style={styles.emptyState}>
@@ -267,6 +383,12 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.primary.main,
     ...shadows.md,
   },
+  currentTaskCard: {
+    borderLeftColor: colors.status.success,
+  },
+  pastTaskCard: {
+    borderLeftColor: colors.status.error,
+  },
   scheduleHeader: {
     marginBottom: spacing.sm,
   },
@@ -277,6 +399,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     alignSelf: 'flex-start',
   },
+  currentTimeBadge: {
+    backgroundColor: colors.status.success,
+  },
+  pastTimeBadge: {
+    backgroundColor: colors.status.error,
+  },
   timeBadgeText: {
     color: '#fff',
     fontSize: typography.size.sm,
@@ -286,6 +414,9 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
     color: colors.text.secondary,
     lineHeight: 20,
+  },
+  pastTaskText: {
+    opacity: 0.6,
   },
   infoCard: {
     backgroundColor: colors.background.secondary,
@@ -372,6 +503,15 @@ const styles = StyleSheet.create({
   lessonValue: {
     fontSize: typography.size.sm,
     color: colors.text.primary,
+  },
+  taskGroup: {
+    marginBottom: spacing.md,
+  },
+  taskGroupTitle: {
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.sm,
   },
 });
 

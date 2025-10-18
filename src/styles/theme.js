@@ -43,6 +43,7 @@ export const colors = {
     teal: '#14b8a6',         // For fresh, active elements
     amber: '#f59e0b',        // For attention items
     pink: '#ec4899',         // For workers/people
+    yellow: '#fbbf24',       // For add icons and highlights
   },
 
   // Border colors - Subtle and refined
