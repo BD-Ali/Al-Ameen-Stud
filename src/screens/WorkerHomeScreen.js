@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, SafeAreaVi
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import AnnouncementsFeed from '../components/AnnouncementsFeed';
 
 /**
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
@@ -139,6 +140,9 @@ const WorkerHomeScreen = () => {
       </View>
 
       <ScrollView style={styles.content}>
+        {/* Announcements Feed */}
+        <AnnouncementsFeed userRole="worker" />
+
         {/* Today's Schedule from Weekly Schedule */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
