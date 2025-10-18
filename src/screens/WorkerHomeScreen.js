@@ -1,15 +1,16 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Alert, ScrollView, SafeAreaView } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
+import CompactHeader from '../components/CompactHeader';
 
 /**
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
  */
 const WorkerHomeScreen = () => {
-  const { schedules, horses, workers, lessons, clients, weeklySchedules, workerUsers } = useContext(DataContext);
+  const { schedules, horses, workers, lessons, clients, weeklySchedules } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
 
   // Find worker by matching user ID
@@ -126,18 +127,13 @@ const WorkerHomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton} activeOpacity={0.7}>
-            <Text style={styles.logoutText}>خروج</Text>
-          </TouchableOpacity>
-          <View style={styles.userInfo}>
-            <Text style={styles.greeting}>مرحباً،</Text>
-            <Text style={styles.userName}>{currentWorker?.name || 'عامل'} 👷</Text>
-          </View>
-        </View>
-      </View>
+      {/* Compact Header */}
+      <CompactHeader
+        userName={currentWorker?.name}
+        userRole="worker"
+        onLogout={logOut}
+        loading={!currentWorker}
+      />
 
       <ScrollView style={styles.content}>
         {/* Announcements Feed */}
@@ -308,52 +304,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background.primary,
-  },
-  header: {
-    backgroundColor: colors.background.secondary,
-    paddingHorizontal: spacing.base,
-    paddingTop: spacing.xxl,
-    paddingBottom: spacing.md,
-    borderBottomLeftRadius: borderRadius.lg,
-    borderBottomRightRadius: borderRadius.lg,
-    ...shadows.sm,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  userInfo: {
-    flex: 1,
-    alignItems: 'flex-end',
-    marginLeft: spacing.base,
-  },
-  greeting: {
-    fontSize: typography.size.sm,
-    color: colors.text.tertiary,
-    marginBottom: spacing.xs,
-    textAlign: 'right',
-  },
-  userName: {
-    fontSize: typography.size.lg,
-    fontWeight: typography.weight.bold,
-    color: colors.text.primary,
-    textAlign: 'right',
-  },
-  logoutButton: {
-    backgroundColor: colors.primary.main,
-    borderRadius: borderRadius.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    minHeight: 44,
-    minWidth: 80,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoutText: {
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
-    color: '#fff',
   },
   content: {
     flex: 1,

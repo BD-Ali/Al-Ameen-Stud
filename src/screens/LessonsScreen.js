@@ -1,0 +1,631 @@
+import React, { useContext, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { DataContext } from '../context/DataContext';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+
+/**
+ * LessonsScreen lists all scheduled lessons and allows the administrator to add
+ * new lessons.
+ */
+const LessonsScreen = () => {
+  const { lessons, addLesson, removeLesson, horses, clients, workers, workerUsers } = useContext(DataContext);
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [horseId, setHorseId] = useState('');
+  const [clientId, setClientId] = useState('');
+  const [instructorId, setInstructorId] = useState('');
+  const [showHorsePicker, setShowHorsePicker] = useState(false);
+  const [showClientPicker, setShowClientPicker] = useState(false);
+  const [showInstructorPicker, setShowInstructorPicker] = useState(false);
+
+  const handleDateChange = (event, selectedDate) => {
+    if (Platform.OS === 'android' && event.type === 'dismissed') {
+      setShowDatePicker(false);
+      return;
+    }
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+  };
+
+  const handleTimeChange = (event, selectedTime) => {
+    if (Platform.OS === 'android' && event.type === 'dismissed') {
+      setShowTimePicker(false);
+      return;
+    }
+    if (selectedTime) {
+      setTime(selectedTime);
+    }
+    if (Platform.OS === 'android') {
+      setShowTimePicker(false);
+    }
+  };
+
+  const handleRemoveLesson = async (id) => {
+    Alert.alert(
+      'حذف الدرس',
+      'هل أنت متأكد أنك تريد حذف هذا الدرس؟',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        {
+          text: 'حذف',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await removeLesson(id);
+            if (result.success) {
+              Alert.alert('نجح', 'تم حذف الدرس بنجاح');
+            } else {
+              Alert.alert('خطأ', result.error || 'فشل حذف الدرس');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatTime = (time) => {
+    const hours = String(time.getHours()).padStart(2, '0');
+    const minutes = String(time.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  const handleAddLesson = async () => {
+    if (!horseId || !clientId || !instructorId) {
+      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
+      return;
+    }
+    const formattedDate = formatDate(date);
+    const formattedTime = formatTime(time);
+
+    const result = await addLesson({
+      date: formattedDate,
+      time: formattedTime,
+      horseId,
+      clientId,
+      instructorId
+    });
+
+    if (result.success) {
+      Alert.alert('نجح', 'تم جدولة الدرس بنجاح');
+      setDate(new Date());
+      setTime(new Date());
+      setHorseId('');
+      setClientId('');
+      setInstructorId('');
+    } else {
+      Alert.alert('خطأ', result.error || 'فشل جدولة الدرس');
+    }
+  };
+
+  const getHorseName = (id) => horses?.find((h) => h.id === id)?.name || id;
+  const getClientName = (id) => clients?.find((c) => c.id === id)?.name || id;
+  const getWorkerName = (id) => {
+    // Try to find in workerUsers first, then fall back to workers
+    const workerUser = workerUsers?.find((w) => w.id === id);
+    if (workerUser) return workerUser.name;
+    const worker = workers?.find((w) => w.id === id);
+    return worker?.name || id;
+  };
+
+  const getSelectedHorseName = () => {
+    const horse = horses?.find(h => h.id === horseId);
+    return horse ? horse.name : 'اختر حصاناً';
+  };
+
+  const getSelectedClientName = () => {
+    const client = clients?.find(c => c.id === clientId);
+    return client ? client.name : 'اختر عميلاً';
+  };
+
+  const getSelectedInstructorName = () => {
+    const instructor = workerUsers?.find(w => w.id === instructorId);
+    return instructor ? instructor.name : 'اختر مدرباً';
+  };
+
+  return (
+    <View style={styles.container}>
+      <FlatList
+        data={lessons}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <View style={styles.headerSection}>
+            <Text style={styles.pageTitle}>📚 الدروس</Text>
+            <View style={styles.countBadge}>
+              <Text style={styles.countText}>{lessons.length}</Text>
+            </View>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.lessonDateTime}>📅 {item.date}</Text>
+              <Text style={styles.lessonTime}>⏰ {item.time}</Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.cardLabel}>🐴 الحصان:</Text>
+              <Text style={styles.cardValue}>{getHorseName(item.horseId)}</Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.cardLabel}>👤 العميل:</Text>
+              <Text style={styles.cardValue}>{getClientName(item.clientId)}</Text>
+            </View>
+            <View style={styles.cardRow}>
+              <Text style={styles.cardLabel}>👨‍🏫 المدرب:</Text>
+              <Text style={styles.cardValue}>{getWorkerName(item.instructorId)}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.removeButton}
+              onPress={() => handleRemoveLesson(item.id)}
+            >
+              <Text style={styles.removeButtonText}>🗑️ حذف الدرس</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        ListFooterComponent={
+          <View style={styles.formSection}>
+            <Text style={styles.formTitle}>➕ جدولة درس جديد</Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>📅 اختر التاريخ</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={styles.pickerButtonText}>
+                  {formatDate(date)}
+                </Text>
+                <Text style={styles.dropdownArrow}>📅</Text>
+              </TouchableOpacity>
+
+              {showDatePicker && (
+                <>
+                  <DateTimePicker
+                    value={date}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleDateChange}
+                    minimumDate={new Date()}
+                  />
+                  {Platform.OS === 'ios' && (
+                    <TouchableOpacity
+                      style={styles.confirmButton}
+                      onPress={() => setShowDatePicker(false)}
+                    >
+                      <Text style={styles.confirmButtonText}>موافق</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>⏰ اختر الوقت</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => setShowTimePicker(true)}
+              >
+                <Text style={styles.pickerButtonText}>
+                  {formatTime(time)}
+                </Text>
+                <Text style={styles.dropdownArrow}>⏰</Text>
+              </TouchableOpacity>
+
+              {showTimePicker && (
+                <>
+                  <DateTimePicker
+                    value={time}
+                    mode="time"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleTimeChange}
+                    is24Hour={true}
+                  />
+                  {Platform.OS === 'ios' && (
+                    <TouchableOpacity
+                      style={styles.confirmButton}
+                      onPress={() => setShowTimePicker(false)}
+                    >
+                      <Text style={styles.confirmButtonText}>موافق</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>🐴 اختر الحصان</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => {
+                  setShowHorsePicker(!showHorsePicker);
+                  setShowClientPicker(false);
+                  setShowInstructorPicker(false);
+                }}
+              >
+                <Text style={[styles.pickerButtonText, !horseId && styles.placeholderText]}>
+                  {getSelectedHorseName()}
+                </Text>
+                <Text style={styles.dropdownArrow}>{showHorsePicker ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {showHorsePicker && horses.length > 0 && (
+                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                  {horses.map((horse) => (
+                    <TouchableOpacity
+                      key={horse.id}
+                      style={[
+                        styles.pickerOption,
+                        horseId === horse.id && styles.pickerOptionSelected
+                      ]}
+                      onPress={() => {
+                        setHorseId(horse.id);
+                        setShowHorsePicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.pickerOptionText,
+                        horseId === horse.id && styles.pickerOptionTextSelected
+                      ]}>
+                        {horse.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+
+              {horses.length === 0 && (
+                <Text style={styles.helpText}>أضف خيولاً أولاً</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>👤 اختر العميل</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => {
+                  setShowClientPicker(!showClientPicker);
+                  setShowHorsePicker(false);
+                  setShowInstructorPicker(false);
+                }}
+              >
+                <Text style={[styles.pickerButtonText, !clientId && styles.placeholderText]}>
+                  {getSelectedClientName()}
+                </Text>
+                <Text style={styles.dropdownArrow}>{showClientPicker ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {showClientPicker && clients.length > 0 && (
+                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                  {clients.map((client) => (
+                    <TouchableOpacity
+                      key={client.id}
+                      style={[
+                        styles.pickerOption,
+                        clientId === client.id && styles.pickerOptionSelected
+                      ]}
+                      onPress={() => {
+                        setClientId(client.id);
+                        setShowClientPicker(false);
+                      }}
+                    >
+                      <Text style={[
+                        styles.pickerOptionText,
+                        clientId === client.id && styles.pickerOptionTextSelected
+                      ]}>
+                        {client.name}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              )}
+
+              {clients.length === 0 && (
+                <Text style={styles.helpText}>أضف عملاء أولاً</Text>
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>👨‍🏫 اختر المدرب</Text>
+              <TouchableOpacity
+                style={styles.pickerButton}
+                onPress={() => {
+                  setShowInstructorPicker(!showInstructorPicker);
+                  setShowHorsePicker(false);
+                  setShowClientPicker(false);
+                }}
+              >
+                <Text style={[styles.pickerButtonText, !instructorId && styles.placeholderText]}>
+                  {getSelectedInstructorName()}
+                </Text>
+                <Text style={styles.dropdownArrow}>{showInstructorPicker ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+
+              {showInstructorPicker && (
+                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                  {workerUsers && workerUsers.length > 0 ? (
+                    workerUsers.map((worker) => (
+                      <TouchableOpacity
+                        key={worker.id}
+                        style={[
+                          styles.pickerOption,
+                          instructorId === worker.id && styles.pickerOptionSelected
+                        ]}
+                        onPress={() => {
+                          setInstructorId(worker.id);
+                          setShowInstructorPicker(false);
+                        }}
+                      >
+                        <Text style={[
+                          styles.pickerOptionText,
+                          instructorId === worker.id && styles.pickerOptionTextSelected
+                        ]}>
+                          {worker.name} {worker.email ? `(${worker.email})` : ''}
+                        </Text>
+                      </TouchableOpacity>
+                    ))
+                  ) : (
+                    <View style={styles.emptyPickerState}>
+                      <Text style={styles.emptyPickerText}>لا يوجد مدربين مضافين</Text>
+                      <Text style={styles.emptyPickerSubtext}>أضف مستخدمين بدور "worker" أولاً</Text>
+                    </View>
+                  )}
+                </ScrollView>
+              )}
+
+              {!workerUsers || workerUsers.length === 0 ? (
+                <Text style={styles.helpText}>لا يوجد مستخدمين بدور worker - أضف مستخدمين أولاً</Text>
+              ) : null}
+            </View>
+
+            <TouchableOpacity style={styles.addButton} onPress={handleAddLesson}>
+              <Text style={styles.addButtonText}>جدولة درس</Text>
+            </TouchableOpacity>
+          </View>
+        }
+        contentContainerStyle={styles.contentContainer}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyEmoji}>📚</Text>
+            <Text style={styles.emptyText}>لا توجد دروس مجدولة</Text>
+            <Text style={styles.emptySubtext}>جدول أول درس أدناه</Text>
+          </View>
+        }
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+  },
+  contentContainer: {
+    padding: spacing.base,
+  },
+  headerSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.lg,
+  },
+  pageTitle: {
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  countBadge: {
+    backgroundColor: colors.accent.purple,
+    borderRadius: borderRadius.lg,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    minWidth: 32,
+    alignItems: 'center',
+  },
+  countText: {
+    color: colors.text.primary,
+    fontWeight: typography.weight.bold,
+    fontSize: typography.size.base,
+  },
+  card: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent.purple,
+    ...shadows.md,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.sm,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+  },
+  lessonDateTime: {
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  lessonTime: {
+    fontSize: typography.size.base,
+    color: colors.text.tertiary,
+  },
+  cardRow: {
+    flexDirection: 'row',
+    marginBottom: spacing.xs,
+  },
+  cardLabel: {
+    fontSize: typography.size.sm,
+    color: colors.text.tertiary,
+    width: 90,
+    fontWeight: typography.weight.semibold,
+  },
+  cardValue: {
+    flex: 1,
+    fontSize: typography.size.sm,
+    color: colors.text.secondary,
+  },
+  removeButton: {
+    backgroundColor: colors.status.error,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.sm,
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+  },
+  formSection: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md,
+    padding: spacing.base,
+    marginTop: spacing.base,
+  },
+  formTitle: {
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.base,
+  },
+  inputGroup: {
+    marginBottom: spacing.md,
+  },
+  label: {
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.semibold,
+    color: colors.text.secondary,
+    marginBottom: spacing.sm,
+  },
+  pickerButton: {
+    backgroundColor: colors.background.primary,
+    borderWidth: 1.5,
+    borderColor: colors.border.light,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 48,
+  },
+  pickerButtonText: {
+    fontSize: typography.size.base,
+    color: colors.text.primary,
+  },
+  placeholderText: {
+    color: colors.text.muted,
+  },
+  dropdownArrow: {
+    fontSize: 16,
+    color: colors.text.tertiary,
+  },
+  pickerDropdown: {
+    maxHeight: 180,
+    backgroundColor: colors.background.primary,
+    borderWidth: 1.5,
+    borderColor: colors.border.light,
+    borderRadius: borderRadius.md,
+    marginTop: spacing.sm,
+  },
+  pickerOption: {
+    padding: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+  },
+  pickerOptionSelected: {
+    backgroundColor: colors.primary.subtle,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent.purple,
+  },
+  pickerOptionText: {
+    fontSize: typography.size.base,
+    color: colors.text.secondary,
+  },
+  pickerOptionTextSelected: {
+    color: colors.accent.purple,
+    fontWeight: typography.weight.semibold,
+  },
+  helpText: {
+    fontSize: typography.size.xs,
+    color: colors.text.muted,
+    fontStyle: 'italic',
+    marginTop: spacing.xs,
+  },
+  confirmButton: {
+    backgroundColor: colors.primary.main,
+    padding: spacing.sm,
+    borderRadius: borderRadius.sm,
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+  confirmButtonText: {
+    color: colors.text.primary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+  },
+  addButton: {
+    backgroundColor: colors.accent.purple,
+    height: 48,
+    borderRadius: borderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.sm,
+    ...shadows.md,
+  },
+  addButtonText: {
+    color: colors.text.primary,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: spacing.xxxl,
+  },
+  emptyEmoji: {
+    fontSize: 48,
+    marginBottom: spacing.md,
+  },
+  emptyText: {
+    fontSize: typography.size.md,
+    color: colors.text.secondary,
+    fontWeight: typography.weight.semibold,
+    marginBottom: spacing.xs,
+  },
+  emptySubtext: {
+    fontSize: typography.size.sm,
+    color: colors.text.tertiary,
+  },
+  emptyPickerState: {
+    padding: spacing.md,
+    alignItems: 'center',
+  },
+  emptyPickerText: {
+    fontSize: typography.size.sm,
+    color: colors.text.muted,
+    fontWeight: typography.weight.semibold,
+  },
+  emptyPickerSubtext: {
+    fontSize: typography.size.xs,
+    color: colors.text.tertiary,
+    textAlign: 'center',
+  },
+});
+
+export default LessonsScreen;
