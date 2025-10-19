@@ -32,15 +32,15 @@ const WeeklyScheduleScreen = () => {
   const [editingScheduleId, setEditingScheduleId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Days of the week (Sunday to Saturday)
+  // Days of the week (Saturday to Friday)
   const daysOfWeek = [
+    { key: 'saturday', label: 'السبت', shortLabel: 'سبت' },
     { key: 'sunday', label: 'الأحد', shortLabel: 'أحد' },
     { key: 'monday', label: 'الاثنين', shortLabel: 'اثنين' },
     { key: 'tuesday', label: 'الثلاثاء', shortLabel: 'ثلاثاء' },
     { key: 'wednesday', label: 'الأربعاء', shortLabel: 'أربعاء' },
     { key: 'thursday', label: 'الخميس', shortLabel: 'خميس' },
     { key: 'friday', label: 'الجمعة', shortLabel: 'جمعة' },
-    { key: 'saturday', label: 'السبت', shortLabel: 'سبت' },
   ];
 
   // Time slots (8 AM to 11 PM)
@@ -72,11 +72,11 @@ const WeeklyScheduleScreen = () => {
     setSelectedDay(today);
   };
 
-  // Get week start (Sunday)
+  // Get week start (Saturday)
   const getWeekStart = (date) => {
     const d = new Date(date);
     const day = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-    const diff = day; // Days to subtract to get to Sunday
+    const diff = (day + 1) % 7; // Days to subtract to get to Saturday
     d.setDate(d.getDate() - diff);
     d.setHours(0, 0, 0, 0);
     // Return in YYYY-MM-DD format using local date
@@ -106,22 +106,23 @@ const WeeklyScheduleScreen = () => {
   // Get current day name
   const getDayName = () => {
     const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    return dayNames[new Date().getDay()]; // getDay() returns 0-6 where 0 is Sunday
+    const jsDay = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    return dayNames[jsDay];
   };
 
   // Get date for each day of the week
   const getDateForDay = (dayKey) => {
     if (!currentWeekStart) return '';
 
-    // Map day keys to their index in the week (0 = Sunday)
+    // Map day keys to their index in the week (0 = Saturday)
     const dayMapping = {
-      'sunday': 0,
-      'monday': 1,
-      'tuesday': 2,
-      'wednesday': 3,
-      'thursday': 4,
-      'friday': 5,
-      'saturday': 6
+      'saturday': 0,
+      'sunday': 1,
+      'monday': 2,
+      'tuesday': 3,
+      'wednesday': 4,
+      'thursday': 5,
+      'friday': 6
     };
 
     const dayOffset = dayMapping[dayKey];
@@ -304,7 +305,6 @@ const WeeklyScheduleScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.weekInfo}>
-          <Text style={styles.weekTitle}>جدول العمل الأسبوعي</Text>
           <Text style={styles.weekSubtitle}>أسبوع {currentWeekId}</Text>
         </View>
 

@@ -3,11 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   Modal,
   ScrollView,
-  Animated,
   Linking,
   ActivityIndicator,
   Image,
@@ -27,17 +25,9 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [displayCount, setDisplayCount] = useState(10);
-  const fadeAnim = new Animated.Value(0);
   const [unreadIds, setUnreadIds] = useState([]);
-  const highlightAnim = new Animated.Value(1);
 
   useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
-
     // Load unread announcement IDs
     loadUnreadIds();
   }, []);
@@ -48,11 +38,6 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
       const announcement = announcements.find(a => a.id === highlightId);
       if (announcement) {
         openDetail(announcement);
-        // Highlight animation
-        Animated.sequence([
-          Animated.timing(highlightAnim, { toValue: 1.1, duration: 200, useNativeDriver: true }),
-          Animated.timing(highlightAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
-        ]).start();
       }
     }
   }, [highlightId, announcements]);
@@ -181,66 +166,6 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
     setDisplayCount(prev => prev + 10);
   };
 
-  const renderAnnouncementCard = ({ item, index }) => {
-    const tagColor = getTagColor(item.tag);
-
-    return (
-      <Animated.View
-        style={[
-          styles.card,
-          {
-            opacity: fadeAnim,
-            transform: [{
-              translateY: fadeAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [20, 0],
-              }),
-            }],
-          },
-        ]}
-      >
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => openDetail(item)}
-        >
-          {item.isPinned && (
-            <View style={styles.pinnedBadge}>
-              <Text style={styles.pinnedText}>📌 مثبت</Text>
-            </View>
-          )}
-
-          <View style={styles.cardHeader}>
-            <View style={[styles.tagBadge, { backgroundColor: tagColor + '20' }]}>
-              <Text style={styles.tagEmoji}>{getTagEmoji(item.tag)}</Text>
-              <Text style={[styles.tagText, { color: tagColor }]}>{item.tag}</Text>
-            </View>
-          </View>
-
-          <Text style={styles.cardTitle} numberOfLines={2}>
-            {item.title}
-          </Text>
-
-          {item.imageUri && (
-            <Image
-              source={{ uri: item.imageUri }}
-              style={styles.cardImage}
-              resizeMode="cover"
-            />
-          )}
-
-          <Text style={styles.cardContent} numberOfLines={3}>
-            {item.content}
-          </Text>
-
-          <View style={styles.cardFooter}>
-            <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
-            <Text style={styles.readMore}>اقرأ المزيد ←</Text>
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
-    );
-  };
-
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -252,38 +177,83 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={displayedAnnouncements}
-        keyExtractor={(item) => item.id}
-        renderItem={renderAnnouncementCard}
-        ListHeaderComponent={
-          visibleAnnouncements.length > 0 && (
-            <View style={styles.header}>
-              <Text style={styles.headerIcon}>📢</Text>
-              <Text style={styles.headerTitle}>الإعلانات والتحديثات</Text>
-            </View>
-          )
-        }
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>📭</Text>
-            <Text style={styles.emptyText}>لا توجد إعلانات حالياً</Text>
-            <Text style={styles.emptySubtext}>سنقوم بإعلامك عند وجود تحديثات جديدة</Text>
-          </View>
-        }
-        ListFooterComponent={
-          hasMore && (
+      {/* Header */}
+      {visibleAnnouncements.length > 0 && (
+        <View style={styles.header}>
+          <Text style={styles.headerIcon}>📢</Text>
+          <Text style={styles.headerTitle}>الإعلانات والتحديثات</Text>
+        </View>
+      )}
+
+      {/* Announcements List */}
+      {displayedAnnouncements.length > 0 ? (
+        <>
+          {displayedAnnouncements.map((item, index) => {
+            const tagColor = getTagColor(item.tag);
+            return (
+              <View
+                key={item.id}
+                style={styles.card}
+              >
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => openDetail(item)}
+                >
+                  {item.isPinned && (
+                    <View style={styles.pinnedBadge}>
+                      <Text style={styles.pinnedText}>📌 مثبت</Text>
+                    </View>
+                  )}
+
+                  <View style={styles.cardHeader}>
+                    <View style={[styles.tagBadge, { backgroundColor: tagColor + '20' }]}>
+                      <Text style={styles.tagEmoji}>{getTagEmoji(item.tag)}</Text>
+                      <Text style={[styles.tagText, { color: tagColor }]}>{item.tag}</Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.cardTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+
+                  {item.imageUri && (
+                    <Image
+                      source={{ uri: item.imageUri }}
+                      style={styles.cardImage}
+                      resizeMode="cover"
+                    />
+                  )}
+
+                  <Text style={styles.cardContent} numberOfLines={3}>
+                    {item.content}
+                  </Text>
+
+                  <View style={styles.cardFooter}>
+                    <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
+                    <Text style={styles.readMore}>اقرأ المزيد ←</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+
+          {/* Load More Button */}
+          {hasMore && (
             <TouchableOpacity
               style={styles.loadMoreButton}
               onPress={loadMore}
             >
               <Text style={styles.loadMoreText}>عرض المزيد ↓</Text>
             </TouchableOpacity>
-          )
-        }
-        contentContainerStyle={visibleAnnouncements.length === 0 && styles.emptyContainer}
-        showsVerticalScrollIndicator={false}
-      />
+          )}
+        </>
+      ) : (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>📭</Text>
+          <Text style={styles.emptyText}>لا توجد إعلانات حالياً</Text>
+          <Text style={styles.emptySubtext}>سنقوم بإعلامك عند وجود تحديثات جديدة</Text>
+        </View>
+      )}
 
       {/* Detail Modal */}
       <Modal
@@ -362,10 +332,11 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    // Removed flex: 1 to allow proper nesting in other ScrollViews/FlatLists
+    minHeight: 100, // Ensure minimum height so it's visible in FlatList
+    backgroundColor: colors.background.primary, // Explicit background color
   },
   loadingContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.xxxl,
@@ -468,13 +439,13 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
   },
   emptyContainer: {
-    flexGrow: 1,
+    // Removed flexGrow to prevent layout issues
   },
   emptyState: {
-    flex: 1,
+    // Removed flex: 1 which was causing issues
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: spacing.xxxl * 2,
+    paddingVertical: spacing.xxxl,
     paddingHorizontal: spacing.base,
   },
   emptyEmoji: {

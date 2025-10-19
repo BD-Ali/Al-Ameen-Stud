@@ -123,29 +123,55 @@ class NotificationService {
   async getUsersByRole(targetAudience) {
     try {
       const usersRef = collection(db, 'users');
-      let q;
+      let users = [];
 
       switch (targetAudience) {
         case 'clients':
-          q = query(usersRef, where('role', '==', 'client'));
+          const clientsQuery = query(usersRef, where('role', '==', 'client'));
+          const clientsSnapshot = await getDocs(clientsQuery);
+          users = clientsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
           break;
         case 'workers':
-          q = query(usersRef, where('role', '==', 'worker'));
+          const workersQuery = query(usersRef, where('role', '==', 'worker'));
+          const workersSnapshot = await getDocs(workersQuery);
+          users = workersSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
           break;
         case 'visitors':
           // Visitors don't have user accounts, skip for now
           return [];
         case 'all':
         default:
-          q = query(usersRef);
+          // Fetch both clients and workers explicitly
+          const clientsQ = query(usersRef, where('role', '==', 'client'));
+          const workersQ = query(usersRef, where('role', '==', 'worker'));
+
+          const [clientsSnap, workersSnap] = await Promise.all([
+            getDocs(clientsQ),
+            getDocs(workersQ)
+          ]);
+
+          const clients = clientsSnap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+
+          const workers = workersSnap.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+
+          // Combine both arrays
+          users = [...clients, ...workers];
           break;
       }
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+      return users;
     } catch (error) {
       console.error('Error getting users by role:', error);
       return [];
@@ -499,4 +525,3 @@ class NotificationService {
 
 export const notificationService = new NotificationService();
 export default notificationService;
-

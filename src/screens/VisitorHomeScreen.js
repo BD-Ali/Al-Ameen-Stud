@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
@@ -14,7 +14,11 @@ const VisitorHomeScreen = ({ navigation }) => {
   const { horses } = useContext(DataContext);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsVerticalScrollIndicator={true}
+    >
       <View style={styles.header}>
         <View style={styles.logoContainer}>
           <Image
@@ -33,41 +37,36 @@ const VisitorHomeScreen = ({ navigation }) => {
       <AnnouncementsFeed userRole="visitor" />
 
       <Text style={styles.subheading}>🏇 خيولنا</Text>
-      <FlatList
-        data={horses}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
+
+      {/* Render horses directly instead of using FlatList */}
+      {horses.length > 0 ? (
+        horses.map((item) => (
+          <View key={item.id} style={styles.card}>
             <Text style={styles.horseName}>{item.name}</Text>
             <View style={styles.breedRow}>
               <Text style={styles.breedLabel}>السلالة:</Text>
               <Text style={styles.breedValue}>{item.breed}</Text>
             </View>
           </View>
-        )}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🐴</Text>
-            <Text style={styles.emptyText}>لا توجد خيول لعرضها بعد</Text>
-          </View>
-        }
-      />
-
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backButtonText}>→ العودة لتسجيل الدخول</Text>
-      </TouchableOpacity>
-    </View>
+        ))
+      ) : (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>🐴</Text>
+          <Text style={styles.emptyText}>لا توجد خيول لعرضها بعد</Text>
+        </View>
+      )}
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: spacing.base,
     backgroundColor: colors.background.primary,
+  },
+  contentContainer: {
+    padding: spacing.base,
+    paddingBottom: spacing.xl, // Extra padding at bottom
   },
   header: {
     alignItems: 'center',
@@ -148,20 +147,6 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: typography.size.base,
     color: colors.text.tertiary,
-  },
-  backButton: {
-    backgroundColor: colors.primary.main,
-    height: 48,
-    borderRadius: borderRadius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.base,
-    ...shadows.md,
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
   },
 });
 
