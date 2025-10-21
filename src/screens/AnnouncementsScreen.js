@@ -23,6 +23,7 @@ import { AuthContext } from '../context/AuthContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
 
 /**
  * Toast Notification Component
@@ -255,10 +256,27 @@ const AnnouncementsScreen = () => {
     }
 
     setIsSubmitting(true);
+    setUploadingImage(true);
 
     try {
+      let cloudinaryImageUrl = formData.imageUri;
+
+      // Upload image to Cloudinary if it's a local URI (not already uploaded)
+      if (formData.imageUri && !formData.imageUri.includes('cloudinary.com')) {
+        const uploadResult = await uploadImageToCloudinary(formData.imageUri, 'announcements');
+        if (uploadResult.success) {
+          cloudinaryImageUrl = uploadResult.url;
+        } else {
+          showToast('فشل رفع الصورة: ' + uploadResult.error, 'error');
+          setIsSubmitting(false);
+          setUploadingImage(false);
+          return;
+        }
+      }
+
       const announcementData = {
         ...formData,
+        imageUri: cloudinaryImageUrl, // Use Cloudinary URL
         status: 'published', // Always publish immediately
         scheduledDate: formData.scheduledDate?.toISOString() || null,
         expiryDate: formData.expiryDate?.toISOString() || null,
@@ -294,6 +312,7 @@ const AnnouncementsScreen = () => {
       showToast('حدث خطأ غير متوقع', 'error');
     } finally {
       setIsSubmitting(false);
+      setUploadingImage(false);
     }
   };
 
@@ -538,7 +557,7 @@ const AnnouncementsScreen = () => {
                     </View>
                     {formData.imageUri && (
                       <Image
-                        source={{ uri: formData.imageUri }}
+                        source={{ uri: getOptimizedImageUrl(formData.imageUri, { width: 600, height: 400 }) }}
                         style={styles.previewImage}
                         resizeMode="cover"
                       />

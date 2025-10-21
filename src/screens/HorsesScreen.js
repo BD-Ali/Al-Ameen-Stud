@@ -1,9 +1,11 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, Image, ActivityIndicator } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';
+import * as ImagePicker from 'expo-image-picker';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -22,6 +24,8 @@ const HorsesScreen = () => {
   const [owner, setOwner] = useState('');
   const [feedSchedule, setFeedSchedule] = useState('');
   const [notes, setNotes] = useState('');
+  const [imageUri, setImageUri] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [expandedHorseId, setExpandedHorseId] = useState(null);
 
   // Reminder modal states
@@ -50,6 +54,73 @@ const HorsesScreen = () => {
     if (finalStatus !== 'granted') {
       Alert.alert('تنبيه', 'يجب منح إذن الإشعارات لتلقي التذكيرات');
     }
+  };
+
+  // Image picker functions
+  const pickImage = async (useCamera = false) => {
+    try {
+      // Request permissions
+      if (useCamera) {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('خطأ', 'نحتاج إلى إذن الوصول للكاميرا');
+          return;
+        }
+      } else {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          Alert.alert('خطأ', 'نحتاج إلى إذن الوصول للمعرض');
+          return;
+        }
+      }
+
+      const result = useCamera
+        ? await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+          });
+
+      if (!result.canceled && result.assets && result.assets[0]) {
+        setImageUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('خطأ', 'حدث خطأ أثناء اختيار الصورة');
+      console.error('Image picker error:', error);
+    }
+  };
+
+  const showImagePickerOptions = () => {
+    Alert.alert(
+      'اختر صورة للحصان',
+      'من أين تريد اختيار الصورة؟',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        { text: '📷 الكاميرا', onPress: () => pickImage(true) },
+        { text: '🖼️ المعرض', onPress: () => pickImage(false) },
+      ]
+    );
+  };
+
+  const removeImage = () => {
+    Alert.alert(
+      'إزالة الصورة',
+      'هل أنت متأكد من إزالة الصورة؟',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        {
+          text: 'إزالة',
+          style: 'destructive',
+          onPress: () => setImageUri(''),
+        },
+      ]
+    );
   };
 
   const scheduleNotification = async (reminder) => {
@@ -89,14 +160,55 @@ const HorsesScreen = () => {
     }
   };
 
-  const handleAddHorse = () => {
-    if (!name) return;
-    addHorse({ name, breed, owner, feedSchedule, notes });
-    setName('');
-    setBreed('');
-    setOwner('');
-    setFeedSchedule('');
-    setNotes('');
+  const handleAddHorse = async () => {
+    if (!name) {
+      Alert.alert('خطأ', 'الرجاء إدخال اسم الحصان');
+      return;
+    }
+
+    setUploadingImage(true);
+    let cloudinaryImageUrl = '';
+
+    try {
+      // Upload image to Cloudinary if exists
+      if (imageUri) {
+        const uploadResult = await uploadImageToCloudinary(imageUri, 'horses');
+        if (uploadResult.success) {
+          cloudinaryImageUrl = uploadResult.url;
+        } else {
+          Alert.alert('خطأ', 'فشل رفع الصورة: ' + uploadResult.error);
+          setUploadingImage(false);
+          return;
+        }
+      }
+
+      // Add horse with Cloudinary image URL
+      const result = await addHorse({
+        name,
+        breed,
+        owner,
+        feedSchedule,
+        notes,
+        imageUrl: cloudinaryImageUrl
+      });
+
+      if (result.success) {
+        setName('');
+        setBreed('');
+        setOwner('');
+        setFeedSchedule('');
+        setNotes('');
+        setImageUri('');
+        Alert.alert('نجح', 'تم إضافة الحصان بنجاح');
+      } else {
+        Alert.alert('خطأ', result.error || 'فشل إضافة الحصان');
+      }
+    } catch (error) {
+      console.error('Error adding horse:', error);
+      Alert.alert('خطأ', 'حدث خطأ غير متوقع');
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleRemoveHorse = (id) => {
@@ -270,6 +382,13 @@ const HorsesScreen = () => {
 
               {isExpanded && (
                 <View style={styles.expandedContent}>
+                  {item.imageUrl && (
+                    <Image
+                      source={{ uri: getOptimizedImageUrl(item.imageUrl, { width: 600, height: 400 }) }}
+                      style={styles.horseImage}
+                      resizeMode="cover"
+                    />
+                  )}
                   <View style={styles.cardRow}>
                     <Text style={styles.cardLabel}>🏇 السلالة:</Text>
                     <Text style={styles.cardValue}>{item.breed || 'غير محدد'}</Text>
@@ -351,6 +470,38 @@ const HorsesScreen = () => {
               />
             </View>
 
+            {/* Image Upload Section */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>📷 صورة الحصان (اختياري)</Text>
+              {imageUri ? (
+                <View style={styles.imagePreviewContainer}>
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={styles.imagePreview}
+                    resizeMode="cover"
+                  />
+                  <TouchableOpacity
+                    style={styles.removeImageButton}
+                    onPress={removeImage}
+                  >
+                    <Text style={styles.removeImageText}>🗑️ إزالة الصورة</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={styles.imageUploadButton}
+                  onPress={showImagePickerOptions}
+                  disabled={uploadingImage}
+                >
+                  {uploadingImage ? (
+                    <ActivityIndicator size="small" color={colors.primary.main} />
+                  ) : (
+                    <Text style={styles.imageUploadText}>📷 اختر صورة</Text>
+                  )}
+                </TouchableOpacity>
+              )}
+            </View>
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>🏇 السلالة</Text>
               <TextInput
@@ -399,8 +550,19 @@ const HorsesScreen = () => {
               />
             </View>
 
-            <TouchableOpacity style={styles.addButton} onPress={handleAddHorse}>
-              <Text style={styles.addButtonText}>إضافة حصان</Text>
+            <TouchableOpacity
+              style={[styles.addButton, uploadingImage && styles.disabledButton]}
+              onPress={handleAddHorse}
+              disabled={uploadingImage}
+            >
+              {uploadingImage ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color={colors.text.primary} />
+                  <Text style={styles.addButtonText}> جاري الرفع...</Text>
+                </View>
+              ) : (
+                <Text style={styles.addButtonText}>إضافة حصان</Text>
+              )}
             </TouchableOpacity>
           </View>
         }
@@ -909,6 +1071,62 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
+  },
+  // Image upload styles
+  horseImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: borderRadius.md,
+    marginBottom: spacing.md,
+  },
+  imagePreviewContainer: {
+    position: 'relative',
+    width: '100%',
+    height: 200,
+    borderRadius: borderRadius.sm,
+    overflow: 'hidden',
+    marginBottom: spacing.sm,
+  },
+  imagePreview: {
+    width: '100%',
+    height: '100%',
+    borderRadius: borderRadius.sm,
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: colors.status.error,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.sm,
+  },
+  removeImageText: {
+    fontSize: typography.size.xs,
+    color: colors.text.primary,
+    fontWeight: typography.weight.bold,
+  },
+  imageUploadButton: {
+    backgroundColor: colors.background.tertiary,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: borderRadius.sm,
+    padding: spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
+  },
+  imageUploadText: {
+    fontSize: typography.size.sm,
+    color: colors.text.secondary,
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -14,6 +14,7 @@ import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import notificationService from '../services/notificationService';
+import { getOptimizedImageUrl } from '../config/cloudinaryConfig';
 
 /**
  * AnnouncementsFeed - Displays announcements to users based on their role
@@ -218,7 +219,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
                   {item.imageUri && (
                     <Image
-                      source={{ uri: item.imageUri }}
+                      source={{ uri: getOptimizedImageUrl(item.imageUri, { width: 600, height: 400 }) }}
                       style={styles.cardImage}
                       resizeMode="cover"
                     />
@@ -296,7 +297,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
                   {selectedAnnouncement.imageUri && (
                     <Image
-                      source={{ uri: selectedAnnouncement.imageUri }}
+                      source={{ uri: getOptimizedImageUrl(selectedAnnouncement.imageUri, { width: 800, height: 600 }) }}
                       style={styles.modalImage}
                       resizeMode="cover"
                     />
