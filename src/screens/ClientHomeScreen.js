@@ -89,6 +89,46 @@ const ClientHomeScreen = () => {
                 </View>
               </View>
 
+              {/* Subscription Card - Only show if client has subscription */}
+              {selectedClient.hasSubscription && (
+                <View style={styles.subscriptionCard}>
+                  <View style={styles.subscriptionHeader}>
+                    <View style={styles.subscriptionTitleContainer}>
+                      <Text style={styles.subscriptionEmoji}>🎫</Text>
+                      <Text style={styles.subscriptionTitle}>اشتراك العيادة</Text>
+                    </View>
+                    <View style={[styles.subscriptionStatusBadge, selectedClient.subscriptionActive && styles.subscriptionActiveBadge]}>
+                      <Text style={styles.subscriptionStatusText}>
+                        {selectedClient.subscriptionActive ? '✓ نشط' : '✕ منتهي'}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.subscriptionStats}>
+                    <View style={styles.subscriptionStatItem}>
+                      <Text style={styles.subscriptionStatLabel}>الدروس المتبقية</Text>
+                      <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionLessons || 0}</Text>
+                    </View>
+                    <View style={styles.subscriptionDivider} />
+                    <View style={styles.subscriptionStatItem}>
+                      <Text style={styles.subscriptionStatLabel}>الدروس المستخدمة</Text>
+                      <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionUsedLessons || 0}</Text>
+                    </View>
+                    <View style={styles.subscriptionDivider} />
+                    <View style={styles.subscriptionStatItem}>
+                      <Text style={styles.subscriptionStatLabel}>إجمالي الاشتراك</Text>
+                      <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionTotalLessons || 0}</Text>
+                    </View>
+                  </View>
+                  {selectedClient.subscriptionStartDate && (
+                    <View style={styles.subscriptionFooter}>
+                      <Text style={styles.subscriptionDate}>
+                        📅 تاريخ البدء: {formatDate(selectedClient.subscriptionStartDate)}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              )}
+
               {/* Lessons Section */}
               <View style={styles.lessonsHeader}>
                 <Text style={styles.sectionTitle}>🗓️ دروسك</Text>
@@ -285,9 +325,85 @@ const styles = StyleSheet.create({
     fontSize: 40,
     marginBottom: spacing.md,
   },
-  loadingText: {
-    fontSize: typography.size.base,
+  // Subscription card styles
+  subscriptionCard: {
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.lg,
+    padding: spacing.base,
+    marginBottom: spacing.base,
+    borderWidth: 2,
+    borderColor: colors.accent.teal,
+    ...shadows.md,
+  },
+  subscriptionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  subscriptionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  subscriptionEmoji: {
+    fontSize: 24,
+    marginRight: spacing.sm,
+  },
+  subscriptionTitle: {
+    fontSize: typography.size.lg,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  subscriptionStatusBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.sm,
+    backgroundColor: colors.status.error,
+  },
+  subscriptionActiveBadge: {
+    backgroundColor: colors.status.success,
+  },
+  subscriptionStatusText: {
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  subscriptionStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingVertical: spacing.md,
+  },
+  subscriptionStatItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  subscriptionStatLabel: {
+    fontSize: typography.size.xs,
     color: colors.text.tertiary,
+    marginBottom: spacing.xs,
+    textAlign: 'center',
+  },
+  subscriptionStatValue: {
+    fontSize: typography.size.xxl,
+    fontWeight: typography.weight.bold,
+    color: colors.accent.teal,
+  },
+  subscriptionDivider: {
+    width: 1,
+    height: 50,
+    backgroundColor: colors.border.light,
+  },
+  subscriptionFooter: {
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border.light,
+  },
+  subscriptionDate: {
+    fontSize: typography.size.xs,
+    color: colors.text.muted,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

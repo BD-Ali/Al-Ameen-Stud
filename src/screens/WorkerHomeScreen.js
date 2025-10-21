@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -10,7 +10,7 @@ import CompactHeader from '../components/CompactHeader';
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
  */
 const WorkerHomeScreen = () => {
-  const { schedules, horses, workers, lessons, clients, weeklySchedules, loading } = useContext(DataContext);
+  const { schedules, horses, workers, lessons, clients, weeklySchedules, loading, confirmLesson, cancelLesson } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
 
   // Find worker by matching user ID
@@ -125,6 +125,49 @@ const WorkerHomeScreen = () => {
     return `${h - 12} PM`;
   };
 
+  const handleConfirmLesson = async (lessonId) => {
+    Alert.alert(
+      'تأكيد إتمام الدرس',
+      'هل تريد تأكيد أن هذا الدرس قد تم بنجاح؟ سيتم تحديث عدد دروس العميل تلقائياً.',
+      [
+        { text: 'إلغاء', style: 'cancel' },
+        {
+          text: 'تأكيد',
+          onPress: async () => {
+            const result = await confirmLesson(lessonId);
+            if (result.success) {
+              Alert.alert('نجح', 'تم تأكيد إتمام الدرس بنجاح ✓');
+            } else {
+              Alert.alert('خطأ', result.error || 'فشل تأكيد الدرس');
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleCancelLesson = async (lessonId) => {
+    Alert.alert(
+      'إلغاء الدرس',
+      'هل تريد إلغاء هذا الدرس؟ لن يتم تحديث عدد دروس العميل.',
+      [
+        { text: 'رجوع', style: 'cancel' },
+        {
+          text: 'إلغاء الدرس',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await cancelLesson(lessonId, 'ألغي من قبل المدرب');
+            if (result.success) {
+              Alert.alert('تم', 'تم إلغاء الدرس');
+            } else {
+              Alert.alert('خطأ', result.error || 'فشل إلغاء الدرس');
+            }
+          }
+        }
+      ]
+    );
+  };
+
   // Create sections data for FlatList
   const sections = [
     { id: 'announcements', type: 'announcements' },
@@ -226,6 +269,16 @@ const WorkerHomeScreen = () => {
                       <View key={lesson.id} style={styles.lessonCard}>
                         <View style={styles.lessonHeader}>
                           <Text style={styles.lessonTime}>⏰ {lesson.time}</Text>
+                          {lesson.confirmed && (
+                            <View style={styles.confirmedBadge}>
+                              <Text style={styles.confirmedBadgeText}>✓ مكتمل</Text>
+                            </View>
+                          )}
+                          {lesson.status === 'cancelled' && (
+                            <View style={styles.cancelledBadge}>
+                              <Text style={styles.cancelledBadgeText}>✕ ملغي</Text>
+                            </View>
+                          )}
                         </View>
                         <View style={styles.lessonDetails}>
                           <View style={styles.lessonInfoRow}>
@@ -237,6 +290,22 @@ const WorkerHomeScreen = () => {
                             <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
                           </View>
                         </View>
+                        {!lesson.confirmed && lesson.status !== 'cancelled' && (
+                          <View style={styles.lessonActions}>
+                            <TouchableOpacity
+                              style={styles.confirmButton}
+                              onPress={() => handleConfirmLesson(lesson.id)}
+                            >
+                              <Text style={styles.confirmButtonText}>✓ تأكيد الإتمام</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              style={styles.cancelButton}
+                              onPress={() => handleCancelLesson(lesson.id)}
+                            >
+                              <Text style={styles.cancelButtonText}>✕ إلغاء</Text>
+                            </TouchableOpacity>
+                          </View>
+                        )}
                       </View>
                     ))}
                   </View>
@@ -481,6 +550,60 @@ const styles = StyleSheet.create({
   lessonValue: {
     fontSize: typography.size.sm,
     color: colors.text.primary,
+    fontWeight: typography.weight.semibold,
+  },
+  lessonActions: {
+    flexDirection: 'row',
+    marginTop: spacing.md,
+    gap: spacing.sm,
+  },
+  confirmButton: {
+    flex: 1,
+    backgroundColor: colors.status.success,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: colors.status.error,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#fff',
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+  },
+  confirmedBadge: {
+    backgroundColor: colors.status.success,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  confirmedBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
+  },
+  cancelledBadge: {
+    backgroundColor: colors.status.error,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  cancelledBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
   },
   taskGroup: {
     marginBottom: spacing.md,

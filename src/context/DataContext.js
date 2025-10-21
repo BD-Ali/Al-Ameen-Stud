@@ -204,7 +204,7 @@ export const DataProvider = ({ children }) => {
   /**
    * Create a new user account with Firebase Auth and store in Firestore
    */
-  const createUserAccount = async (name, email, phoneNumber, role = 'client') => {
+  const createUserAccount = async (name, email, phoneNumber, role = 'client', subscriptionData = null) => {
     try {
       // Create auth user with phone number as password
       const userCredential = await createUserWithEmailAndPassword(auth, email, phoneNumber);
@@ -221,7 +221,7 @@ export const DataProvider = ({ children }) => {
 
       // If client, create client record
       if (role === 'client') {
-        await setDoc(doc(db, 'clients', user.uid), {
+        const clientData = {
           name,
           email,
           phoneNumber,
@@ -229,7 +229,26 @@ export const DataProvider = ({ children }) => {
           amountDue: 0,
           lessonCount: 0,
           createdAt: serverTimestamp(),
-        });
+        };
+
+        // Add subscription data if provided
+        if (subscriptionData) {
+          clientData.hasSubscription = subscriptionData.hasSubscription || false;
+          clientData.subscriptionLessons = subscriptionData.subscriptionLessons || 0;
+          clientData.subscriptionTotalLessons = subscriptionData.subscriptionTotalLessons || 0;
+          clientData.subscriptionUsedLessons = subscriptionData.subscriptionUsedLessons || 0;
+          clientData.subscriptionActive = subscriptionData.subscriptionActive || false;
+          clientData.subscriptionStartDate = subscriptionData.subscriptionStartDate || null;
+        } else {
+          // Default subscription values
+          clientData.hasSubscription = false;
+          clientData.subscriptionLessons = 0;
+          clientData.subscriptionTotalLessons = 0;
+          clientData.subscriptionUsedLessons = 0;
+          clientData.subscriptionActive = false;
+        }
+
+        await setDoc(doc(db, 'clients', user.uid), clientData);
       }
 
       // If worker, create worker record
@@ -333,14 +352,96 @@ export const DataProvider = ({ children }) => {
   };
 
   /**
+   * Check if worker is available at the given date and time
+   */
+  const isWorkerAvailable = (workerId, date, time, excludeLessonId = null) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const lessonStartTime = hours * 60 + minutes;
+    const lessonEndTime = lessonStartTime + 60; // 1 hour lesson duration
+
+    const workerLessons = lessons.filter(l =>
+      l.instructorId === workerId &&
+      l.date === date &&
+      l.id !== excludeLessonId
+    );
+
+    for (const existingLesson of workerLessons) {
+      const [existingHours, existingMinutes] = existingLesson.time.split(':').map(Number);
+      const existingStartTime = existingHours * 60 + existingMinutes;
+      const existingEndTime = existingStartTime + 60;
+
+      // Check if there's any overlap
+      if (
+        (lessonStartTime >= existingStartTime && lessonStartTime < existingEndTime) ||
+        (lessonEndTime > existingStartTime && lessonEndTime <= existingEndTime) ||
+        (lessonStartTime <= existingStartTime && lessonEndTime >= existingEndTime)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * Check if horse is available at the given date and time
+   */
+  const isHorseAvailable = (horseId, date, time, excludeLessonId = null) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const lessonStartTime = hours * 60 + minutes;
+    const lessonEndTime = lessonStartTime + 60; // 1 hour lesson duration
+
+    const horseLessons = lessons.filter(l =>
+      l.horseId === horseId &&
+      l.date === date &&
+      l.id !== excludeLessonId
+    );
+
+    for (const existingLesson of horseLessons) {
+      const [existingHours, existingMinutes] = existingLesson.time.split(':').map(Number);
+      const existingStartTime = existingHours * 60 + existingMinutes;
+      const existingEndTime = existingStartTime + 60;
+
+      // Check if there's any overlap
+      if (
+        (lessonStartTime >= existingStartTime && lessonStartTime < existingEndTime) ||
+        (lessonEndTime > existingStartTime && lessonEndTime <= existingEndTime) ||
+        (lessonStartTime <= existingStartTime && lessonEndTime >= existingEndTime)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
    * Add a new lesson.
    * Automatically creates a schedule entry, mission, and schedules reminder notifications.
    */
   const addLesson = async (lesson) => {
     try {
-      // Add the lesson
+      // Validate worker availability
+      if (!isWorkerAvailable(lesson.instructorId, lesson.date, lesson.time)) {
+        const workerName = workerUsers.find(w => w.id === lesson.instructorId)?.name || 'المدرب';
+        return {
+          success: false,
+          error: `${workerName} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.`
+        };
+      }
+
+      // Validate horse availability
+      if (!isHorseAvailable(lesson.horseId, lesson.date, lesson.time)) {
+        const horseName = horses.find(h => h.id === lesson.horseId)?.name || 'الحصان';
+        return {
+          success: false,
+          error: `${horseName} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.`
+        };
+      }
+
+      // Add the lesson with initial status
       const lessonRef = await addDoc(collection(db, 'lessons'), {
         ...lesson,
+        status: 'scheduled',
+        confirmed: false,
         createdAt: serverTimestamp(),
         remindersSent: false,
       });
@@ -366,6 +467,7 @@ export const DataProvider = ({ children }) => {
         dueDate: lesson.date,
         time: lesson.time,
         horseId: lesson.horseId,
+        clientId: lesson.clientId,
         lessonId: lessonRef.id,
         type: 'lesson',
         priority: 'high',
@@ -400,6 +502,38 @@ export const DataProvider = ({ children }) => {
       // Check if date or time changed
       const dateChanged = updates.date && updates.date !== currentLesson.date;
       const timeChanged = updates.time && updates.time !== currentLesson.time;
+      const workerChanged = updates.instructorId && updates.instructorId !== currentLesson.instructorId;
+      const horseChanged = updates.horseId && updates.horseId !== currentLesson.horseId;
+
+      // Validate worker availability if changed
+      if (workerChanged || dateChanged || timeChanged) {
+        const instructorId = updates.instructorId || currentLesson.instructorId;
+        const date = updates.date || currentLesson.date;
+        const time = updates.time || currentLesson.time;
+
+        if (!isWorkerAvailable(instructorId, date, time, id)) {
+          const workerName = workerUsers.find(w => w.id === instructorId)?.name || 'المدرب';
+          return {
+            success: false,
+            error: `${workerName} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.`
+          };
+        }
+      }
+
+      // Validate horse availability if changed
+      if (horseChanged || dateChanged || timeChanged) {
+        const horseId = updates.horseId || currentLesson.horseId;
+        const date = updates.date || currentLesson.date;
+        const time = updates.time || currentLesson.time;
+
+        if (!isHorseAvailable(horseId, date, time, id)) {
+          const horseName = horses.find(h => h.id === horseId)?.name || 'الحصان';
+          return {
+            success: false,
+            error: `${horseName} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.`
+          };
+        }
+      }
 
       await updateDoc(doc(db, 'lessons', id), {
         ...updates,
@@ -419,6 +553,104 @@ export const DataProvider = ({ children }) => {
       return { success: true };
     } catch (error) {
       console.error('Error updating lesson:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Confirm a lesson as completed by the worker.
+   * Updates lesson status, marks mission as completed, and increments client lesson count.
+   */
+  const confirmLesson = async (lessonId) => {
+    try {
+      const lesson = lessons.find(l => l.id === lessonId);
+      if (!lesson) {
+        return { success: false, error: 'الدرس غير موجود' };
+      }
+
+      if (lesson.confirmed) {
+        return { success: false, error: 'تم تأكيد هذا الدرس مسبقاً' };
+      }
+
+      // Update lesson status
+      await updateDoc(doc(db, 'lessons', lessonId), {
+        confirmed: true,
+        status: 'completed',
+        completedAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+
+      // Mark associated mission as completed
+      const associatedMissions = missions.filter(m => m.lessonId === lessonId);
+      for (const mission of associatedMissions) {
+        await updateDoc(doc(db, 'missions', mission.id), {
+          completed: true,
+          completedAt: serverTimestamp()
+        });
+      }
+
+      // Increment client lesson count and handle subscription
+      const client = clients.find(c => c.id === lesson.clientId);
+      if (client) {
+        const newLessonCount = (client.lessonCount || 0) + 1;
+        const updateData = {
+          lessonCount: newLessonCount,
+          lastLessonDate: lesson.date,
+          updatedAt: serverTimestamp()
+        };
+
+        // Handle subscription deduction if client has active subscription
+        if (client.hasSubscription && client.subscriptionLessons > 0) {
+          const newSubscriptionBalance = client.subscriptionLessons - 1;
+          updateData.subscriptionLessons = newSubscriptionBalance;
+          updateData.subscriptionUsedLessons = (client.subscriptionUsedLessons || 0) + 1;
+
+          // If subscription is depleted, optionally mark it as inactive
+          if (newSubscriptionBalance === 0) {
+            updateData.subscriptionActive = false;
+          }
+        }
+
+        await updateDoc(doc(db, 'clients', lesson.clientId), updateData);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error confirming lesson:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Cancel a lesson.
+   * Updates lesson status without incrementing client count.
+   */
+  const cancelLesson = async (lessonId, reason = '') => {
+    try {
+      const lesson = lessons.find(l => l.id === lessonId);
+      if (!lesson) {
+        return { success: false, error: 'الدرس غير موجود' };
+      }
+
+      await updateDoc(doc(db, 'lessons', lessonId), {
+        status: 'cancelled',
+        cancelReason: reason,
+        cancelledAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+
+      // Mark associated mission as completed (cancelled)
+      const associatedMissions = missions.filter(m => m.lessonId === lessonId);
+      for (const mission of associatedMissions) {
+        await updateDoc(doc(db, 'missions', mission.id), {
+          completed: true,
+          completedAt: serverTimestamp()
+        });
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error cancelling lesson:', error);
       return { success: false, error: error.message };
     }
   };
@@ -1312,6 +1544,8 @@ export const DataProvider = ({ children }) => {
         addLesson,
         updateLesson,
         removeLesson,
+        confirmLesson,
+        cancelLesson,
         reminders,
         addReminder,
         updateReminder,

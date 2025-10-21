@@ -48,6 +48,8 @@ const UsersScreen = () => {
     name: '',
     email: '',
     phone: '',
+    hasSubscription: false,
+    subscriptionLessons: '',
   });
 
   // Search & Filter
@@ -265,6 +267,15 @@ const UsersScreen = () => {
       return;
     }
 
+    // Validate subscription data for clients
+    if (activeTab === 'clients' && newUserForm.hasSubscription) {
+      const subscriptionCount = parseInt(newUserForm.subscriptionLessons);
+      if (isNaN(subscriptionCount) || subscriptionCount <= 0) {
+        Alert.alert('خطأ', 'يرجى إدخال عدد صحيح من الدروس للاشتراك');
+        return;
+      }
+    }
+
     setIsAddingUser(true);
     setIsLoading(true);
     setLoadingMessage('جاري الإضافة...');
@@ -273,7 +284,16 @@ const UsersScreen = () => {
       newUserForm.name.trim(),
       newUserForm.email.trim(),
       newUserForm.phone.trim(),
-      activeTab === 'clients' ? 'client' : 'worker'
+      activeTab === 'clients' ? 'client' : 'worker',
+      // Pass subscription data if client
+      activeTab === 'clients' && newUserForm.hasSubscription ? {
+        hasSubscription: true,
+        subscriptionLessons: parseInt(newUserForm.subscriptionLessons),
+        subscriptionTotalLessons: parseInt(newUserForm.subscriptionLessons),
+        subscriptionUsedLessons: 0,
+        subscriptionActive: true,
+        subscriptionStartDate: new Date().toISOString().split('T')[0]
+      } : null
     );
 
     setIsAddingUser(false);
@@ -282,7 +302,7 @@ const UsersScreen = () => {
     if (result.success) {
       const userType = activeTab === 'clients' ? 'العميل' : 'العامل';
       showToastNotification(`✅ تم إضافة ${userType} ${newUserForm.name} بنجاح`, 'success');
-      setNewUserForm({ name: '', email: '', phone: '' });
+      setNewUserForm({ name: '', email: '', phone: '', hasSubscription: false, subscriptionLessons: '' });
     } else {
       showToastNotification(result.error || 'فشل الإضافة', 'error');
     }
@@ -418,6 +438,41 @@ const UsersScreen = () => {
                         <Text style={styles.detailLabel}>📚 عدد الدروس</Text>
                         <Text style={styles.detailValue}>{item.lessonCount || 0}</Text>
                       </View>
+
+                      {/* Subscription Information */}
+                      {item.hasSubscription && (
+                        <View style={styles.subscriptionInfoCard}>
+                          <View style={styles.subscriptionInfoHeader}>
+                            <Text style={styles.subscriptionInfoTitle}>🎫 اشتراك العيادة</Text>
+                            <View style={[styles.subscriptionStatusBadge, item.subscriptionActive && styles.subscriptionActiveBadge]}>
+                              <Text style={styles.subscriptionStatusText}>
+                                {item.subscriptionActive ? '✓ نشط' : '✕ منتهي'}
+                              </Text>
+                            </View>
+                          </View>
+                          <View style={styles.subscriptionStats}>
+                            <View style={styles.subscriptionStatItem}>
+                              <Text style={styles.subscriptionStatLabel}>المتبقي</Text>
+                              <Text style={styles.subscriptionStatValue}>{item.subscriptionLessons || 0}</Text>
+                            </View>
+                            <View style={styles.subscriptionStatDivider} />
+                            <View style={styles.subscriptionStatItem}>
+                              <Text style={styles.subscriptionStatLabel}>المستخدم</Text>
+                              <Text style={styles.subscriptionStatValue}>{item.subscriptionUsedLessons || 0}</Text>
+                            </View>
+                            <View style={styles.subscriptionStatDivider} />
+                            <View style={styles.subscriptionStatItem}>
+                              <Text style={styles.subscriptionStatLabel}>الإجمالي</Text>
+                              <Text style={styles.subscriptionStatValue}>{item.subscriptionTotalLessons || 0}</Text>
+                            </View>
+                          </View>
+                          {item.subscriptionStartDate && (
+                            <Text style={styles.subscriptionDate}>
+                              تاريخ البدء: {formatDate(item.subscriptionStartDate)}
+                            </Text>
+                          )}
+                        </View>
+                      )}
 
                       <TouchableOpacity
                         style={styles.editDetailsButton}
@@ -613,6 +668,49 @@ const UsersScreen = () => {
                   />
                 </View>
 
+                {/* Subscription Section - Only for Clients */}
+                {activeTab === 'clients' && (
+                  <View style={styles.subscriptionSection}>
+                    <View style={styles.subscriptionHeader}>
+                      <Text style={styles.subscriptionTitle}>🎫 اشتراك العيادة</Text>
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.subscriptionToggle}
+                      onPress={() => setNewUserForm({
+                        ...newUserForm,
+                        hasSubscription: !newUserForm.hasSubscription,
+                        subscriptionLessons: !newUserForm.hasSubscription ? newUserForm.subscriptionLessons : ''
+                      })}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.checkboxContainer}>
+                        <View style={[styles.checkbox, newUserForm.hasSubscription && styles.checkboxChecked]}>
+                          {newUserForm.hasSubscription && <Text style={styles.checkboxIcon}>✓</Text>}
+                        </View>
+                        <Text style={styles.checkboxLabel}>لديه اشتراك من العيادة</Text>
+                      </View>
+                    </TouchableOpacity>
+
+                    {newUserForm.hasSubscription && (
+                      <View style={styles.inputGroup}>
+                        <Text style={styles.label}>📊 عدد الدروس في الاشتراك</Text>
+                        <TextInput
+                          value={newUserForm.subscriptionLessons}
+                          onChangeText={(text) => setNewUserForm({...newUserForm, subscriptionLessons: text})}
+                          placeholder="مثال: 10"
+                          keyboardType="number-pad"
+                          placeholderTextColor="#64748b"
+                          style={styles.input}
+                        />
+                        <Text style={styles.helpText}>
+                          سيتم خصم درس من الاشتراك عند تأكيد كل درس مكتمل
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+
                 <TouchableOpacity
                   style={[styles.addButton, activeTab === 'workers' && styles.addButtonWorker]}
                   onPress={handleAddNewUser}
@@ -620,7 +718,7 @@ const UsersScreen = () => {
                   activeOpacity={0.7}
                 >
                   <Text style={styles.addButtonText}>
-                    {isAddingUser ? 'جاري الإضافة...' : `➕ إضافة ${activeTab === 'clients' ? 'عميل' : 'عامل'}`}
+                    {isAddingUser ? 'جاری الإضافة...' : `➕ إضافة ${activeTab === 'clients' ? 'عميل' : 'عامل'}`}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1120,6 +1218,127 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
     color: colors.text.primary,
     textAlign: 'center',
+  },
+  // Subscription styles
+  subscriptionSection: {
+    marginTop: spacing.base,
+    marginBottom: spacing.base,
+    padding: spacing.md,
+    backgroundColor: colors.surface.elevated,
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  subscriptionHeader: {
+    marginBottom: spacing.sm,
+  },
+  subscriptionTitle: {
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  subscriptionToggle: {
+    marginBottom: spacing.md,
+  },
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: borderRadius.sm,
+    borderWidth: 2,
+    borderColor: colors.border.light,
+    backgroundColor: colors.background.primary,
+    marginRight: spacing.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkboxChecked: {
+    backgroundColor: colors.status.success,
+    borderColor: colors.status.success,
+  },
+  checkboxIcon: {
+    color: colors.text.primary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+  },
+  checkboxLabel: {
+    fontSize: typography.size.sm,
+    color: colors.text.secondary,
+    fontWeight: typography.weight.semibold,
+  },
+  helpText: {
+    fontSize: typography.size.xs,
+    color: colors.text.muted,
+    fontStyle: 'italic',
+    marginTop: spacing.xs,
+  },
+  subscriptionInfoCard: {
+    backgroundColor: colors.background.primary,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginTop: spacing.md,
+    marginBottom: spacing.md,
+    borderWidth: 2,
+    borderColor: colors.accent.teal,
+  },
+  subscriptionInfoHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+  },
+  subscriptionInfoTitle: {
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  subscriptionStatusBadge: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: borderRadius.sm,
+    backgroundColor: colors.status.error,
+  },
+  subscriptionActiveBadge: {
+    backgroundColor: colors.status.success,
+  },
+  subscriptionStatusText: {
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  subscriptionStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    marginBottom: spacing.sm,
+  },
+  subscriptionStatItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  subscriptionStatLabel: {
+    fontSize: typography.size.xs,
+    color: colors.text.tertiary,
+    marginBottom: spacing.xs,
+  },
+  subscriptionStatValue: {
+    fontSize: typography.size.xl,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  subscriptionStatDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: colors.border.light,
+  },
+  subscriptionDate: {
+    fontSize: typography.size.xs,
+    color: colors.text.muted,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

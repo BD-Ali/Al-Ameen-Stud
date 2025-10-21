@@ -151,8 +151,25 @@ const LessonsScreen = () => {
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.lessonDateTime}>📅 {item.date}</Text>
-              <Text style={styles.lessonTime}>⏰ {item.time}</Text>
+              <View style={styles.dateTimeContainer}>
+                <Text style={styles.lessonDateTime}>📅 {item.date}</Text>
+                <Text style={styles.lessonTime}>⏰ {item.time}</Text>
+              </View>
+              {item.confirmed && (
+                <View style={styles.confirmedBadge}>
+                  <Text style={styles.confirmedBadgeText}>✓ مكتمل</Text>
+                </View>
+              )}
+              {item.status === 'cancelled' && (
+                <View style={styles.cancelledBadge}>
+                  <Text style={styles.cancelledBadgeText}>✕ ملغي</Text>
+                </View>
+              )}
+              {item.status === 'scheduled' && !item.confirmed && (
+                <View style={styles.scheduledBadge}>
+                  <Text style={styles.scheduledBadgeText}>⏳ مجدول</Text>
+                </View>
+              )}
             </View>
             <View style={styles.cardRow}>
               <Text style={styles.cardLabel}>🐴 الحصان:</Text>
@@ -611,6 +628,42 @@ const styles = StyleSheet.create({
   emptySubtext: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
+  },
+  dateTimeContainer: {
+    flex: 1,
+  },
+  confirmedBadge: {
+    backgroundColor: colors.status.success,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  confirmedBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
+  },
+  cancelledBadge: {
+    backgroundColor: colors.status.error,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  cancelledBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
+  },
+  scheduledBadge: {
+    backgroundColor: colors.primary.main,
+    borderRadius: borderRadius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  scheduledBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
   },
   emptyPickerState: {
     padding: spacing.md,
