@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';
 import { DataContext } from '../context/DataContext';
@@ -15,7 +15,7 @@ Notifications.setNotificationHandler({
 });
 
 const HorsesScreen = () => {
-  const { horses, addHorse, removeHorse, reminders, addReminder, removeReminder, updateReminder } = useContext(DataContext);
+  const { horses, addHorse, removeHorse, reminders, addReminder, removeReminder } = useContext(DataContext);
 
   const [name, setName] = useState('');
   const [breed, setBreed] = useState('');
@@ -49,7 +49,6 @@ const HorsesScreen = () => {
 
     if (finalStatus !== 'granted') {
       Alert.alert('تنبيه', 'يجب منح إذن الإشعارات لتلقي التذكيرات');
-      return;
     }
   };
 
@@ -68,7 +67,7 @@ const HorsesScreen = () => {
         date: notificationDate
       };
 
-      const notificationId = await Notifications.scheduleNotificationAsync({
+      await Notifications.scheduleNotificationAsync({
         content: {
           title: `تذكير: ${reminder.horseName} 🐴`,
           body: reminder.note,
@@ -77,8 +76,6 @@ const HorsesScreen = () => {
         },
         trigger,
       });
-
-      return notificationId;
     } catch (error) {
       console.error('Error scheduling notification:', error);
       Alert.alert('خطأ', 'فشل جدولة الإشعار');

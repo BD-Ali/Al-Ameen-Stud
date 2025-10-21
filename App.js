@@ -28,7 +28,6 @@ function AppNavigator() {
   const [bannerVisible, setBannerVisible] = useState(false);
   const [bannerData, setBannerData] = useState(null);
   const [deepLinkAnnouncementId, setDeepLinkAnnouncementId] = useState(null);
-  const [deepLinkLessonId, setDeepLinkLessonId] = useState(null);
 
   useEffect(() => {
     // Request notification permissions
@@ -77,7 +76,6 @@ function AppNavigator() {
         } else if (dataOrId?.type === 'announcement') {
           setDeepLinkAnnouncementId(dataOrId.announcementId);
         } else if (dataOrId?.type === 'lesson_reminder') {
-          setDeepLinkLessonId(dataOrId.lessonId);
           // Mark reminder as seen
           if (dataOrId.lessonId && dataOrId.reminderType) {
             lessonReminderService.markReminderAsSeen(dataOrId.lessonId, dataOrId.reminderType);
@@ -95,7 +93,6 @@ function AppNavigator() {
     if (bannerData?.type === 'announcement' && bannerData?.announcementId) {
       setDeepLinkAnnouncementId(bannerData.announcementId);
     } else if (bannerData?.type === 'lesson_reminder' && bannerData?.lessonId) {
-      setDeepLinkLessonId(bannerData.lessonId);
       // Mark as seen
       lessonReminderService.markReminderAsSeen(bannerData.lessonId, 'banner');
     }

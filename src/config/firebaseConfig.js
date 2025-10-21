@@ -29,8 +29,6 @@ export const auth = initializeAuth(app, {
 // Initialize Firestore
 export const db = getFirestore(app);
 
-export default app;
-
 /*
  * ========================================
  * FIREBASE SETUP CHECKLIST

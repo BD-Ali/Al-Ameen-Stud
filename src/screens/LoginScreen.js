@@ -23,7 +23,7 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
  * Different user roles (admin, client, visitor) determine access levels.
  */
 const LoginScreen = ({ navigation }) => {
-  const { signIn, signUp, loading: authLoading } = useContext(AuthContext);
+  const { signIn, signUp } = useContext(AuthContext);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -382,4 +382,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-

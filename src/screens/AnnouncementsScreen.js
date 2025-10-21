@@ -23,7 +23,6 @@ import { AuthContext } from '../context/AuthContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
-import notificationService from '../services/notificationService';
 
 /**
  * Toast Notification Component
@@ -1359,4 +1358,3 @@ const styles = StyleSheet.create({
 });
 
 export default AnnouncementsScreen;
-

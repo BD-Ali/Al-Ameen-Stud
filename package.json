@@ -20,6 +20,7 @@
     "@react-navigation/bottom-tabs": "^6.6.1",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
+    "ci-info": "^4.3.1",
     "expo": "~54.0.0",
     "expo-constants": "~18.0.9",
     "expo-dev-client": "~6.0.14",
