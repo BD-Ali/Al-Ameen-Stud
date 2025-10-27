@@ -12,12 +12,24 @@ import CompactHeader from '../components/CompactHeader';
  * their authenticated account.
  */
 const ClientHomeScreen = () => {
-  const { clients, lessons, horses, workers } = useContext(DataContext);
+  const { clients, lessons, horses, workers, getConfirmedLessons, getScheduledLessons } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
 
   // Find client by matching user ID
   const selectedClient = clients.find((c) => c.id === user?.uid);
-  const clientLessons = lessons.filter((l) => l.clientId === user?.uid);
+
+  // Get confirmed lessons (completed) and scheduled lessons separately
+  const confirmedLessons = getConfirmedLessons ? getConfirmedLessons(user?.uid) : [];
+  const scheduledLessons = getScheduledLessons ? getScheduledLessons(user?.uid) : [];
+
+  // Combine for display: show both confirmed and scheduled, but only confirmed count toward totals
+  const clientLessons = [...confirmedLessons, ...scheduledLessons].sort((a, b) => {
+    // Sort by date descending (newest first)
+    const dateCompare = new Date(b.date) - new Date(a.date);
+    if (dateCompare !== 0) return dateCompare;
+    // Then by time descending
+    return b.time.localeCompare(a.time);
+  });
 
   const getHorseName = (id) => horses.find((h) => h.id === id)?.name || id;
   const getWorkerName = (id) => workers.find((w) => w.id === id)?.name || id;
@@ -138,24 +150,50 @@ const ClientHomeScreen = () => {
               </View>
             </>
           }
-          renderItem={({ item }) => (
-            <View style={styles.lessonCard}>
-              <View style={styles.lessonHeader}>
-                <Text style={styles.lessonDate}>📅 {formatDate(item.date)}</Text>
-                <Text style={styles.lessonTime}>⏰ {item.time}</Text>
-              </View>
-              <View style={styles.lessonDetails}>
-                <View style={styles.lessonDetail}>
-                  <Text style={styles.lessonDetailIcon}>🐴</Text>
-                  <Text style={styles.lessonDetailText}>{getHorseName(item.horseId)}</Text>
+          renderItem={({ item }) => {
+            const isConfirmed = item.confirmed === true || item.status === 'completed';
+            const isCancelled = item.status === 'cancelled';
+
+            return (
+              <View style={[
+                styles.lessonCard,
+                isConfirmed && styles.lessonCardConfirmed,
+                isCancelled && styles.lessonCardCancelled
+              ]}>
+                <View style={styles.lessonHeader}>
+                  <View style={styles.lessonDateContainer}>
+                    <Text style={styles.lessonDate}>📅 {formatDate(item.date)}</Text>
+                    {isConfirmed && (
+                      <View style={styles.confirmedBadge}>
+                        <Text style={styles.confirmedBadgeText}>✓ مكتمل</Text>
+                      </View>
+                    )}
+                    {!isConfirmed && !isCancelled && (
+                      <View style={styles.scheduledBadge}>
+                        <Text style={styles.scheduledBadgeText}>⏳ مجدول</Text>
+                      </View>
+                    )}
+                    {isCancelled && (
+                      <View style={styles.cancelledBadge}>
+                        <Text style={styles.cancelledBadgeText}>✕ ملغي</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.lessonTime}>⏰ {item.time}</Text>
                 </View>
-                <View style={styles.lessonDetail}>
-                  <Text style={styles.lessonDetailIcon}>👨‍🏫</Text>
-                  <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
+                <View style={styles.lessonDetails}>
+                  <View style={styles.lessonDetail}>
+                    <Text style={styles.lessonDetailIcon}>🐴</Text>
+                    <Text style={styles.lessonDetailText}>{getHorseName(item.horseId)}</Text>
+                  </View>
+                  <View style={styles.lessonDetail}>
+                    <Text style={styles.lessonDetailIcon}>👨‍🏫</Text>
+                    <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
+            );
+          }}
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Text style={styles.emptyEmoji}>📭</Text>
@@ -267,15 +305,61 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.primary.main,
     ...shadows.sm,
   },
+  lessonCardConfirmed: {
+    borderLeftColor: colors.status.success,
+    opacity: 0.9,
+  },
+  lessonCardCancelled: {
+    borderLeftColor: colors.status.error,
+    opacity: 0.7,
+  },
   lessonHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
+  lessonDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   lessonDate: {
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+  },
+  confirmedBadge: {
+    backgroundColor: colors.status.success,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.sm,
+  },
+  confirmedBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
+  },
+  scheduledBadge: {
+    backgroundColor: colors.primary.main,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.sm,
+  },
+  scheduledBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
+  },
+  cancelledBadge: {
+    backgroundColor: colors.status.error,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    borderRadius: borderRadius.sm,
+  },
+  cancelledBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
   },
   lessonTime: {
     fontSize: typography.size.sm,

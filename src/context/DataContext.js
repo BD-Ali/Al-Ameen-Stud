@@ -17,6 +17,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebaseConfig';
 import notificationService from '../services/notificationService';
 import lessonReminderService from '../services/lessonReminderService';
+import lessonCleanupService from '../services/lessonCleanupService';
 
 /**
  * DataContext stores all of the core stable data and syncs with Firebase Firestore.
@@ -121,6 +122,24 @@ export const DataProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
+  // Start automatic lesson cleanup when data is loaded
+  useEffect(() => {
+    if (lessons.length > 0 && schedules.length >= 0 && missions.length >= 0) {
+      // Start auto-cleanup that runs every 12 hours
+      lessonCleanupService.startAutoCleanup(
+        () => lessons,
+        () => schedules,
+        () => missions,
+        12 // Run every 12 hours
+      );
+
+      return () => {
+        // Stop auto-cleanup when component unmounts
+        lessonCleanupService.stopAutoCleanup();
+      };
+    }
+  }, [lessons.length, schedules.length, missions.length]);
+
   // Subscribe to reminders collection
   useEffect(() => {
     const q = query(collection(db, 'reminders'));
@@ -206,8 +225,9 @@ export const DataProvider = ({ children }) => {
    */
   const createUserAccount = async (name, email, phoneNumber, role = 'client', subscriptionData = null) => {
     try {
-      // Create auth user with phone number as password
-      const userCredential = await createUserWithEmailAndPassword(auth, email, phoneNumber);
+      // Create auth user with phone number as password (remove dashes from phone number)
+      const passwordFromPhone = phoneNumber.replace(/-/g, '');
+      const userCredential = await createUserWithEmailAndPassword(auth, email, passwordFromPhone);
       const user = userCredential.user;
 
       // Store user profile in Firestore
@@ -1525,6 +1545,65 @@ export const DataProvider = ({ children }) => {
     }
   };
 
+  /**
+   * Manually trigger lesson cleanup
+   * Removes expired unconfirmed lessons that are 24+ hours past their scheduled time
+   * @param {boolean} dryRun - If true, only reports what would be deleted
+   * @returns {Promise<Object>} Cleanup result
+   */
+  const cleanupExpiredLessons = async (dryRun = false) => {
+    try {
+      return await lessonCleanupService.performCleanup(lessons, schedules, missions, dryRun);
+    } catch (error) {
+      console.error('Error during manual cleanup:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Get cleanup statistics and status
+   * @returns {Object} Cleanup stats
+   */
+  const getCleanupStats = () => {
+    return lessonCleanupService.getCleanupStats();
+  };
+
+  /**
+   * Get only confirmed/completed lessons for a client
+   * This is what should be counted toward client statistics
+   * @param {string} clientId - Client ID
+   * @returns {Array} Confirmed lessons only
+   */
+  const getConfirmedLessons = (clientId) => {
+    return lessons.filter(l =>
+      l.clientId === clientId &&
+      (l.confirmed === true || l.status === 'completed')
+    );
+  };
+
+  /**
+   * Get count of confirmed lessons for a client
+   * @param {string} clientId - Client ID
+   * @returns {number} Count of confirmed lessons
+   */
+  const getConfirmedLessonCount = (clientId) => {
+    return getConfirmedLessons(clientId).length;
+  };
+
+  /**
+   * Get all scheduled (unconfirmed) lessons for a client
+   * These are lessons that haven't been confirmed yet
+   * @param {string} clientId - Client ID
+   * @returns {Array} Scheduled lessons
+   */
+  const getScheduledLessons = (clientId) => {
+    return lessons.filter(l =>
+      l.clientId === clientId &&
+      l.status === 'scheduled' &&
+      !l.confirmed
+    );
+  };
+
   return (
     <DataContext.Provider
       value={{
@@ -1575,6 +1654,13 @@ export const DataProvider = ({ children }) => {
         addAnnouncement,
         updateAnnouncement,
         deleteAnnouncement,
+        // Lesson cleanup functions
+        cleanupExpiredLessons,
+        getCleanupStats,
+        // Confirmed lesson helpers
+        getConfirmedLessons,
+        getConfirmedLessonCount,
+        getScheduledLessons,
       }}
     >
       {children}
