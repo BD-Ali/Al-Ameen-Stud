@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo, useRef } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,7 @@ import {
   Animated,
   ActivityIndicator,
   TouchableWithoutFeedback,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  RefreshControl
+  Keyboard
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -67,11 +64,6 @@ const UsersScreen = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('success');
   const [fadeAnim] = useState(new Animated.Value(0));
-
-  // Scroll and Refresh
-  const flatListRef = useRef(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Get current data based on active tab
   const currentData = useMemo(() => {
@@ -155,33 +147,12 @@ const UsersScreen = () => {
     });
   };
 
-  // Pull to Refresh Handler
-  const onRefresh = async () => {
-    setRefreshing(true);
-    // Simulate refresh - data already syncs in real-time via Firebase
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setRefreshing(false);
-    showToastNotification('✅ تم تحديث البيانات', 'success');
-  };
-
-  // Scroll to Top
-  const scrollToTop = () => {
-    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
-  };
-
-  // Handle Scroll Event
-  const handleScroll = (event) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    setShowScrollTop(offsetY > 300);
-  };
-
   // Tab Switching
   const switchTab = (tab) => {
     setActiveTab(tab);
     setExpandedUserId(null);
     setEditingUserId(null);
     setSearchQuery('');
-    scrollToTop();
   };
 
   // Expansion Toggle
@@ -589,13 +560,8 @@ const UsersScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-    >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
         {/* Header with Tabs */}
         <View style={styles.header}>
           <Text style={styles.pageTitle}>👥 المستخدمين</Text>
@@ -642,31 +608,10 @@ const UsersScreen = () => {
 
         {/* User List */}
         <FlatList
-          ref={flatListRef}
           data={currentData}
           keyExtractor={(item) => item.id}
           renderItem={renderUserCard}
           contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={true}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={10}
-          updateCellsBatchingPeriod={50}
-          initialNumToRender={10}
-          windowSize={10}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          onScroll={handleScroll}
-          scrollEventThrottle={16}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[colors.primary.main, colors.accent.purple]}
-              tintColor={colors.primary.main}
-              title="جاري التحديث..."
-              titleColor={colors.text.secondary}
-            />
-          }
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <Text style={styles.emptyEmoji}>{activeTab === 'clients' ? '👥' : '👷'}</Text>
@@ -804,20 +749,8 @@ const UsersScreen = () => {
             <Text style={styles.toastText}>{toastMessage}</Text>
           </Animated.View>
         )}
-
-        {/* Scroll to Top Button */}
-        {showScrollTop && (
-          <TouchableOpacity
-            style={styles.scrollToTopButton}
-            onPress={scrollToTop}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.scrollToTopText}>⬆</Text>
-          </TouchableOpacity>
-        )}
-        </View>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -900,8 +833,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.base,
-    paddingBottom: spacing.xxxl,
-    flexGrow: 1,
   },
   card: {
     backgroundColor: colors.background.secondary,
@@ -1408,25 +1339,6 @@ const styles = StyleSheet.create({
     color: colors.text.muted,
     textAlign: 'center',
     fontStyle: 'italic',
-  },
-  scrollToTopButton: {
-    position: 'absolute',
-    bottom: spacing.xxxl,
-    right: spacing.lg,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary.main,
-    justifyContent: 'center',
-    alignItems: 'center',
-    ...shadows.xl,
-    zIndex: 999,
-    elevation: 8,
-  },
-  scrollToTopText: {
-    fontSize: 24,
-    color: colors.text.primary,
-    fontWeight: typography.weight.bold,
   },
 });
 
