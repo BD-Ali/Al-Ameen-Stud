@@ -116,6 +116,16 @@ const WorkerHomeScreen = () => {
     );
   };
 
+  const handleContactUs = () => {
+    Alert.alert(
+      '📞 تواصل معنا',
+      'للتواصل مع الإدارة:\n\n' +
+      '📧 البريد الإلكتروني:\nbadarne3li@gmail.com\n\n' +
+      '📱 رقم الهاتف:\n0503653429',
+      [{ text: 'حسناً', style: 'default' }]
+    );
+  };
+
   const formatTime = (time) => {
     const [hour] = time.split(':');
     const h = parseInt(hour);
@@ -389,6 +399,15 @@ const WorkerHomeScreen = () => {
         keyExtractor={(item) => item.id}
         renderItem={renderSection}
       />
+
+      {/* Contact Us Floating Button */}
+      <TouchableOpacity
+        style={styles.contactButton}
+        onPress={handleContactUs}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.contactButtonIcon}>📞</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -613,6 +632,22 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
     marginBottom: spacing.sm,
+  },
+  contactButton: {
+    position: 'absolute',
+    bottom: spacing.xl,
+    right: spacing.xl,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary.main,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.lg,
+    elevation: 5,
+  },
+  contactButtonIcon: {
+    fontSize: 24,
   },
 });
 

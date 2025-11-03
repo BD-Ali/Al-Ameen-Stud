@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
@@ -13,53 +13,78 @@ import AnnouncementsFeed from '../components/AnnouncementsFeed';
 const VisitorHomeScreen = ({ navigation }) => {
   const { horses } = useContext(DataContext);
 
+  const handleContactUs = () => {
+    Alert.alert(
+      '📞 تواصل معنا',
+      'للتواصل مع الإدارة:\n\n' +
+      '📧 البريد الإلكتروني:\nbadarne3li@gmail.com\n\n' +
+      '📱 رقم الهاتف:\n0503653429',
+      [{ text: 'حسناً', style: 'default' }]
+    );
+  };
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      showsVerticalScrollIndicator={true}
-    >
-      <View style={styles.header}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={require('../../assets/icon.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-        <Text style={styles.heading}>مرحباً بك في مربط الأمين!</Text>
-        <Text style={styles.paragraph}>
-          نحن فخورون برعاية مجموعة متنوعة من الخيول الرائعة. لا تتردد في الاطلاع والتعرف عليها.
-        </Text>
-      </View>
-
-      {/* Announcements Feed */}
-      <AnnouncementsFeed userRole="visitor" />
-
-      <Text style={styles.subheading}>🏇 خيولنا</Text>
-
-      {/* Render horses directly instead of using FlatList */}
-      {horses.length > 0 ? (
-        horses.map((item) => (
-          <View key={item.id} style={styles.card}>
-            <Text style={styles.horseName}>{item.name}</Text>
-            <View style={styles.breedRow}>
-              <Text style={styles.breedLabel}>السلالة:</Text>
-              <Text style={styles.breedValue}>{item.breed}</Text>
-            </View>
+    <View style={styles.wrapper}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={true}
+      >
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('../../assets/icon.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
-        ))
-      ) : (
-        <View style={styles.emptyState}>
-          <Text style={styles.emptyEmoji}>🐴</Text>
-          <Text style={styles.emptyText}>لا توجد خيول لعرضها بعد</Text>
+          <Text style={styles.heading}>مرحباً بك في مربط الأمين!</Text>
+          <Text style={styles.paragraph}>
+            نحن فخورون برعاية مجموعة متنوعة من الخيول الرائعة. لا تتردد في الاطلاع والتعرف عليها.
+          </Text>
         </View>
-      )}
-    </ScrollView>
+
+        {/* Announcements Feed */}
+        <AnnouncementsFeed userRole="visitor" />
+
+        <Text style={styles.subheading}>🏇 خيولنا</Text>
+
+        {/* Render horses directly instead of using FlatList */}
+        {horses.length > 0 ? (
+          horses.map((item) => (
+            <View key={item.id} style={styles.card}>
+              <Text style={styles.horseName}>{item.name}</Text>
+              <View style={styles.breedRow}>
+                <Text style={styles.breedLabel}>السلالة:</Text>
+                <Text style={styles.breedValue}>{item.breed}</Text>
+              </View>
+            </View>
+          ))
+        ) : (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyEmoji}>🐴</Text>
+            <Text style={styles.emptyText}>لا توجد خيول لعرضها بعد</Text>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Contact Us Floating Button */}
+      <TouchableOpacity
+        style={styles.contactButton}
+        onPress={handleContactUs}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.contactButtonIcon}>📞</Text>
+      </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.background.primary,
@@ -147,6 +172,22 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: typography.size.base,
     color: colors.text.tertiary,
+  },
+  contactButton: {
+    position: 'absolute',
+    bottom: spacing.xl,
+    right: spacing.xl,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary.main,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...shadows.lg,
+    elevation: 5,
+  },
+  contactButtonIcon: {
+    fontSize: 24,
   },
 });
 
