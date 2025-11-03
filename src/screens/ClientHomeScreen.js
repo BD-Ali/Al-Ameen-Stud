@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, SafeAreaView, Linking } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -66,10 +66,29 @@ const ClientHomeScreen = () => {
   const handleContactUs = () => {
     Alert.alert(
       '📞 تواصل معنا',
-      'للتواصل مع الإدارة:\n\n' +
-      '📧 البريد الإلكتروني:\nbadarne3li@gmail.com\n\n' +
-      '📱 رقم الهاتف:\n0503653429',
-      [{ text: 'حسناً', style: 'default' }]
+      'اختر طريقة التواصل مع الإدارة:',
+      [
+        {
+          text: '📧 إرسال بريد إلكتروني',
+          onPress: () => {
+            Linking.openURL('mailto:badarne3li@gmail.com').catch(err => {
+              Alert.alert('خطأ', 'لا يمكن فتح تطبيق البريد الإلكتروني');
+            });
+          }
+        },
+        {
+          text: '📱 اتصال هاتفي',
+          onPress: () => {
+            Linking.openURL('tel:0503653429').catch(err => {
+              Alert.alert('خطأ', 'لا يمكن إجراء المكالمة');
+            });
+          }
+        },
+        {
+          text: 'إلغاء',
+          style: 'cancel'
+        }
+      ]
     );
   };
 
