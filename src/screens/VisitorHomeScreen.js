@@ -72,10 +72,19 @@ const VisitorHomeScreen = ({ navigation }) => {
         {horses.length > 0 ? (
           horses.map((item) => (
             <View key={item.id} style={styles.card}>
-              <Text style={styles.horseName}>{item.name}</Text>
-              <View style={styles.breedRow}>
-                <Text style={styles.breedLabel}>السلالة:</Text>
-                <Text style={styles.breedValue}>{item.breed}</Text>
+              {item.imageUrl && (
+                <Image
+                  source={{ uri: item.imageUrl }}
+                  style={styles.horseImage}
+                  resizeMode="cover"
+                />
+              )}
+              <View style={styles.horseInfo}>
+                <Text style={styles.horseName}>{item.name}</Text>
+                <View style={styles.breedRow}>
+                  <Text style={styles.breedLabel}>السلالة:</Text>
+                  <Text style={styles.breedValue}>{item.breed}</Text>
+                </View>
               </View>
             </View>
           ))
@@ -156,11 +165,19 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.background.secondary,
-    padding: spacing.md,
     marginBottom: spacing.md,
     borderRadius: borderRadius.md,
     borderLeftWidth: 3,
     borderLeftColor: colors.primary.main,
+    overflow: 'hidden',
+  },
+  horseImage: {
+    width: '100%',
+    height: 200,
+    backgroundColor: colors.background.tertiary,
+  },
+  horseInfo: {
+    padding: spacing.md,
   },
   horseName: {
     fontSize: typography.size.lg,
