@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity, Linking, Image, ScrollView } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -200,6 +200,7 @@ const WorkerHomeScreen = () => {
   // Create sections data for FlatList
   const sections = [
     { id: 'announcements', type: 'announcements' },
+    { id: 'horses', type: 'horses' },
     { id: 'schedule', type: 'schedule' },
     { id: 'lessons', type: 'lessons' },
     { id: 'info', type: 'info' },
@@ -209,6 +210,45 @@ const WorkerHomeScreen = () => {
     switch (item.type) {
       case 'announcements':
         return <AnnouncementsFeed userRole="worker" />;
+
+      case 'horses':
+        return horses && horses.length > 0 ? (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionIcon}>🐴</Text>
+              <Text style={styles.sectionTitle}>خيولنا</Text>
+              <View style={styles.horsesBadge}>
+                <Text style={styles.horsesBadgeText}>{horses.length}</Text>
+              </View>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.horsesScrollView}
+              contentContainerStyle={styles.horsesScrollContent}
+            >
+              {horses.map((horse) => (
+                <View key={horse.id} style={styles.horseCardCompact}>
+                  {horse.imageUrl ? (
+                    <Image
+                      source={{ uri: horse.imageUrl }}
+                      style={styles.horseImageCompact}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <View style={styles.horseImagePlaceholder}>
+                      <Text style={styles.horseImagePlaceholderText}>🐴</Text>
+                    </View>
+                  )}
+                  <View style={styles.horseCardCompactInfo}>
+                    <Text style={styles.horseCardCompactName}>{horse.name}</Text>
+                    <Text style={styles.horseCardCompactBreed}>{horse.breed}</Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+        ) : null;
 
       case 'schedule':
         return (
@@ -651,6 +691,64 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
     marginBottom: spacing.sm,
+  },
+  // Horses gallery styles
+  horsesBadge: {
+    backgroundColor: colors.primary.main,
+    borderRadius: borderRadius.full,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: spacing.xs,
+    marginLeft: spacing.sm,
+  },
+  horsesBadgeText: {
+    color: '#fff',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
+  },
+  horsesScrollView: {
+    marginTop: spacing.md,
+  },
+  horsesScrollContent: {
+    paddingRight: spacing.base,
+  },
+  horseCardCompact: {
+    width: 160,
+    marginRight: spacing.md,
+    backgroundColor: colors.background.secondary,
+    borderRadius: borderRadius.md,
+    overflow: 'hidden',
+    ...shadows.sm,
+  },
+  horseImageCompact: {
+    width: '100%',
+    height: 120,
+    backgroundColor: colors.background.tertiary,
+  },
+  horseImagePlaceholder: {
+    width: '100%',
+    height: 120,
+    backgroundColor: colors.background.tertiary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  horseImagePlaceholderText: {
+    fontSize: 48,
+  },
+  horseCardCompactInfo: {
+    padding: spacing.sm,
+  },
+  horseCardCompactName: {
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+    marginBottom: spacing.xs,
+  },
+  horseCardCompactBreed: {
+    fontSize: typography.size.sm,
+    color: colors.text.tertiary,
   },
   contactButton: {
     position: 'absolute',
