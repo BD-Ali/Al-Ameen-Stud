@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import AnimatedCard from '../components/AnimatedCard';
 
 /**
  * UsersScreen - Unified section for managing both Clients and Workers
@@ -309,7 +310,7 @@ const UsersScreen = () => {
   };
 
   // Render Functions
-  const renderUserCard = ({ item }) => {
+  const renderUserCard = ({ item, index }) => {
     const isExpanded = expandedUserId === item.id;
     const isEditing = editingUserId === item.id;
     const isClient = activeTab === 'clients';
@@ -320,7 +321,7 @@ const UsersScreen = () => {
     const nextLesson = upcomingLessons[0];
 
     return (
-      <Animated.View style={styles.card}>
+      <AnimatedCard index={index} delay={80} style={styles.card}>
         {/* Compact Header - Always Visible */}
         <TouchableOpacity onPress={() => toggleExpand(item.id)} activeOpacity={0.7}>
           <View style={styles.cardHeader}>
@@ -555,7 +556,7 @@ const UsersScreen = () => {
             </TouchableOpacity>
           </View>
         )}
-      </Animated.View>
+      </AnimatedCard>
     );
   };
 

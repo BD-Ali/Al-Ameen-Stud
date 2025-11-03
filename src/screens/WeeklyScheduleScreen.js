@@ -17,6 +17,8 @@ import {
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import AnimatedCard from '../components/AnimatedCard';
+import { useFadeIn } from '../utils/animations';
 
 const WeeklyScheduleScreen = () => {
   const { weeklySchedules, workerUsers, addWeeklySchedule, updateWeeklySchedule, removeWeeklySchedule } = useContext(DataContext);

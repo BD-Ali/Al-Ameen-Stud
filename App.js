@@ -12,7 +12,8 @@ import VisitorHomeScreen from './src/screens/VisitorHomeScreen';
 import InAppNotificationBanner from './src/components/InAppNotificationBanner';
 import notificationService from './src/services/notificationService';
 import lessonReminderService from './src/services/lessonReminderService';
-import { ActivityIndicator, View, StyleSheet, I18nManager } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, I18nManager, Animated } from 'react-native';
+import { useFadeIn } from './src/utils/animations';
 
 // Enable RTL for Arabic
 I18nManager.allowRTL(true);
@@ -28,6 +29,7 @@ function AppNavigator() {
   const [bannerVisible, setBannerVisible] = useState(false);
   const [bannerData, setBannerData] = useState(null);
   const [deepLinkAnnouncementId, setDeepLinkAnnouncementId] = useState(null);
+  const fadeAnim = useFadeIn(600);
 
   useEffect(() => {
     // Request notification permissions
@@ -100,9 +102,9 @@ function AppNavigator() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
+      <Animated.View style={[styles.loadingContainer, { opacity: fadeAnim }]}>
         <ActivityIndicator size="large" color="#3b82f6" />
-      </View>
+      </Animated.View>
     );
   }
 

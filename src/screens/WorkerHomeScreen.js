@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity, Linking, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity, Linking, Image, ScrollView, Animated } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import CompactHeader from '../components/CompactHeader';
+import AnimatedCard from '../components/AnimatedCard';
+import { useFadeIn, usePulse } from '../utils/animations';
 
 /**
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
@@ -12,6 +14,10 @@ import CompactHeader from '../components/CompactHeader';
 const WorkerHomeScreen = () => {
   const { schedules, horses, workers, lessons, clients, weeklySchedules, loading, confirmLesson, cancelLesson } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
+
+  // Animations
+  const fadeAnim = useFadeIn(600);
+  const pulseAnim = usePulse();
 
   // Find worker by matching user ID
   const currentWorker = workers?.find((w) => w.id === user?.uid);
@@ -465,7 +471,9 @@ const WorkerHomeScreen = () => {
         onPress={handleContactUs}
         activeOpacity={0.8}
       >
-        <Text style={styles.contactButtonIcon}>📞</Text>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+          <Text style={styles.contactButtonIcon}>📞</Text>
+        </Animated.View>
       </TouchableOpacity>
     </SafeAreaView>
   );

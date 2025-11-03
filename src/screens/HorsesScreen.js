@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
+import AnimatedCard from '../components/AnimatedCard';
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -356,12 +357,12 @@ const HorsesScreen = () => {
             </View>
           </View>
         }
-        renderItem={({ item }) => {
+        renderItem={({ item, index }) => {
           const isExpanded = expandedHorseId === item.id;
           const horseReminders = getHorseReminders(item.id);
 
           return (
-            <View style={styles.card}>
+            <AnimatedCard index={index} delay={80} style={styles.card}>
               <TouchableOpacity
                 onPress={() => toggleExpand(item.id)}
                 style={styles.cardHeader}
@@ -452,7 +453,7 @@ const HorsesScreen = () => {
                   </TouchableOpacity>
                 </View>
               )}
-            </View>
+            </AnimatedCard>
           );
         }}
         ListFooterComponent={

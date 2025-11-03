@@ -24,6 +24,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
+import AnimatedCard from '../components/AnimatedCard';
+import AnimatedButton from '../components/AnimatedButton';
 
 /**
  * Toast Notification Component
@@ -365,12 +367,12 @@ const AnnouncementsScreen = () => {
     return emojis[tag] || '📌';
   };
 
-  const renderAnnouncementCard = ({ item }) => {
+  const renderAnnouncementCard = ({ item, index }) => {
     const statusInfo = getStatusInfo(item.status);
     const audienceLabel = audiences.find(a => a.value === item.targetAudience)?.label || 'الجميع';
 
     return (
-      <View style={styles.card}>
+      <AnimatedCard index={index} delay={80} style={styles.card}>
         {item.isPinned && (
           <View style={styles.pinnedBadge}>
             <Text style={styles.pinnedText}>📌 مثبت</Text>
@@ -443,7 +445,7 @@ const AnnouncementsScreen = () => {
             آخر تعديل بواسطة: {item.lastEditedBy}
           </Text>
         )}
-      </View>
+      </AnimatedCard>
     );
   };
 

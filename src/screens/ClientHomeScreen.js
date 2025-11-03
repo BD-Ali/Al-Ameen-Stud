@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, SafeAreaView, Linking, Image, ScrollView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, SafeAreaView, Linking, Image, ScrollView, Animated } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import CompactHeader from '../components/CompactHeader';
+import AnimatedCard from '../components/AnimatedCard';
+import { useFadeIn, usePulse } from '../utils/animations';
 
 /**
  * ClientHomeScreen displays a client's upcoming and past lessons along with
@@ -14,6 +16,10 @@ import CompactHeader from '../components/CompactHeader';
 const ClientHomeScreen = () => {
   const { clients, lessons, horses, workers, getConfirmedLessons, getScheduledLessons } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
+
+  // Animations
+  const fadeAnim = useFadeIn(600);
+  const pulseAnim = usePulse();
 
   // Find client by matching user ID
   const selectedClient = clients.find((c) => c.id === user?.uid);
@@ -112,7 +118,7 @@ const ClientHomeScreen = () => {
               <AnnouncementsFeed userRole="client" />
 
               {/* Payment Status Card */}
-              <View style={styles.paymentCard}>
+              <AnimatedCard index={0} delay={100} style={styles.paymentCard}>
                 <View style={styles.paymentHeader}>
                   <Text style={styles.paymentEmoji}>💰</Text>
                   <Text style={styles.paymentTitle}>حالة الدفع</Text>
@@ -128,11 +134,11 @@ const ClientHomeScreen = () => {
                     <Text style={styles.paymentAmountDue}>₪{selectedClient.amountDue || 0}</Text>
                   </View>
                 </View>
-              </View>
+              </AnimatedCard>
 
               {/* Subscription Card - Only show if client has subscription */}
               {selectedClient.hasSubscription && (
-                <View style={styles.subscriptionCard}>
+                <AnimatedCard index={1} delay={100} style={styles.subscriptionCard}>
                   <View style={styles.subscriptionHeader}>
                     <View style={styles.subscriptionTitleContainer}>
                       <Text style={styles.subscriptionEmoji}>🎫</Text>
@@ -167,7 +173,7 @@ const ClientHomeScreen = () => {
                       </Text>
                     </View>
                   )}
-                </View>
+                </AnimatedCard>
               )}
 
               {/* Horses Gallery Section */}
@@ -185,8 +191,8 @@ const ClientHomeScreen = () => {
                     style={styles.horsesScrollView}
                     contentContainerStyle={styles.horsesScrollContent}
                   >
-                    {horses.map((horse) => (
-                      <View key={horse.id} style={styles.horseCardCompact}>
+                    {horses.map((horse, index) => (
+                      <AnimatedCard key={horse.id} index={index} delay={60} style={styles.horseCardCompact}>
                         {horse.imageUrl ? (
                           <Image
                             source={{ uri: horse.imageUrl }}
@@ -202,7 +208,7 @@ const ClientHomeScreen = () => {
                           <Text style={styles.horseCardCompactName}>{horse.name}</Text>
                           <Text style={styles.horseCardCompactBreed}>{horse.breed}</Text>
                         </View>
-                      </View>
+                      </AnimatedCard>
                     ))}
                   </ScrollView>
                 </>
@@ -217,16 +223,20 @@ const ClientHomeScreen = () => {
               </View>
             </>
           }
-          renderItem={({ item }) => {
+          renderItem={({ item, index }) => {
             const isConfirmed = item.confirmed === true || item.status === 'completed';
             const isCancelled = item.status === 'cancelled';
 
             return (
-              <View style={[
-                styles.lessonCard,
-                isConfirmed && styles.lessonCardConfirmed,
-                isCancelled && styles.lessonCardCancelled
-              ]}>
+              <AnimatedCard
+                index={index + 2}
+                delay={80}
+                style={[
+                  styles.lessonCard,
+                  isConfirmed && styles.lessonCardConfirmed,
+                  isCancelled && styles.lessonCardCancelled
+                ]}
+              >
                 <View style={styles.lessonHeader}>
                   <View style={styles.lessonDateContainer}>
                     <Text style={styles.lessonDate}>📅 {formatDate(item.date)}</Text>
@@ -258,7 +268,7 @@ const ClientHomeScreen = () => {
                     <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
                   </View>
                 </View>
-              </View>
+              </AnimatedCard>
             );
           }}
           ListEmptyComponent={
@@ -283,7 +293,9 @@ const ClientHomeScreen = () => {
         onPress={handleContactUs}
         activeOpacity={0.8}
       >
-        <Text style={styles.contactButtonIcon}>📞</Text>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+          <Text style={styles.contactButtonIcon}>📞</Text>
+        </Animated.View>
       </TouchableOpacity>
     </SafeAreaView>
   );

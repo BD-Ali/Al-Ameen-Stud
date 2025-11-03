@@ -1,8 +1,10 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
+import AnimatedCard from '../components/AnimatedCard';
+import { useFadeIn, useScaleIn, usePulse } from '../utils/animations';
 
 /**
  * VisitorHomeScreen is the public‑facing section of the app.  It shows a
@@ -12,6 +14,11 @@ import AnnouncementsFeed from '../components/AnnouncementsFeed';
  */
 const VisitorHomeScreen = ({ navigation }) => {
   const { horses } = useContext(DataContext);
+
+  // Animations
+  const fadeAnim = useFadeIn(700);
+  const scaleAnim = useScaleIn(600, 100);
+  const pulseAnim = usePulse();
 
   const handleContactUs = () => {
     Alert.alert(
@@ -49,19 +56,20 @@ const VisitorHomeScreen = ({ navigation }) => {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={true}
       >
-        <View style={styles.header}>
+        <Animated.View style={[styles.header, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
           <View style={styles.logoContainer}>
             <Image
               source={require('../../assets/icon.png')}
               style={styles.logo}
               resizeMode="contain"
             />
+            <View style={styles.logoReflection} />
           </View>
           <Text style={styles.heading}>مرحباً بك في مربط الأمين!</Text>
           <Text style={styles.paragraph}>
             نحن فخورون برعاية مجموعة متنوعة من الخيول الرائعة. لا تتردد في الاطلاع والتعرف عليها.
           </Text>
-        </View>
+        </Animated.View>
 
         {/* Announcements Feed */}
         <AnnouncementsFeed userRole="visitor" />
@@ -70,8 +78,8 @@ const VisitorHomeScreen = ({ navigation }) => {
 
         {/* Render horses directly instead of using FlatList */}
         {horses.length > 0 ? (
-          horses.map((item) => (
-            <View key={item.id} style={styles.card}>
+          horses.map((item, index) => (
+            <AnimatedCard key={item.id} index={index} delay={100} style={styles.card}>
               {item.imageUrl && (
                 <Image
                   source={{ uri: item.imageUrl }}
@@ -86,7 +94,7 @@ const VisitorHomeScreen = ({ navigation }) => {
                   <Text style={styles.breedValue}>{item.breed}</Text>
                 </View>
               </View>
-            </View>
+            </AnimatedCard>
           ))
         ) : (
           <View style={styles.emptyState}>
@@ -102,7 +110,9 @@ const VisitorHomeScreen = ({ navigation }) => {
         onPress={handleContactUs}
         activeOpacity={0.8}
       >
-        <Text style={styles.contactButtonIcon}>📞</Text>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+          <Text style={styles.contactButtonIcon}>📞</Text>
+        </Animated.View>
       </TouchableOpacity>
     </View>
   );
@@ -136,6 +146,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#fff',
     alignSelf: 'center',
+    ...shadows.md,
+    position: 'relative',
+  },
+  logoReflection: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 40,
   },
   logo: {
     width: '100%',

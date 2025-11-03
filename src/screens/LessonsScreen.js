@@ -3,6 +3,8 @@ import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, ScrollVi
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import AnimatedCard from '../components/AnimatedCard';
+import AnimatedButton from '../components/AnimatedButton';
 
 /**
  * LessonsScreen lists all scheduled lessons and allows the administrator to add
@@ -148,8 +150,8 @@ const LessonsScreen = () => {
             </View>
           </View>
         }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
+        renderItem={({ item, index }) => (
+          <AnimatedCard index={index} delay={80} style={styles.card}>
             <View style={styles.cardHeader}>
               <View style={styles.dateTimeContainer}>
                 <Text style={styles.lessonDateTime}>📅 {item.date}</Text>
@@ -189,7 +191,7 @@ const LessonsScreen = () => {
             >
               <Text style={styles.removeButtonText}>🗑️ حذف الدرس</Text>
             </TouchableOpacity>
-          </View>
+          </AnimatedCard>
         )}
         ListFooterComponent={
           <View style={styles.formSection}>

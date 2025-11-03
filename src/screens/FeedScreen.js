@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import AnimatedCard from '../components/AnimatedCard';
 
 /**
  * FeedScreen shows a consolidated list of feeding plans for all horses.
@@ -22,8 +23,8 @@ const FeedScreen = () => {
             </View>
           </View>
         }
-        renderItem={({ item }) => (
-          <View style={styles.card}>
+        renderItem={({ item, index }) => (
+          <AnimatedCard index={index} delay={80} style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.horseName}>{item.name}</Text>
               <Text style={styles.horseEmoji}>🐴</Text>
@@ -34,7 +35,7 @@ const FeedScreen = () => {
                 {item.feedSchedule || 'لا يوجد جدول محدد'}
               </Text>
             </View>
-          </View>
+          </AnimatedCard>
         )}
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={

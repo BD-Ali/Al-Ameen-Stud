@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,9 +13,11 @@ import {
   Image,
   TouchableWithoutFeedback,
   Keyboard,
+  Animated,
 } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { useFadeIn, useSlideInFromBottom, useScaleIn, createPressAnimation } from '../utils/animations';
 
 /**
  * LoginScreen provides authentication with sign in and sign up functionality.
@@ -29,6 +31,16 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Animation values
+  const fadeAnim = useFadeIn(800);
+  const slideAnim = useSlideInFromBottom(700, 100);
+  const scaleAnim = useScaleIn(600, 200);
+  const buttonScale = useRef(new Animated.Value(1)).current;
+  const visitorButtonScale = useRef(new Animated.Value(1)).current;
+
+  const buttonPressHandlers = createPressAnimation(buttonScale);
+  const visitorPressHandlers = createPressAnimation(visitorButtonScale);
 
   const handleAuth = async () => {
     if (!email || !password) {
@@ -95,7 +107,8 @@ const LoginScreen = ({ navigation }) => {
           </View>
 
           {/* Form Card */}
-          <View style={styles.formCard}>
+          <Animated.View style={[styles.formCard, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+            <View style={styles.cardReflection} />
             {isSignUp && (
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>الاسم الكامل</Text>
@@ -152,18 +165,22 @@ const LoginScreen = ({ navigation }) => {
               style={styles.primaryButton}
               onPress={handleAuth}
               disabled={loading}
-              activeOpacity={0.8}
+              activeOpacity={0.9}
+              {...buttonPressHandlers}
             >
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <>
-                  <Text style={styles.primaryButtonText}>
-                    {isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول'}
-                  </Text>
-                  <Text style={styles.buttonArrow}>←</Text>
-                </>
-              )}
+              <Animated.View style={[styles.buttonContent, { transform: [{ scale: buttonScale }] }]}>
+                <View style={styles.buttonReflection} />
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <>
+                    <Text style={styles.primaryButtonText}>
+                      {isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول'}
+                    </Text>
+                    <Text style={styles.buttonArrow}>←</Text>
+                  </>
+                )}
+              </Animated.View>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -200,12 +217,16 @@ const LoginScreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.visitorButton}
               onPress={handleVisitorAccess}
-              activeOpacity={0.8}
+              activeOpacity={0.9}
+              {...visitorPressHandlers}
             >
-              <Text style={styles.visitorEmoji}>👁️</Text>
-              <Text style={styles.visitorButtonText}>متابعة كزائر</Text>
+              <Animated.View style={[styles.visitorButtonContent, { transform: [{ scale: visitorButtonScale }] }]}>
+                <View style={styles.buttonReflection} />
+                <Text style={styles.visitorEmoji}>👁️</Text>
+                <Text style={styles.visitorButtonText}>متابعة كزائر</Text>
+              </Animated.View>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
 
           {/* Footer */}
           <Text style={styles.footer}>
@@ -240,6 +261,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.lg,
+    position: 'relative',
+  },
+  logoReflection: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: '40%',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    borderRadius: 50,
   },
   logo: {
     width: '100%',
@@ -262,6 +294,18 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.xl,
     padding: spacing.lg,
     ...shadows.lg,
+    overflow: 'hidden',
+    position: 'relative',
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  cardReflection: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   inputContainer: {
     marginBottom: spacing.base,
@@ -294,14 +338,26 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: colors.primary.main,
+    borderRadius: borderRadius.md,
+    marginTop: spacing.sm,
+    ...shadows.md,
+    overflow: 'hidden',
+  },
+  buttonContent: {
     minHeight: 50,
     paddingVertical: spacing.md,
-    borderRadius: borderRadius.md,
-    alignItems: 'center',
-    marginTop: spacing.sm,
     flexDirection: 'row',
     justifyContent: 'center',
-    ...shadows.md,
+    alignItems: 'center',
+    position: 'relative',
+  },
+  buttonReflection: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   primaryButtonText: {
     color: '#fff',
@@ -355,14 +411,18 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
   },
   visitorButton: {
-    height: 48,
     borderRadius: borderRadius.md,
     borderWidth: 1.5,
     borderColor: colors.border.medium,
+    backgroundColor: colors.background.tertiary,
+    overflow: 'hidden',
+  },
+  visitorButtonContent: {
+    height: 48,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    backgroundColor: colors.background.tertiary,
+    position: 'relative',
   },
   visitorEmoji: {
     fontSize: 18,

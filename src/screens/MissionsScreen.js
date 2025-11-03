@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import AnimatedCard from '../components/AnimatedCard';
 
 const MissionsScreen = () => {
   const { reminders, updateReminder } = useContext(DataContext);
@@ -86,8 +87,8 @@ const MissionsScreen = () => {
     }
   };
 
-  const renderMission = ({ item, showMarkAsDone = true }) => (
-    <View style={[styles.missionCard, item.completed && styles.completedCard]}>
+  const renderMission = ({ item, index, showMarkAsDone = true }) => (
+    <AnimatedCard index={index} delay={80} style={[styles.missionCard, item.completed && styles.completedCard]}>
       <View style={styles.missionHeader}>
         <View style={styles.missionTitleContainer}>
           <Text style={styles.horseIcon}>🐴</Text>
@@ -115,11 +116,11 @@ const MissionsScreen = () => {
           <Text style={styles.undoneButtonText}>↺ إلغاء الإنجاز</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </AnimatedCard>
   );
 
-  const renderUpcomingMission = ({ item }) => (
-    <View style={styles.upcomingCard}>
+  const renderUpcomingMission = ({ item, index }) => (
+    <AnimatedCard index={index} delay={80} style={styles.upcomingCard}>
       <View style={styles.missionHeader}>
         <View style={styles.missionTitleContainer}>
           <Text style={styles.horseIcon}>🐴</Text>
@@ -130,7 +131,7 @@ const MissionsScreen = () => {
 
       <Text style={styles.missionNote}>{item.note}</Text>
       <Text style={styles.upcomingTime}>⏰ {item.time}</Text>
-    </View>
+    </AnimatedCard>
   );
 
   return (
