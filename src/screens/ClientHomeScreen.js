@@ -13,7 +13,7 @@ import { useFadeIn, usePulse } from '../utils/animations';
  * their current payment status. The client is automatically identified from
  * their authenticated account.
  */
-const ClientHomeScreen = () => {
+const ClientHomeScreen = ({ navigation }) => {
   const { clients, lessons, horses, workers, getConfirmedLessons, getScheduledLessons } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
 
@@ -98,6 +98,10 @@ const ClientHomeScreen = () => {
     );
   };
 
+  const handleProfilePress = () => {
+    navigation.navigate('Profile');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Compact Header */}
@@ -105,6 +109,7 @@ const ClientHomeScreen = () => {
         userName={selectedClient?.name}
         userRole="client"
         onLogout={logOut}
+        onProfilePress={handleProfilePress}
         loading={!selectedClient}
       />
 

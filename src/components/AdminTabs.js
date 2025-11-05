@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Text, StyleSheet, Alert, View, Image } from 'react-native';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
@@ -15,6 +16,7 @@ const Tab = createBottomTabNavigator();
 
 const AdminTabs = () => {
   const { logOut } = useContext(AuthContext);
+  const navigation = useNavigation();
 
   const handleLogout = async () => {
     Alert.alert(
@@ -30,6 +32,10 @@ const AdminTabs = () => {
         },
       ]
     );
+  };
+
+  const handleProfilePress = () => {
+    navigation.navigate('Profile');
   };
 
   return (
@@ -71,9 +77,14 @@ const AdminTabs = () => {
           </View>
         ),
         headerRight: () => (
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-            <Text style={styles.logoutText}>خروج</Text>
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <TouchableOpacity onPress={handleProfilePress} style={styles.profileButton}>
+              <Text style={styles.profileIcon}>👤</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+              <Text style={styles.logoutText}>خروج</Text>
+            </TouchableOpacity>
+          </View>
         ),
       }}
     >
@@ -174,8 +185,26 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  logoutButton: {
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginRight: spacing.base,
+    gap: spacing.sm,
+  },
+  profileButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: colors.primary.main + '18',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.primary.main,
+  },
+  profileIcon: {
+    fontSize: 20,
+  },
+  logoutButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.sm,

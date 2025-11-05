@@ -11,7 +11,7 @@ import { useFadeIn, usePulse } from '../utils/animations';
 /**
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
  */
-const WorkerHomeScreen = () => {
+const WorkerHomeScreen = ({ navigation }) => {
   const { schedules, horses, workers, lessons, clients, weeklySchedules, loading, confirmLesson, cancelLesson } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
 
@@ -201,6 +201,10 @@ const WorkerHomeScreen = () => {
         }
       ]
     );
+  };
+
+  const handleProfilePress = () => {
+    navigation.navigate('Profile');
   };
 
   // Create sections data for FlatList
@@ -455,6 +459,7 @@ const WorkerHomeScreen = () => {
         userName={currentWorker?.name || user?.email || 'عامل'}
         userRole="worker"
         onLogout={logOut}
+        onProfilePress={handleProfilePress}
         loading={loading}
       />
 

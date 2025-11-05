@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
-import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 
 /**
  * CompactHeader - A compact, modern header for user home screens
@@ -12,7 +12,8 @@ const CompactHeader = ({
   userRole = 'user',
   onLogout,
   loading = false,
-  onAvatarPress = null
+  onAvatarPress = null,
+  onProfilePress = null
 }) => {
   const [pressAnim] = useState(new Animated.Value(1));
 
@@ -121,18 +122,33 @@ const CompactHeader = ({
           </View>
         </TouchableOpacity>
 
-        {/* Right: Logout Button */}
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogoutPress}
-          activeOpacity={0.6}
-          disabled={loading}
-          accessibilityLabel="تسجيل الخروج"
-          accessibilityRole="button"
-          accessibilityHint="اضغط لتسجيل الخروج من حسابك"
-        >
-          <Text style={styles.logoutIcon}>⎋</Text>
-        </TouchableOpacity>
+        {/* Right: Profile and Logout Buttons */}
+        <View style={styles.actionButtons}>
+          {onProfilePress && (
+            <TouchableOpacity
+              style={styles.profileButton}
+              onPress={onProfilePress}
+              activeOpacity={0.6}
+              disabled={loading}
+              accessibilityLabel="الملف الشخصي"
+              accessibilityRole="button"
+              accessibilityHint="اضغط لفتح الملف الشخصي"
+            >
+              <Text style={styles.profileIcon}>👤</Text>
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogoutPress}
+            activeOpacity={0.6}
+            disabled={loading}
+            accessibilityLabel="تسجيل الخروج"
+            accessibilityRole="button"
+            accessibilityHint="اضغط لتسجيل الخروج من حسابك"
+          >
+            <Text style={styles.logoutIcon}>⎋</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -206,15 +222,36 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
   },
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  profileButton: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.primary.main + '18',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.primary.main,
+    ...shadows.sm,
+  },
+  profileIcon: {
+    fontSize: 22,
+    color: colors.primary.main,
+  },
   logoutButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: colors.background.tertiary,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border.light,
+    borderWidth: 1.5,
+    borderColor: colors.border.medium,
+    ...shadows.sm,
   },
   logoutIcon: {
     fontSize: 20,

@@ -9,6 +9,7 @@ import AdminTabs from './src/components/AdminTabs';
 import ClientHomeScreen from './src/screens/ClientHomeScreen';
 import WorkerHomeScreen from './src/screens/WorkerHomeScreen';
 import VisitorHomeScreen from './src/screens/VisitorHomeScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 import InAppNotificationBanner from './src/components/InAppNotificationBanner';
 import notificationService from './src/services/notificationService';
 import lessonReminderService from './src/services/lessonReminderService';
@@ -140,6 +141,16 @@ function AppNavigator() {
                 component={AdminTabs}
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="Profile"
+                component={ProfileScreen}
+                options={{
+                  headerShown: true,
+                  title: 'الملف الشخصي',
+                  headerStyle: { backgroundColor: '#141b2d' },
+                  headerTintColor: '#fff',
+                }}
+              />
             </>
           ) : userRole === 'worker' ? (
             // Worker user - show worker home
@@ -152,6 +163,16 @@ function AppNavigator() {
                 }}
                 initialParams={{ highlightAnnouncementId: deepLinkAnnouncementId }}
               />
+              <Stack.Screen
+                name="Profile"
+                component={ProfileScreen}
+                options={{
+                  headerShown: true,
+                  title: 'الملف الشخصي',
+                  headerStyle: { backgroundColor: '#141b2d' },
+                  headerTintColor: '#fff',
+                }}
+              />
             </>
           ) : userRole === 'client' ? (
             // Client user - show client home
@@ -163,6 +184,16 @@ function AppNavigator() {
                   headerShown: false,
                 }}
                 initialParams={{ highlightAnnouncementId: deepLinkAnnouncementId }}
+              />
+              <Stack.Screen
+                name="Profile"
+                component={ProfileScreen}
+                options={{
+                  headerShown: true,
+                  title: 'الملف الشخصي',
+                  headerStyle: { backgroundColor: '#141b2d' },
+                  headerTintColor: '#fff',
+                }}
               />
             </>
           ) : (
