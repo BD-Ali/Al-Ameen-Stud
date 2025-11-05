@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 
 /**
@@ -36,9 +37,9 @@ const CompactHeader = ({
   // Get role display info
   const getRoleInfo = (role) => {
     const roleMap = {
-      'client': { label: 'عميل', color: colors.accent.teal, emoji: '👤' },
-      'worker': { label: 'عامل', color: colors.accent.pink, emoji: '👷' },
-      'admin': { label: 'مدير', color: colors.accent.purple, emoji: '⚙️' },
+      'client': { label: 'عميل', color: colors.accent.teal, icon: 'person', iconFamily: 'Ionicons' },
+      'worker': { label: 'عامل', color: colors.accent.pink, icon: 'hammer-wrench', iconFamily: 'MaterialCommunityIcons' },
+      'admin': { label: 'مدير', color: colors.accent.purple, icon: 'shield-checkmark', iconFamily: 'Ionicons' },
     };
     return roleMap[role.toLowerCase()] || roleMap['client'];
   };
@@ -111,8 +112,13 @@ const CompactHeader = ({
             <View style={styles.greetingRow}>
               <Text style={styles.greeting}>{getGreeting()}</Text>
               <View style={[styles.roleBadge, { backgroundColor: roleInfo.color + '20' }]}>
+                {roleInfo.iconFamily === 'Ionicons' ? (
+                  <Ionicons name={roleInfo.icon} size={10} color={roleInfo.color} style={styles.roleIcon} />
+                ) : (
+                  <MaterialCommunityIcons name={roleInfo.icon} size={10} color={roleInfo.color} style={styles.roleIcon} />
+                )}
                 <Text style={[styles.roleText, { color: roleInfo.color }]}>
-                  {roleInfo.emoji} {roleInfo.label}
+                  {roleInfo.label}
                 </Text>
               </View>
             </View>
@@ -134,7 +140,7 @@ const CompactHeader = ({
               accessibilityRole="button"
               accessibilityHint="اضغط لفتح الملف الشخصي"
             >
-              <Text style={styles.profileIcon}>👤</Text>
+              <Ionicons name="person-circle-outline" size={24} color={colors.primary.main} />
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -146,7 +152,7 @@ const CompactHeader = ({
             accessibilityRole="button"
             accessibilityHint="اضغط لتسجيل الخروج من حسابك"
           >
-            <Text style={styles.logoutIcon}>⎋</Text>
+            <Ionicons name="log-out-outline" size={22} color={colors.text.secondary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -209,9 +215,15 @@ const styles = StyleSheet.create({
     marginRight: spacing.xs,
   },
   roleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: spacing.xs,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
+    gap: 3,
+  },
+  roleIcon: {
+    marginTop: 1,
   },
   roleText: {
     fontSize: typography.size.xs - 1,

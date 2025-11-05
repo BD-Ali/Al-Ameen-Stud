@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -58,9 +59,9 @@ const ProfileScreen = ({ navigation }) => {
   // Get role display info
   const getRoleInfo = (role) => {
     const roleMap = {
-      'client': { label: 'عميل', color: colors.accent.teal, emoji: '👤' },
-      'worker': { label: 'عامل', color: colors.accent.pink, emoji: '👷' },
-      'admin': { label: 'مدير', color: colors.accent.purple, emoji: '⚙️' },
+      'client': { label: 'عميل', color: colors.accent.teal, icon: 'person', iconFamily: 'Ionicons' },
+      'worker': { label: 'عامل', color: colors.accent.pink, icon: 'hammer-wrench', iconFamily: 'MaterialCommunityIcons' },
+      'admin': { label: 'مدير', color: colors.accent.purple, icon: 'shield-checkmark', iconFamily: 'Ionicons' },
     };
     return roleMap[role?.toLowerCase()] || roleMap['client'];
   };
@@ -229,8 +230,13 @@ const ProfileScreen = ({ navigation }) => {
             <Text style={styles.displayName}>{displayName}</Text>
             <Text style={styles.displayEmail}>{displayEmail}</Text>
             <View style={[styles.roleBadgeLarge, { backgroundColor: roleInfo.color + '15', borderColor: roleInfo.color }]}>
+              {roleInfo.iconFamily === 'Ionicons' ? (
+                <Ionicons name={roleInfo.icon} size={16} color={roleInfo.color} style={styles.roleIconLarge} />
+              ) : (
+                <MaterialCommunityIcons name={roleInfo.icon} size={16} color={roleInfo.color} style={styles.roleIconLarge} />
+              )}
               <Text style={[styles.roleBadgeText, { color: roleInfo.color }]}>
-                {roleInfo.emoji} {roleInfo.label}
+                {roleInfo.label}
               </Text>
             </View>
           </AnimatedCard>
@@ -469,11 +475,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   roleBadgeLarge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.xl,
     borderWidth: 2,
+    gap: spacing.xs,
     ...shadows.sm,
+  },
+  roleIconLarge: {
+    marginTop: 2,
   },
   roleBadgeText: {
     fontSize: typography.size.md,

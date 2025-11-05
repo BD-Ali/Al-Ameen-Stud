@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Text, StyleSheet, Alert, View, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import HorsesScreen from '../screens/HorsesScreen';
@@ -79,7 +80,7 @@ const AdminTabs = () => {
         headerRight: () => (
           <View style={styles.headerActions}>
             <TouchableOpacity onPress={handleProfilePress} style={styles.profileButton}>
-              <Text style={styles.profileIcon}>👤</Text>
+              <Ionicons name="person-circle-outline" size={22} color={colors.primary.main} />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
               <Text style={styles.logoutText}>خروج</Text>
