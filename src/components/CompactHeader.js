@@ -63,7 +63,7 @@ const CompactHeader = ({
   };
 
   const handleAvatarPress = () => {
-    if (onAvatarPress) {
+    if (onProfilePress) {
       Animated.sequence([
         Animated.timing(pressAnim, {
           toValue: 0.9,
@@ -76,7 +76,7 @@ const CompactHeader = ({
           useNativeDriver: true,
         }),
       ]).start();
-      onAvatarPress();
+      onProfilePress();
     }
   };
 
@@ -87,8 +87,8 @@ const CompactHeader = ({
         <TouchableOpacity
           style={styles.userSection}
           onPress={handleAvatarPress}
-          activeOpacity={onAvatarPress ? 0.7 : 1}
-          disabled={!onAvatarPress || loading}
+          activeOpacity={onProfilePress ? 0.7 : 1}
+          disabled={!onProfilePress || loading}
         >
           {loading ? (
             <View style={[styles.avatar, styles.avatarLoading]}>
@@ -124,21 +124,8 @@ const CompactHeader = ({
           </View>
         </TouchableOpacity>
 
-        {/* Right: Profile and Logout Buttons */}
+        {/* Right: Logout Button */}
         <View style={styles.actionButtons}>
-          {onProfilePress && (
-            <TouchableOpacity
-              style={styles.profileButton}
-              onPress={onProfilePress}
-              activeOpacity={0.6}
-              disabled={loading}
-              accessibilityLabel="الملف الشخصي"
-              accessibilityRole="button"
-              accessibilityHint="اضغط لفتح الملف الشخصي"
-            >
-              <FontAwesome5 name="user-circle" size={24} color="#3B82F6" solid />
-            </TouchableOpacity>
-          )}
           <TouchableOpacity
             style={styles.logoutButton}
             onPress={handleLogoutPress}
@@ -233,22 +220,6 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-  },
-  profileButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: colors.primary.main + '18',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: colors.primary.main,
-    ...shadows.sm,
-  },
-  profileIcon: {
-    fontSize: 22,
-    color: colors.primary.main,
   },
   logoutButton: {
     width: 46,

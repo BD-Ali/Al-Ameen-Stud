@@ -69,19 +69,16 @@ const AdminTabs = () => {
           marginTop: 2,
         },
         headerLeft: () => (
-          <View style={styles.logoHeader}>
+          <TouchableOpacity onPress={handleProfilePress} style={styles.logoHeader} activeOpacity={0.7}>
             <Image
               source={require('../../assets/icon.png')}
               style={styles.headerLogo}
               resizeMode="contain"
             />
-          </View>
+          </TouchableOpacity>
         ),
         headerRight: () => (
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={handleProfilePress} style={styles.profileButton}>
-              <FontAwesome5 name="user-circle" size={22} color="#3B82F6" solid />
-            </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
               <Text style={styles.logoutText}>خروج</Text>
             </TouchableOpacity>
@@ -190,20 +187,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginRight: spacing.base,
-    gap: spacing.sm,
-  },
-  profileButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.primary.main + '18',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: colors.primary.main,
-  },
-  profileIcon: {
-    fontSize: 20,
   },
   logoutButton: {
     paddingHorizontal: spacing.md,

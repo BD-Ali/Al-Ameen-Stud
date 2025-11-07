@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import AnimatedCard from '../components/AnimatedCard';
 
@@ -38,9 +38,30 @@ const ProfileScreen = ({ navigation }) => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [newEmail, setNewEmail] = useState('');
+  const [newName, setNewName] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [showEmailSection, setShowEmailSection] = useState(false);
+  const [showNameSection, setShowNameSection] = useState(false);
+  const [adminData, setAdminData] = useState(null);
+
+  // Fetch admin data from users collection
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      if (userRole === 'admin' && user?.uid) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            setAdminData(userDoc.data());
+          }
+        } catch (error) {
+          console.error('Error fetching admin data:', error);
+        }
+      }
+    };
+
+    fetchAdminData();
+  }, [userRole, user]);
 
   // Get user data
   const getUserData = () => {
@@ -48,6 +69,8 @@ const ProfileScreen = ({ navigation }) => {
       return clients?.find((c) => c.id === user?.uid);
     } else if (userRole === 'worker') {
       return workers?.find((w) => w.id === user?.uid);
+    } else if (userRole === 'admin') {
+      return adminData;
     }
     return null;
   };
@@ -183,6 +206,10 @@ const ProfileScreen = ({ navigation }) => {
         await updateDoc(doc(db, 'clients', user.uid), {
           email: newEmail,
         });
+      } else if (userRole === 'worker') {
+        await updateDoc(doc(db, 'workers', user.uid), {
+          email: newEmail,
+        });
       }
 
       // Clear form
@@ -204,6 +231,44 @@ const ProfileScreen = ({ navigation }) => {
       }
 
       Alert.alert('خطأ', errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle name change (Admin only)
+  const handleChangeName = async () => {
+    // Validation
+    if (!newName || newName.trim().length === 0) {
+      Alert.alert('خطأ', 'الرجاء إدخال اسم صحيح');
+      return;
+    }
+
+    if (newName === displayName) {
+      Alert.alert('خطأ', 'الاسم الجديد هو نفسه الاسم الحالي');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Update name in users collection
+      await updateDoc(doc(db, 'users', user.uid), {
+        name: newName,
+        updatedAt: new Date().toISOString(),
+      });
+
+      // Update local state
+      setAdminData({ ...adminData, name: newName });
+
+      // Clear form
+      setNewName('');
+      setShowNameSection(false);
+
+      Alert.alert('نجح ✓', 'تم تغيير الاسم بنجاح');
+    } catch (error) {
+      console.error('Name change error:', error);
+      Alert.alert('خطأ', 'فشل تغيير الاسم');
     } finally {
       setLoading(false);
     }
@@ -267,13 +332,66 @@ const ProfileScreen = ({ navigation }) => {
             <View style={styles.infoNote}>
               <FontAwesome5 name="info-circle" size={18} color="#3498DB" solid style={styles.infoNoteIcon} />
               <Text style={styles.infoNoteText}>
-                لا يمكن تغيير الاسم. للقيام بذلك، تواصل مع الإدارة.
+                {userRole === 'admin'
+                  ? 'يمكنك تغيير اسمك من خلال قسم "تغيير الاسم" أدناه.'
+                  : 'لا يمكن تغيير الاسم. للقيام بذلك، تواصل مع الإدارة.'}
               </Text>
             </View>
           </AnimatedCard>
 
+          {/* Change Name Section (Admin Only) */}
+          {userRole === 'admin' && (
+            <AnimatedCard index={2} delay={175} style={styles.card}>
+              <View style={styles.sectionTitleContainer}>
+                <TouchableOpacity
+                  style={styles.sectionHeaderButton}
+                  onPress={() => setShowNameSection(!showNameSection)}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.titleWithIcon}>
+                    <FontAwesome5 name="user-edit" size={20} color="#1ABC9C" solid />
+                    <Text style={styles.cardTitle}>تغيير الاسم</Text>
+                  </View>
+                  <Ionicons name={showNameSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
+                </TouchableOpacity>
+              </View>
+
+              {showNameSection && (
+                <View style={styles.framedContent}>
+                  <View style={styles.formSection}>
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>الاسم الجديد</Text>
+                      <TextInput
+                        style={styles.input}
+                        value={newName}
+                        onChangeText={setNewName}
+                        placeholder="أدخل الاسم الجديد"
+                        placeholderTextColor={colors.text.muted}
+                        autoCapitalize="words"
+                        editable={!loading}
+                      />
+                    </View>
+
+                    <TouchableOpacity
+                      style={[styles.actionButton, loading && styles.actionButtonDisabled]}
+                      onPress={handleChangeName}
+                      disabled={loading}
+                      activeOpacity={0.8}
+                    >
+                      {loading ? (
+                        <ActivityIndicator color={colors.text.primary} size="small" />
+                      ) : (
+                        <Text style={styles.actionButtonText}>✓ حفظ الاسم الجديد</Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </AnimatedCard>
+          )}
+
           {/* Change Password Section */}
-          <AnimatedCard index={2} delay={200} style={styles.card}>
+          <AnimatedCard index={userRole === 'admin' ? 3 : 2} delay={200} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <TouchableOpacity
                 style={styles.sectionHeaderButton}
@@ -351,7 +469,7 @@ const ProfileScreen = ({ navigation }) => {
           </AnimatedCard>
 
           {/* Change Email Section */}
-          <AnimatedCard index={3} delay={250} style={styles.card}>
+          <AnimatedCard index={userRole === 'admin' ? 4 : 3} delay={250} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <TouchableOpacity
                 style={styles.sectionHeaderButton}

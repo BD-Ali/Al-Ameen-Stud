@@ -15,6 +15,7 @@ import {
   Keyboard,
   Animated,
 } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { useFadeIn, useSlideInFromBottom, useScaleIn, createPressAnimation } from '../utils/animations';
@@ -113,7 +114,7 @@ const LoginScreen = ({ navigation }) => {
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>الاسم الكامل</Text>
                 <View style={styles.inputWrapper}>
-                  <Text style={styles.inputIcon}>👤</Text>
+                  <FontAwesome5 name="user" size={18} color="#95A5A6" solid style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
                     placeholder="أدخل اسمك"
@@ -130,7 +131,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>البريد الإلكتروني</Text>
               <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>✉️</Text>
+                <FontAwesome5 name="envelope" size={16} color="#95A5A6" solid style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="your@email.com"
@@ -147,7 +148,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>كلمة المرور</Text>
               <View style={styles.inputWrapper}>
-                <Text style={styles.inputIcon}>🔒</Text>
+                <FontAwesome5 name="lock" size={18} color="#95A5A6" solid style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="••••••••"
@@ -202,8 +203,9 @@ const LoginScreen = ({ navigation }) => {
 
             {isSignUp && (
               <View style={styles.infoBox}>
+                <FontAwesome5 name="info-circle" size={16} color="#3498DB" solid style={styles.infoIcon} />
                 <Text style={styles.infoText}>
-                  ℹ️ التسجيل ينشئ حساب عميل. يجب منح صلاحية المسؤول من قبل إدارة المربط.
+                  التسجيل ينشئ حساب عميل. يجب منح صلاحية المسؤول من قبل إدارة المربط.
                 </Text>
               </View>
             )}
@@ -222,7 +224,7 @@ const LoginScreen = ({ navigation }) => {
             >
               <Animated.View style={[styles.visitorButtonContent, { transform: [{ scale: visitorButtonScale }] }]}>
                 <View style={styles.buttonReflection} />
-                <Text style={styles.visitorEmoji}>👁️</Text>
+                <FontAwesome5 name="eye" size={18} color="#7F8C8D" solid style={styles.visitorIcon} />
                 <Text style={styles.visitorButtonText}>متابعة كزائر</Text>
               </Animated.View>
             </TouchableOpacity>
@@ -327,7 +329,6 @@ const styles = StyleSheet.create({
     height: 48,
   },
   inputIcon: {
-    fontSize: 18,
     marginRight: spacing.sm,
   },
   input: {
@@ -388,8 +389,15 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     borderLeftWidth: 3,
     borderLeftColor: colors.status.info,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  infoIcon: {
+    marginRight: spacing.sm,
+    marginTop: 2,
   },
   infoText: {
+    flex: 1,
     fontSize: typography.size.xs,
     color: colors.text.tertiary,
     lineHeight: 16,
@@ -424,8 +432,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  visitorEmoji: {
-    fontSize: 18,
+  visitorIcon: {
     marginRight: spacing.sm,
   },
   visitorButtonText: {
