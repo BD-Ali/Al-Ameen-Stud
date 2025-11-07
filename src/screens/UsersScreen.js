@@ -8,9 +8,7 @@ import {
   TouchableOpacity,
   Alert,
   Animated,
-  ActivityIndicator,
-  TouchableWithoutFeedback,
-  Keyboard
+  ActivityIndicator
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -631,62 +629,64 @@ const UsersScreen = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <View style={styles.container}>
-        {/* Header with Tabs */}
-        <View style={styles.header}>
-          <View style={styles.titleRow}>
-            <FontAwesome5 name="users" size={24} color="#3B82F6" solid />
-            <Text style={styles.pageTitle}>المستخدمين</Text>
-          </View>
-
-          {/* Tab Selector */}
-          <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'clients' && styles.tabActive]}
-              onPress={() => switchTab('clients')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.tabText, activeTab === 'clients' && styles.tabTextActive]}>
-                العملاء ({clients.length})
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'workers' && styles.tabActive]}
-              onPress={() => switchTab('workers')}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.tabText, activeTab === 'workers' && styles.tabTextActive]}>
-                العمال ({(workerUsers || workers).length})
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <FontAwesome5 name="search" size={16} color={colors.text.secondary} solid style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="ابحث بالاسم أو البريد أو الهاتف..."
-              placeholderTextColor={colors.text.muted}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
-                <FontAwesome5 name="times" size={14} color={colors.text.secondary} solid />
-              </TouchableOpacity>
-            )}
-          </View>
+    <View style={styles.container}>
+      {/* Header with Tabs */}
+      <View style={styles.header}>
+        <View style={styles.titleRow}>
+          <FontAwesome5 name="users" size={24} color="#3B82F6" solid />
+          <Text style={styles.pageTitle}>المستخدمين</Text>
         </View>
 
-        {/* User List */}
-        <FlatList
-          data={currentData}
-          keyExtractor={(item) => item.id}
-          renderItem={renderUserCard}
-          contentContainerStyle={styles.contentContainer}
-          ListEmptyComponent={
+        {/* Tab Selector */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'clients' && styles.tabActive]}
+            onPress={() => switchTab('clients')}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.tabText, activeTab === 'clients' && styles.tabTextActive]}>
+              العملاء ({clients.length})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'workers' && styles.tabActive]}
+            onPress={() => switchTab('workers')}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.tabText, activeTab === 'workers' && styles.tabTextActive]}>
+              العمال ({(workerUsers || workers).length})
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <FontAwesome5 name="search" size={16} color={colors.text.secondary} solid style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="ابحث بالاسم أو البريد أو الهاتف..."
+            placeholderTextColor={colors.text.muted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+              <FontAwesome5 name="times" size={14} color={colors.text.secondary} solid />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      {/* User List */}
+      <FlatList
+        data={currentData}
+        keyExtractor={(item) => item.id}
+        renderItem={renderUserCard}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={true}
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
+        ListEmptyComponent={
             <View style={styles.emptyState}>
               <FontAwesome5 
                 name={activeTab === 'clients' ? 'users' : 'hard-hat'} 
@@ -845,11 +845,10 @@ const UsersScreen = () => {
               { opacity: fadeAnim }
             ]}
           >
-            <Text style={styles.toastText}>{toastMessage}</Text>
-          </Animated.View>
-        )}
-      </View>
-    </TouchableWithoutFeedback>
+          <Text style={styles.toastText}>{toastMessage}</Text>
+        </Animated.View>
+      )}
+    </View>
   );
 };
 
@@ -1037,7 +1036,6 @@ const styles = StyleSheet.create({
   },
   detailRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing.sm,
     paddingVertical: spacing.xs,
@@ -1046,19 +1044,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+    flex: 1,
   },
   detailLabel: {
     fontSize: typography.size.sm,
     color: colors.text.secondary,
     fontWeight: typography.weight.semibold,
-    flex: 1,
   },
   detailValue: {
     fontSize: typography.size.sm,
     color: colors.text.primary,
     fontWeight: typography.weight.bold,
-    flex: 1,
-    textAlign: 'right',
+    marginLeft: spacing.md,
   },
   paidText: {
     color: colors.status.success,
@@ -1077,7 +1074,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     fontSize: typography.size.sm,
     color: colors.text.primary,
-    flex: 1,
+    minWidth: 100,
     textAlign: 'right',
   },
   editButtonsRow: {

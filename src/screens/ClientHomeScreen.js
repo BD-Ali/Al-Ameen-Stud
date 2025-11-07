@@ -72,7 +72,7 @@ const ClientHomeScreen = ({ navigation }) => {
 
   const handleContactUs = () => {
     Alert.alert(
-      'تواصل معنا',
+      '📞 تواصل معنا',
       'اختر طريقة التواصل مع الإدارة:',
       [
         {
@@ -126,7 +126,7 @@ const ClientHomeScreen = ({ navigation }) => {
               {/* Payment Status Card */}
               <AnimatedCard index={0} delay={100} style={styles.paymentCard}>
                 <View style={styles.paymentHeader}>
-                  <FontAwesome5 name="wallet" size={20} color="#27AE60" solid />
+                  <Text style={styles.paymentEmoji}>💰</Text>
                   <Text style={styles.paymentTitle}>حالة الدفع</Text>
                 </View>
                 <View style={styles.paymentRow}>
@@ -147,7 +147,7 @@ const ClientHomeScreen = ({ navigation }) => {
                 <AnimatedCard index={1} delay={100} style={styles.subscriptionCard}>
                   <View style={styles.subscriptionHeader}>
                     <View style={styles.subscriptionTitleContainer}>
-                      <FontAwesome5 name="ticket-alt" size={18} color="#9B59B6" solid />
+                      <Text style={styles.subscriptionEmoji}>🎫</Text>
                       <Text style={styles.subscriptionTitle}>اشتراك العيادة</Text>
                     </View>
                     <View style={[styles.subscriptionStatusBadge, selectedClient.subscriptionActive && styles.subscriptionActiveBadge]}>
@@ -343,8 +343,11 @@ const styles = StyleSheet.create({
   paymentHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
     marginBottom: spacing.md,
+  },
+  paymentEmoji: {
+    fontSize: 20,
+    marginRight: spacing.sm,
   },
   paymentTitle: {
     fontSize: typography.size.md,
@@ -557,7 +560,10 @@ const styles = StyleSheet.create({
   subscriptionTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+  },
+  subscriptionEmoji: {
+    fontSize: 24,
+    marginRight: spacing.sm,
   },
   subscriptionTitle: {
     fontSize: typography.size.lg,

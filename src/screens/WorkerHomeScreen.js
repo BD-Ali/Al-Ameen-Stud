@@ -1,4 +1,3 @@
-          <FontAwesome5 name="phone" size={20} color="#fff" solid />
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity, Linking, Image, ScrollView, Animated } from 'react-native';
 import { DataContext } from '../context/DataContext';
@@ -6,7 +5,6 @@ import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import CompactHeader from '../components/CompactHeader';
-import AnimatedCard from '../components/AnimatedCard';
 import { useFadeIn, usePulse } from '../utils/animations';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -349,8 +347,10 @@ const WorkerHomeScreen = ({ navigation }) => {
         return (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <FontAwesome5 name="book-open" size={22} color="#9B59B6" solid style={styles.sectionIcon} />
-              <Text style={styles.sectionTitle}>دروسي</Text>
+              <View style={styles.sectionTitleRow}>
+                <FontAwesome5 name="book-open" size={22} color="#9B59B6" solid />
+                <Text style={styles.sectionTitle}>دروسي</Text>
+              </View>
             </View>
 
             {myLessons.length > 0 ? (
@@ -511,6 +511,7 @@ const WorkerHomeScreen = ({ navigation }) => {
         activeOpacity={0.8}
       >
         <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+          <FontAwesome5 name="phone" size={20} color="#fff" solid />
         </Animated.View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -625,6 +626,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
     color: colors.text.tertiary,
     fontStyle: 'italic',
+    marginTop: spacing.md,
   },
   lessonGroup: {
     marginBottom: spacing.md,
