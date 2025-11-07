@@ -26,6 +26,7 @@ import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
 import AnimatedCard from '../components/AnimatedCard';
 import AnimatedButton from '../components/AnimatedButton';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 /**
  * Toast Notification Component
@@ -56,7 +57,6 @@ const Toast = ({ visible, message, type, onHide }) => {
   if (!visible) return null;
 
   const bgColor = type === 'success' ? colors.status.success : colors.status.error;
-  const icon = type === 'success' ? '✅' : '❌';
 
   return (
     <Animated.View
@@ -65,9 +65,15 @@ const Toast = ({ visible, message, type, onHide }) => {
         { backgroundColor: bgColor, transform: [{ translateY }] },
       ]}
     >
-      <Text style={styles.toastText}>
-        {icon} {message}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        <FontAwesome5
+          name={type === 'success' ? 'check-circle' : 'times-circle'}
+          size={16}
+          color="#fff"
+          solid
+        />
+        <Text style={styles.toastText}>{message}</Text>
+      </View>
     </Animated.View>
   );
 };
@@ -236,8 +242,8 @@ const AnnouncementsScreen = () => {
       'من أين تريد اختيار الصورة؟',
       [
         { text: 'إلغاء', style: 'cancel' },
-        { text: '📷 الكاميرا', onPress: () => pickImage(true) },
-        { text: '🖼️ المعرض', onPress: () => pickImage(false) },
+        { text: 'الكاميرا', onPress: () => pickImage(true) },
+        { text: 'المعرض', onPress: () => pickImage(false) },
       ]
     );
   };
@@ -481,7 +487,7 @@ const AnnouncementsScreen = () => {
         renderItem={renderAnnouncementCard}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>📢</Text>
+            <FontAwesome5 name="bullhorn" size={64} color="#95A5A6" solid />
             <Text style={styles.emptyText}>لا توجد إعلانات بعد</Text>
             <Text style={styles.emptySubtext}>ابدأ بإنشاء إعلان جديد</Text>
           </View>
@@ -496,7 +502,7 @@ const AnnouncementsScreen = () => {
         accessibilityLabel="إنشاء إعلان جديد"
         accessibilityRole="button"
       >
-        <Text style={styles.fabText}>➕</Text>
+        <FontAwesome5 name="plus" size={20} color="#fff" solid />
       </TouchableOpacity>
 
       {/* Create/Edit Modal */}
@@ -525,7 +531,12 @@ const AnnouncementsScreen = () => {
                 accessibilityRole="button"
                 disabled={isSubmitting}
               >
-                <Text style={[styles.closeButton, isSubmitting && styles.disabledText]}>✕</Text>
+                <FontAwesome5
+                  name="times"
+                  size={20}
+                  color={isSubmitting ? colors.text.disabled : colors.text.secondary}
+                  solid
+                />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>
                 {previewMode ? 'معاينة' : editingId ? 'تعديل إعلان' : 'إعلان جديد'}
@@ -618,7 +629,8 @@ const AnnouncementsScreen = () => {
                         onPress={removeImage}
                         disabled={isSubmitting}
                       >
-                        <Text style={styles.removeImageText}>🗑️ إزالة الصورة</Text>
+                        <FontAwesome5 name="trash-alt" size={12} color="#E74C3C" solid />
+                        <Text style={styles.removeImageText}> إزالة الصورة</Text>
                       </TouchableOpacity>
                     </View>
                   ) : (
@@ -841,9 +853,17 @@ const AnnouncementsScreen = () => {
                   {isSubmitting ? (
                     <ActivityIndicator size="small" color={colors.text.primary} />
                   ) : (
-                    <Text style={styles.saveButtonText}>
-                      {editingId ? '✓ تحديث' : '💾 نشر'}
-                    </Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      <FontAwesome5
+                        name={editingId ? 'check' : 'paper-plane'}
+                        size={14}
+                        color={colors.text.primary}
+                        solid
+                      />
+                      <Text style={styles.saveButtonText}>
+                        {editingId ? 'تحديث' : 'نشر'}
+                      </Text>
+                    </View>
                   )}
                 </TouchableOpacity>
               </View>
@@ -957,12 +977,20 @@ const styles = StyleSheet.create({
     color: colors.accent.amber,
     marginBottom: spacing.xs,
   },
+  expiryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: spacing.sm,
+  },
   expiryText: {
     fontSize: typography.size.xs,
     color: colors.text.muted,
-    marginBottom: spacing.sm,
   },
   notificationStatus: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: colors.background.tertiary,
     padding: spacing.sm,
     borderRadius: borderRadius.sm,
@@ -1336,6 +1364,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
   },
   removeImageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
     position: 'absolute',
     top: 8,
     right: 8,
@@ -1345,6 +1375,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     minHeight: 44,
     justifyContent: 'center',
+    gap: 4,
   },
   removeImageText: {
     fontSize: typography.size.xs,

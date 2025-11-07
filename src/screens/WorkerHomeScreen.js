@@ -1,3 +1,4 @@
+          <FontAwesome5 name="phone" size={20} color="#fff" solid />
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity, Linking, Image, ScrollView, Animated } from 'react-native';
 import { DataContext } from '../context/DataContext';
@@ -7,6 +8,7 @@ import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import CompactHeader from '../components/CompactHeader';
 import AnimatedCard from '../components/AnimatedCard';
 import { useFadeIn, usePulse } from '../utils/animations';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 /**
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
@@ -124,21 +126,21 @@ const WorkerHomeScreen = ({ navigation }) => {
 
   const handleContactUs = () => {
     Alert.alert(
-      '📞 تواصل معنا',
+      'تواصل معنا',
       'اختر طريقة التواصل مع الإدارة:',
       [
         {
-          text: '📧 إرسال بريد إلكتروني',
+          text: 'إرسال بريد إلكتروني',
           onPress: () => {
-            Linking.openURL('mailto:badarne3li@gmail.com').catch(err => {
+            Linking.openURL('mailto:badarne3li@gmail.com').catch(() => {
               Alert.alert('خطأ', 'لا يمكن فتح تطبيق البريد الإلكتروني');
             });
           }
         },
         {
-          text: '📱 اتصال هاتفي',
+          text: 'اتصال هاتفي',
           onPress: () => {
-            Linking.openURL('tel:0503653429').catch(err => {
+            Linking.openURL('tel:0503653429').catch(() => {
               Alert.alert('خطأ', 'لا يمكن إجراء المكالمة');
             });
           }
@@ -225,8 +227,10 @@ const WorkerHomeScreen = ({ navigation }) => {
         return horses && horses.length > 0 ? (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionIcon}>🐴</Text>
-              <Text style={styles.sectionTitle}>خيولنا</Text>
+              <View style={styles.sectionTitleRow}>
+                <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
+                <Text style={styles.sectionTitle}>خيولنا</Text>
+              </View>
               <View style={styles.horsesBadge}>
                 <Text style={styles.horsesBadgeText}>{horses.length}</Text>
               </View>
@@ -247,7 +251,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                     />
                   ) : (
                     <View style={styles.horseImagePlaceholder}>
-                      <Text style={styles.horseImagePlaceholderText}>🐴</Text>
+                      <MaterialCommunityIcons name="horse-variant" size={40} color="#F39C12" />
                     </View>
                   )}
                   <View style={styles.horseCardCompactInfo}>
@@ -264,8 +268,10 @@ const WorkerHomeScreen = ({ navigation }) => {
         return (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionIcon}>📅</Text>
-              <Text style={styles.sectionTitle}>جدول اليوم</Text>
+              <View style={styles.sectionTitleRow}>
+                <FontAwesome5 name="calendar-alt" size={24} color="#5DADE2" solid />
+                <Text style={styles.sectionTitle}>جدول اليوم</Text>
+              </View>
             </View>
 
             {allTodaySchedules.length > 0 ? (
@@ -273,7 +279,10 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {/* Current Tasks */}
                 {currentTasks.length > 0 && (
                   <View style={styles.taskGroup}>
-                    <Text style={styles.taskGroupTitle}>⏰ المهمة الحالية</Text>
+                    <View style={styles.taskGroupTitleRow}>
+                      <FontAwesome5 name="clock" size={16} color="#27AE60" solid />
+                      <Text style={styles.taskGroupTitle}>المهمة الحالية</Text>
+                    </View>
                     {currentTasks.map((schedule) => (
                       <View key={schedule.id} style={[styles.scheduleCard, styles.currentTaskCard]}>
                         <View style={styles.scheduleHeader}>
@@ -290,7 +299,10 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {/* Upcoming Tasks */}
                 {upcomingTasks.length > 0 && (
                   <View style={styles.taskGroup}>
-                    <Text style={styles.taskGroupTitle}>📋 المهام القادمة ({upcomingTasks.length})</Text>
+                    <View style={styles.taskGroupTitleRow}>
+                      <FontAwesome5 name="clipboard-list" size={16} color="#3B82F6" solid />
+                      <Text style={styles.taskGroupTitle}>المهام القادمة ({upcomingTasks.length})</Text>
+                    </View>
                     {upcomingTasks.map((schedule) => (
                       <View key={schedule.id} style={styles.scheduleCard}>
                         <View style={styles.scheduleHeader}>
@@ -307,7 +319,10 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {/* Past Tasks */}
                 {pastTasks.length > 0 && (
                   <View style={styles.taskGroup}>
-                    <Text style={styles.taskGroupTitle}>✅ المهام المكتملة ({pastTasks.length})</Text>
+                    <View style={styles.taskGroupTitleRow}>
+                      <FontAwesome5 name="check-circle" size={16} color="#27AE60" solid />
+                      <Text style={styles.taskGroupTitle}>المهام المكتملة ({pastTasks.length})</Text>
+                    </View>
                     {pastTasks.map((schedule) => (
                       <View key={schedule.id} style={[styles.scheduleCard, styles.pastTaskCard]}>
                         <View style={styles.scheduleHeader}>
@@ -323,7 +338,7 @@ const WorkerHomeScreen = ({ navigation }) => {
               </View>
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyEmoji}>📋</Text>
+                <FontAwesome5 name="clipboard-list" size={48} color="#4A90E2" solid />
                 <Text style={styles.emptyText}>لا توجد مهام مجدولة لليوم</Text>
               </View>
             )}
@@ -334,7 +349,7 @@ const WorkerHomeScreen = ({ navigation }) => {
         return (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionIcon}>📚</Text>
+              <FontAwesome5 name="book-open" size={22} color="#9B59B6" solid style={styles.sectionIcon} />
               <Text style={styles.sectionTitle}>دروسي</Text>
             </View>
 
@@ -347,25 +362,32 @@ const WorkerHomeScreen = ({ navigation }) => {
                     {todayLessons.map((lesson) => (
                       <View key={lesson.id} style={styles.lessonCard}>
                         <View style={styles.lessonHeader}>
-                          <Text style={styles.lessonTime}>⏰ {lesson.time}</Text>
+                          <View style={styles.lessonTimeRow}>
+                            <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                            <Text style={styles.lessonTime}>{lesson.time}</Text>
+                          </View>
                           {lesson.confirmed && (
                             <View style={styles.confirmedBadge}>
-                              <Text style={styles.confirmedBadgeText}>✓ مكتمل</Text>
+                              <FontAwesome5 name="check" size={10} color="#fff" solid />
+                              <Text style={styles.confirmedBadgeText}>مكتمل</Text>
                             </View>
                           )}
                           {lesson.status === 'cancelled' && (
                             <View style={styles.cancelledBadge}>
-                              <Text style={styles.cancelledBadgeText}>✕ ملغي</Text>
+                              <FontAwesome5 name="times" size={10} color="#fff" solid />
+                              <Text style={styles.cancelledBadgeText}>ملغي</Text>
                             </View>
                           )}
                         </View>
                         <View style={styles.lessonDetails}>
                           <View style={styles.lessonInfoRow}>
-                            <Text style={styles.lessonLabel}>👤 العميل:</Text>
+                            <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
+                            <Text style={styles.lessonLabel}>العميل:</Text>
                             <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
                           </View>
                           <View style={styles.lessonInfoRow}>
-                            <Text style={styles.lessonLabel}>🐴 الحصان:</Text>
+                            <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
+                            <Text style={styles.lessonLabel}>الحصان:</Text>
                             <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
                           </View>
                         </View>
@@ -375,13 +397,15 @@ const WorkerHomeScreen = ({ navigation }) => {
                               style={styles.confirmButton}
                               onPress={() => handleConfirmLesson(lesson.id)}
                             >
-                              <Text style={styles.confirmButtonText}>✓ تأكيد الإتمام</Text>
+                              <FontAwesome5 name="check" size={12} color="#fff" solid />
+                              <Text style={styles.confirmButtonText}>تأكيد الإتمام</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                               style={styles.cancelButton}
                               onPress={() => handleCancelLesson(lesson.id)}
                             >
-                              <Text style={styles.cancelButtonText}>✕ إلغاء</Text>
+                              <FontAwesome5 name="times" size={12} color="#fff" solid />
+                              <Text style={styles.cancelButtonText}>إلغاء</Text>
                             </TouchableOpacity>
                           </View>
                         )}
@@ -397,16 +421,24 @@ const WorkerHomeScreen = ({ navigation }) => {
                     {upcomingLessons.map((lesson) => (
                       <View key={lesson.id} style={styles.lessonCard}>
                         <View style={styles.lessonHeader}>
-                          <Text style={styles.lessonDate}>📅 {lesson.date}</Text>
-                          <Text style={styles.lessonTime}>⏰ {lesson.time}</Text>
+                          <View style={styles.lessonDateRow}>
+                            <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                            <Text style={styles.lessonDate}>{lesson.date}</Text>
+                          </View>
+                          <View style={styles.lessonTimeRow}>
+                            <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                            <Text style={styles.lessonTime}>{lesson.time}</Text>
+                          </View>
                         </View>
                         <View style={styles.lessonDetails}>
                           <View style={styles.lessonInfoRow}>
-                            <Text style={styles.lessonLabel}>👤 العميل:</Text>
+                            <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
+                            <Text style={styles.lessonLabel}>العميل:</Text>
                             <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
                           </View>
                           <View style={styles.lessonInfoRow}>
-                            <Text style={styles.lessonLabel}>🐴 الحصان:</Text>
+                            <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
+                            <Text style={styles.lessonLabel}>الحصان:</Text>
                             <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
                           </View>
                         </View>
@@ -417,7 +449,7 @@ const WorkerHomeScreen = ({ navigation }) => {
               </View>
             ) : (
               <View style={styles.emptyState}>
-                <Text style={styles.emptyEmoji}>📖</Text>
+                <FontAwesome5 name="book-open" size={48} color="#9B59B6" solid />
                 <Text style={styles.emptyText}>لا توجد دروس مضافة</Text>
               </View>
             )}
@@ -428,8 +460,10 @@ const WorkerHomeScreen = ({ navigation }) => {
         return currentWorker ? (
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionIcon}>ℹ️</Text>
-              <Text style={styles.sectionTitle}>معلوماتي</Text>
+              <View style={styles.sectionTitleRow}>
+                <FontAwesome5 name="info-circle" size={24} color="#3B82F6" solid />
+                <Text style={styles.sectionTitle}>معلوماتي</Text>
+              </View>
             </View>
 
             <View style={styles.infoCard}>
@@ -477,7 +511,6 @@ const WorkerHomeScreen = ({ navigation }) => {
         activeOpacity={0.8}
       >
         <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-          <Text style={styles.contactButtonIcon}>📞</Text>
         </Animated.View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -499,11 +532,13 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
-  sectionIcon: {
-    fontSize: 24,
-    marginRight: spacing.sm,
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   sectionTitle: {
     fontSize: typography.size.lg,
@@ -586,10 +621,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...shadows.sm,
   },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: spacing.md,
-  },
   emptyText: {
     fontSize: typography.size.base,
     color: colors.text.tertiary,
@@ -616,6 +647,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  lessonDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  lessonTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   lessonDate: {
     fontSize: typography.size.sm,
     color: colors.primary.main,
@@ -631,12 +672,12 @@ const styles = StyleSheet.create({
   lessonInfoRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.xs,
     marginBottom: spacing.xs,
   },
   lessonLabel: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
-    marginRight: spacing.xs,
   },
   lessonValue: {
     fontSize: typography.size.sm,
@@ -654,7 +695,10 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
   },
   confirmButtonText: {
     color: '#fff',
@@ -667,7 +711,10 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
   },
   cancelButtonText: {
     color: '#fff',
@@ -679,6 +726,9 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   confirmedBadgeText: {
     color: '#fff',
@@ -690,6 +740,9 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   cancelledBadgeText: {
     color: '#fff',
@@ -699,11 +752,16 @@ const styles = StyleSheet.create({
   taskGroup: {
     marginBottom: spacing.md,
   },
+  taskGroupTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
   taskGroupTitle: {
     fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
-    marginBottom: spacing.sm,
   },
   // Horses gallery styles
   horsesBadge: {
@@ -775,9 +833,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...shadows.lg,
     elevation: 5,
-  },
-  contactButtonIcon: {
-    fontSize: 24,
   },
 });
 

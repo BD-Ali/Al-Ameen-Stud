@@ -12,7 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -59,9 +59,9 @@ const ProfileScreen = ({ navigation }) => {
   // Get role display info
   const getRoleInfo = (role) => {
     const roleMap = {
-      'client': { label: 'عميل', color: colors.accent.teal, icon: 'person', iconFamily: 'Ionicons' },
-      'worker': { label: 'عامل', color: colors.accent.pink, icon: 'hammer-wrench', iconFamily: 'MaterialCommunityIcons' },
-      'admin': { label: 'مدير', color: colors.accent.purple, icon: 'shield-checkmark', iconFamily: 'Ionicons' },
+      'client': { label: 'عميل', color: colors.accent.teal, icon: 'user', iconFamily: 'FontAwesome5', iconColor: '#1ABC9C' },
+      'worker': { label: 'عامل', color: colors.accent.pink, icon: 'hard-hat', iconFamily: 'FontAwesome5', iconColor: '#E91E63' },
+      'admin': { label: 'مدير', color: colors.accent.purple, icon: 'user-shield', iconFamily: 'FontAwesome5', iconColor: '#9B59B6' },
     };
     return roleMap[role?.toLowerCase()] || roleMap['client'];
   };
@@ -230,11 +230,7 @@ const ProfileScreen = ({ navigation }) => {
             <Text style={styles.displayName}>{displayName}</Text>
             <Text style={styles.displayEmail}>{displayEmail}</Text>
             <View style={[styles.roleBadgeLarge, { backgroundColor: roleInfo.color + '15', borderColor: roleInfo.color }]}>
-              {roleInfo.iconFamily === 'Ionicons' ? (
-                <Ionicons name={roleInfo.icon} size={16} color={roleInfo.color} style={styles.roleIconLarge} />
-              ) : (
-                <MaterialCommunityIcons name={roleInfo.icon} size={16} color={roleInfo.color} style={styles.roleIconLarge} />
-              )}
+              <FontAwesome5 name={roleInfo.icon} size={16} color={roleInfo.iconColor} solid style={styles.roleIconLarge} />
               <Text style={[styles.roleBadgeText, { color: roleInfo.color }]}>
                 {roleInfo.label}
               </Text>
@@ -244,7 +240,10 @@ const ProfileScreen = ({ navigation }) => {
           {/* Profile Information (Read-only) */}
           <AnimatedCard index={1} delay={150} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
-              <Text style={styles.cardTitle}>📋 معلومات الحساب</Text>
+              <View style={styles.titleWithIcon}>
+                <FontAwesome5 name="clipboard-list" size={22} color="#4A90E2" solid />
+                <Text style={styles.cardTitle}>معلومات الحساب</Text>
+              </View>
             </View>
             <View style={styles.infoContainer}>
               {/* Name Frame */}
@@ -266,8 +265,9 @@ const ProfileScreen = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.infoNote}>
+              <FontAwesome5 name="info-circle" size={18} color="#3498DB" solid style={styles.infoNoteIcon} />
               <Text style={styles.infoNoteText}>
-                ℹ️ لا يمكن تغيير الاسم. للقيام بذلك، تواصل مع الإدارة.
+                لا يمكن تغيير الاسم. للقيام بذلك، تواصل مع الإدارة.
               </Text>
             </View>
           </AnimatedCard>
@@ -280,8 +280,11 @@ const ProfileScreen = ({ navigation }) => {
                 onPress={() => setShowPasswordSection(!showPasswordSection)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.cardTitle}>🔒 تغيير كلمة المرور</Text>
-                <Text style={styles.expandIcon}>{showPasswordSection ? '▼' : '◀'}</Text>
+                <View style={styles.titleWithIcon}>
+                  <FontAwesome5 name="lock" size={22} color="#F39C12" solid />
+                  <Text style={styles.cardTitle}>تغيير كلمة المرور</Text>
+                </View>
+                <Ionicons name={showPasswordSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
 
@@ -355,8 +358,11 @@ const ProfileScreen = ({ navigation }) => {
                 onPress={() => setShowEmailSection(!showEmailSection)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.cardTitle}>📧 تغيير البريد الإلكتروني</Text>
-                <Text style={styles.expandIcon}>{showEmailSection ? '▼' : '◀'}</Text>
+                <View style={styles.titleWithIcon}>
+                  <FontAwesome5 name="envelope" size={20} color="#E74C3C" solid />
+                  <Text style={styles.cardTitle}>تغيير البريد الإلكتروني</Text>
+                </View>
+                <Ionicons name={showEmailSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
 
@@ -410,7 +416,7 @@ const ProfileScreen = ({ navigation }) => {
 
           {/* Security Note */}
           <View style={styles.securityNote}>
-            <Text style={styles.securityNoteIcon}>🛡️</Text>
+            <FontAwesome5 name="shield-alt" size={22} color="#27AE60" solid style={styles.securityNoteIcon} />
             <Text style={styles.securityNoteText}>
               لحماية حسابك، يرجى استخدام كلمة مرور قوية وعدم مشاركتها مع أي شخص.
             </Text>
@@ -507,6 +513,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  titleWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -588,6 +599,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   infoNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     marginTop: spacing.lg,
     padding: spacing.lg,
     backgroundColor: colors.primary.subtle,
@@ -595,8 +608,13 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: colors.primary.main,
     ...shadows.sm,
+    gap: spacing.sm,
+  },
+  infoNoteIcon: {
+    marginTop: 2,
   },
   infoNoteText: {
+    flex: 1,
     fontSize: typography.size.sm,
     color: colors.text.secondary,
     lineHeight: 22,
@@ -657,10 +675,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border.medium,
     ...shadows.sm,
+    gap: spacing.sm,
   },
   securityNoteIcon: {
-    fontSize: typography.size.xl,
-    marginRight: spacing.md,
+    marginTop: 2,
   },
   securityNoteText: {
     flex: 1,

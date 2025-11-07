@@ -7,6 +7,7 @@ import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import CompactHeader from '../components/CompactHeader';
 import AnimatedCard from '../components/AnimatedCard';
 import { useFadeIn, usePulse } from '../utils/animations';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 /**
  * ClientHomeScreen displays a client's upcoming and past lessons along with
@@ -71,7 +72,7 @@ const ClientHomeScreen = ({ navigation }) => {
 
   const handleContactUs = () => {
     Alert.alert(
-      '📞 تواصل معنا',
+      'تواصل معنا',
       'اختر طريقة التواصل مع الإدارة:',
       [
         {
@@ -125,7 +126,7 @@ const ClientHomeScreen = ({ navigation }) => {
               {/* Payment Status Card */}
               <AnimatedCard index={0} delay={100} style={styles.paymentCard}>
                 <View style={styles.paymentHeader}>
-                  <Text style={styles.paymentEmoji}>💰</Text>
+                  <FontAwesome5 name="wallet" size={20} color="#27AE60" solid />
                   <Text style={styles.paymentTitle}>حالة الدفع</Text>
                 </View>
                 <View style={styles.paymentRow}>
@@ -146,7 +147,7 @@ const ClientHomeScreen = ({ navigation }) => {
                 <AnimatedCard index={1} delay={100} style={styles.subscriptionCard}>
                   <View style={styles.subscriptionHeader}>
                     <View style={styles.subscriptionTitleContainer}>
-                      <Text style={styles.subscriptionEmoji}>🎫</Text>
+                      <FontAwesome5 name="ticket-alt" size={18} color="#9B59B6" solid />
                       <Text style={styles.subscriptionTitle}>اشتراك العيادة</Text>
                     </View>
                     <View style={[styles.subscriptionStatusBadge, selectedClient.subscriptionActive && styles.subscriptionActiveBadge]}>
@@ -173,9 +174,12 @@ const ClientHomeScreen = ({ navigation }) => {
                   </View>
                   {selectedClient.subscriptionStartDate && (
                     <View style={styles.subscriptionFooter}>
-                      <Text style={styles.subscriptionDate}>
-                        📅 تاريخ البدء: {formatDate(selectedClient.subscriptionStartDate)}
-                      </Text>
+                      <View style={styles.subscriptionDateRow}>
+                        <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                        <Text style={styles.subscriptionDate}>
+                          تاريخ البدء: {formatDate(selectedClient.subscriptionStartDate)}
+                        </Text>
+                      </View>
                     </View>
                   )}
                 </AnimatedCard>
@@ -185,7 +189,10 @@ const ClientHomeScreen = ({ navigation }) => {
               {horses && horses.length > 0 && (
                 <>
                   <View style={styles.horsesHeader}>
-                    <Text style={styles.sectionTitle}>🐴 خيولنا</Text>
+                    <View style={styles.sectionTitleRow}>
+                      <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
+                      <Text style={styles.sectionTitle}>خيولنا</Text>
+                    </View>
                     <View style={styles.horsesBadge}>
                       <Text style={styles.horsesBadgeText}>{horses.length}</Text>
                     </View>
@@ -206,7 +213,7 @@ const ClientHomeScreen = ({ navigation }) => {
                           />
                         ) : (
                           <View style={styles.horseImagePlaceholder}>
-                            <Text style={styles.horseImagePlaceholderText}>🐴</Text>
+                            <MaterialCommunityIcons name="horse-variant" size={40} color="#F39C12" />
                           </View>
                         )}
                         <View style={styles.horseCardCompactInfo}>
@@ -221,7 +228,10 @@ const ClientHomeScreen = ({ navigation }) => {
 
               {/* Lessons Section */}
               <View style={styles.lessonsHeader}>
-                <Text style={styles.sectionTitle}>🗓️ دروسك</Text>
+                <View style={styles.sectionTitleRow}>
+                  <FontAwesome5 name="calendar-check" size={22} color="#9B59B6" solid />
+                  <Text style={styles.sectionTitle}>دروسك</Text>
+                </View>
                 <View style={styles.lessonsBadge}>
                   <Text style={styles.lessonsBadgeText}>{clientLessons.length}</Text>
                 </View>
@@ -244,32 +254,41 @@ const ClientHomeScreen = ({ navigation }) => {
               >
                 <View style={styles.lessonHeader}>
                   <View style={styles.lessonDateContainer}>
-                    <Text style={styles.lessonDate}>📅 {formatDate(item.date)}</Text>
+                    <View style={styles.lessonDateRow}>
+                      <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                      <Text style={styles.lessonDate}>{formatDate(item.date)}</Text>
+                    </View>
                     {isConfirmed && (
                       <View style={styles.confirmedBadge}>
-                        <Text style={styles.confirmedBadgeText}>✓ مكتمل</Text>
+                        <FontAwesome5 name="check-circle" size={12} color="#27AE60" solid />
+                        <Text style={styles.confirmedBadgeText}> مكتمل</Text>
                       </View>
                     )}
                     {!isConfirmed && !isCancelled && (
                       <View style={styles.scheduledBadge}>
-                        <Text style={styles.scheduledBadgeText}>⏳ مجدول</Text>
+                        <FontAwesome5 name="hourglass-half" size={12} color="#F39C12" solid />
+                        <Text style={styles.scheduledBadgeText}> مجدول</Text>
                       </View>
                     )}
                     {isCancelled && (
                       <View style={styles.cancelledBadge}>
-                        <Text style={styles.cancelledBadgeText}>✕ ملغي</Text>
+                        <FontAwesome5 name="times-circle" size={12} color="#E74C3C" solid />
+                        <Text style={styles.cancelledBadgeText}> ملغي</Text>
                       </View>
                     )}
                   </View>
-                  <Text style={styles.lessonTime}>⏰ {item.time}</Text>
+                  <View style={styles.lessonTimeRow}>
+                    <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                    <Text style={styles.lessonTime}>{item.time}</Text>
+                  </View>
                 </View>
                 <View style={styles.lessonDetails}>
                   <View style={styles.lessonDetail}>
-                    <Text style={styles.lessonDetailIcon}>🐴</Text>
+                    <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
                     <Text style={styles.lessonDetailText}>{getHorseName(item.horseId)}</Text>
                   </View>
                   <View style={styles.lessonDetail}>
-                    <Text style={styles.lessonDetailIcon}>👨‍🏫</Text>
+                    <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
                     <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
                   </View>
                 </View>
@@ -278,7 +297,7 @@ const ClientHomeScreen = ({ navigation }) => {
           }}
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>📭</Text>
+              <FontAwesome5 name="calendar-times" size={48} color="#95A5A6" solid />
               <Text style={styles.emptyText}>لا توجد دروس مجدولة بعد</Text>
               <Text style={styles.emptySubtext}>اتصل بنا لحجز درسك الأول!</Text>
             </View>
@@ -287,7 +306,7 @@ const ClientHomeScreen = ({ navigation }) => {
         />
       ) : (
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingEmoji}>🔄</Text>
+          <FontAwesome5 name="spinner" size={48} color="#3B82F6" />
           <Text style={styles.loadingText}>جاري تحميل معلوماتك...</Text>
         </View>
       )}
@@ -299,7 +318,7 @@ const ClientHomeScreen = ({ navigation }) => {
         activeOpacity={0.8}
       >
         <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-          <Text style={styles.contactButtonIcon}>📞</Text>
+          <FontAwesome5 name="phone" size={20} color="#fff" solid />
         </Animated.View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -324,11 +343,8 @@ const styles = StyleSheet.create({
   paymentHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.sm,
     marginBottom: spacing.md,
-  },
-  paymentEmoji: {
-    fontSize: 20,
-    marginRight: spacing.sm,
   },
   paymentTitle: {
     fontSize: typography.size.md,
@@ -371,10 +387,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.md,
   },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   sectionTitle: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+  },
+  subscriptionDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  lessonDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  lessonTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   lessonsBadge: {
     backgroundColor: colors.primary.main,
@@ -521,10 +557,7 @@ const styles = StyleSheet.create({
   subscriptionTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  subscriptionEmoji: {
-    fontSize: 24,
-    marginRight: spacing.sm,
+    gap: spacing.sm,
   },
   subscriptionTitle: {
     fontSize: typography.size.lg,
@@ -532,10 +565,13 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   subscriptionStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
     backgroundColor: colors.status.error,
+    gap: 4,
   },
   subscriptionActiveBadge: {
     backgroundColor: colors.status.success,

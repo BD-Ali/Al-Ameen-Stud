@@ -15,6 +15,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
@@ -370,19 +371,25 @@ const WeeklyScheduleScreen = () => {
               ]}
             >
               <View style={styles.timeSlotHeader}>
-                <Text style={styles.timeSlotTime}>⏰ {timeSlot}</Text>
+                <View style={styles.timeSlotTimeRow}>
+                  <FontAwesome5 name="clock" size={12} color="#5DADE2" solid />
+                  <Text style={styles.timeSlotTime}>{timeSlot}</Text>
+                </View>
                 {isSelected && (
                   <View style={styles.selectedBadge}>
-                    <Text style={styles.selectedBadgeText}>✓</Text>
+                    <FontAwesome5 name="check" size={12} color="#27AE60" solid />
                   </View>
                 )}
               </View>
 
               {schedule ? (
                 <View style={styles.assignmentInfo}>
-                  <Text style={styles.workerName}>
-                    👤 {getWorkerName(schedule.workerId)}
-                  </Text>
+                  <View style={styles.workerNameRow}>
+                    <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
+                    <Text style={styles.workerName}>
+                      {getWorkerName(schedule.workerId)}
+                    </Text>
+                  </View>
                   <Text style={styles.workDescription} numberOfLines={2}>
                     {schedule.description}
                   </Text>
@@ -426,7 +433,7 @@ const WeeklyScheduleScreen = () => {
                 {editMode ? 'تعديل المهمة' : 'تعيين عمل'}
               </Text>
               <TouchableOpacity onPress={closeModal}>
-                <Text style={styles.closeButton}>✕</Text>
+                <FontAwesome5 name="times" size={20} color={colors.text.secondary} solid />
               </TouchableOpacity>
             </View>
 
@@ -463,7 +470,12 @@ const WeeklyScheduleScreen = () => {
                           selectedWorker === worker.id && styles.workerCardSelected,
                         ]}
                       >
-                        <Text style={styles.workerIcon}>👤</Text>
+                        <FontAwesome5
+                          name="user-circle"
+                          size={24}
+                          color={selectedWorker === worker.id ? '#1ABC9C' : colors.text.tertiary}
+                          solid
+                        />
                         <Text
                           style={[
                             styles.workerCardName,
@@ -593,34 +605,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  timeSlotTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   timeSlotTime: {
-    fontSize: typography.size.md,
+    fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
   },
   selectedBadge: {
-    backgroundColor: colors.primary.main,
-    borderRadius: borderRadius.full,
+    backgroundColor: colors.status.success,
+    borderRadius: borderRadius.sm,
     width: 24,
     height: 24,
-    justifyContent: 'center',
     alignItems: 'center',
-  },
-  selectedBadgeText: {
-    color: '#fff',
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.bold,
+    justifyContent: 'center',
   },
   assignmentInfo: {
     marginTop: spacing.xs,
   },
-  workerName: {
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.semibold,
-    color: colors.accent.pink,
+  workerNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
     marginBottom: spacing.xs,
+  },
+  workerName: {
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
   },
   workDescription: {
     fontSize: typography.size.base,
@@ -733,18 +750,18 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   workerCard: {
-    backgroundColor: colors.background.tertiary,
+    backgroundColor: colors.background.secondary,
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginRight: spacing.sm,
     alignItems: 'center',
     minWidth: 80,
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: colors.border.light,
   },
   workerCardSelected: {
-    backgroundColor: colors.primary.subtle,
-    borderColor: colors.primary.main,
+    borderColor: colors.status.success,
+    backgroundColor: colors.surface.elevated,
   },
   workerIcon: {
     fontSize: 24,

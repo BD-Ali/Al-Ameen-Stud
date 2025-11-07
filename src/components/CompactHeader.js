@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 
 /**
@@ -37,9 +37,9 @@ const CompactHeader = ({
   // Get role display info
   const getRoleInfo = (role) => {
     const roleMap = {
-      'client': { label: 'عميل', color: colors.accent.teal, icon: 'person', iconFamily: 'Ionicons' },
-      'worker': { label: 'عامل', color: colors.accent.pink, icon: 'hammer-wrench', iconFamily: 'MaterialCommunityIcons' },
-      'admin': { label: 'مدير', color: colors.accent.purple, icon: 'shield-checkmark', iconFamily: 'Ionicons' },
+      'client': { label: 'عميل', color: colors.accent.teal, icon: 'user', iconFamily: 'FontAwesome5', iconColor: '#1ABC9C' },
+      'worker': { label: 'عامل', color: colors.accent.pink, icon: 'hard-hat', iconFamily: 'FontAwesome5', iconColor: '#E91E63' },
+      'admin': { label: 'مدير', color: colors.accent.purple, icon: 'user-shield', iconFamily: 'FontAwesome5', iconColor: '#9B59B6' },
     };
     return roleMap[role.toLowerCase()] || roleMap['client'];
   };
@@ -112,11 +112,7 @@ const CompactHeader = ({
             <View style={styles.greetingRow}>
               <Text style={styles.greeting}>{getGreeting()}</Text>
               <View style={[styles.roleBadge, { backgroundColor: roleInfo.color + '20' }]}>
-                {roleInfo.iconFamily === 'Ionicons' ? (
-                  <Ionicons name={roleInfo.icon} size={10} color={roleInfo.color} style={styles.roleIcon} />
-                ) : (
-                  <MaterialCommunityIcons name={roleInfo.icon} size={10} color={roleInfo.color} style={styles.roleIcon} />
-                )}
+                <FontAwesome5 name={roleInfo.icon} size={10} color={roleInfo.iconColor} solid style={styles.roleIcon} />
                 <Text style={[styles.roleText, { color: roleInfo.color }]}>
                   {roleInfo.label}
                 </Text>
@@ -140,7 +136,7 @@ const CompactHeader = ({
               accessibilityRole="button"
               accessibilityHint="اضغط لفتح الملف الشخصي"
             >
-              <Ionicons name="person-circle-outline" size={24} color={colors.primary.main} />
+              <FontAwesome5 name="user-circle" size={24} color="#3B82F6" solid />
             </TouchableOpacity>
           )}
           <TouchableOpacity
@@ -152,7 +148,7 @@ const CompactHeader = ({
             accessibilityRole="button"
             accessibilityHint="اضغط لتسجيل الخروج من حسابك"
           >
-            <Ionicons name="log-out-outline" size={22} color={colors.text.secondary} />
+            <FontAwesome5 name="sign-out-alt" size={20} color="#EF4444" solid />
           </TouchableOpacity>
         </View>
       </View>

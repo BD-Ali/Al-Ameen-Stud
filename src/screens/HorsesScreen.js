@@ -7,6 +7,7 @@ import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
 import AnimatedCard from '../components/AnimatedCard';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -103,8 +104,8 @@ const HorsesScreen = () => {
       'من أين تريد اختيار الصورة؟',
       [
         { text: 'إلغاء', style: 'cancel' },
-        { text: '📷 الكاميرا', onPress: () => pickImage(true) },
-        { text: '🖼️ المعرض', onPress: () => pickImage(false) },
+        { text: 'الكاميرا', onPress: () => pickImage(true) },
+        { text: 'المعرض', onPress: () => pickImage(false) },
       ]
     );
   };
@@ -141,7 +142,7 @@ const HorsesScreen = () => {
 
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: `تذكير: ${reminder.horseName} 🐴`,
+          title: `تذكير: ${reminder.horseName}`,
           body: reminder.note,
           sound: true,
           priority: Notifications.AndroidNotificationPriority.HIGH,
@@ -351,7 +352,10 @@ const HorsesScreen = () => {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View style={styles.headerSection}>
-            <Text style={styles.pageTitle}>🐴 الخيول</Text>
+            <View style={styles.titleRow}>
+              <MaterialCommunityIcons name="horse-variant" size={28} color="#F39C12" />
+              <Text style={styles.pageTitle}>الخيول</Text>
+            </View>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{horses.length}</Text>
             </View>
@@ -391,20 +395,32 @@ const HorsesScreen = () => {
                     />
                   )}
                   <View style={styles.cardRow}>
-                    <Text style={styles.cardLabel}>🏇 السلالة:</Text>
+                    <View style={styles.labelRow}>
+                      <MaterialCommunityIcons name="horse" size={16} color="#E67E22" />
+                      <Text style={styles.cardLabel}>السلالة:</Text>
+                    </View>
                     <Text style={styles.cardValue}>{item.breed || 'غير محدد'}</Text>
                   </View>
                   <View style={styles.cardRow}>
-                    <Text style={styles.cardLabel}>👤 المالك:</Text>
+                    <View style={styles.labelRow}>
+                      <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                      <Text style={styles.cardLabel}>المالك:</Text>
+                    </View>
                     <Text style={styles.cardValue}>{item.owner || 'غير محدد'}</Text>
                   </View>
                   <View style={styles.cardRow}>
-                    <Text style={styles.cardLabel}>🥕 التغذية:</Text>
+                    <View style={styles.labelRow}>
+                      <FontAwesome5 name="carrot" size={14} color="#FF9800" solid />
+                      <Text style={styles.cardLabel}>التغذية:</Text>
+                    </View>
                     <Text style={styles.cardValue}>{item.feedSchedule || 'غير محدد'}</Text>
                   </View>
                   {item.notes && (
                     <View style={styles.notesSection}>
-                      <Text style={styles.notesLabel}>📝 ملاحظات:</Text>
+                      <View style={styles.labelRow}>
+                        <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
+                        <Text style={styles.notesLabel}>ملاحظات:</Text>
+                      </View>
                       <Text style={styles.notesValue}>{item.notes}</Text>
                     </View>
                   )}
@@ -412,12 +428,16 @@ const HorsesScreen = () => {
                   {/* Reminders Section */}
                   <View style={styles.remindersSection}>
                     <View style={styles.remindersSectionHeader}>
-                      <Text style={styles.remindersSectionTitle}>🔔 التذكيرات</Text>
+                      <View style={styles.labelRow}>
+                        <FontAwesome5 name="bell" size={16} color="#F39C12" solid />
+                        <Text style={styles.remindersSectionTitle}>التذكيرات</Text>
+                      </View>
                       <TouchableOpacity
                         style={styles.addReminderButton}
                         onPress={() => openReminderModal(item)}
                       >
-                        <Text style={styles.addReminderButtonText}>+ إضافة تذكير</Text>
+                        <FontAwesome5 name="plus" size={12} color="#fff" solid />
+                        <Text style={styles.addReminderButtonText}>إضافة تذكير</Text>
                       </TouchableOpacity>
                     </View>
 
@@ -427,18 +447,20 @@ const HorsesScreen = () => {
                           <View key={reminder.id} style={styles.reminderItem}>
                             <View style={styles.reminderInfo}>
                               <Text style={styles.reminderNote}>{reminder.note}</Text>
-                              <Text style={styles.reminderDate}>
-                                📅 {formatDate(reminder.date)}
-                              </Text>
-                              <Text style={styles.reminderTime}>
-                                ⏰ {formatTime(reminder.time)}
-                              </Text>
+                              <View style={styles.reminderDateRow}>
+                                <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
+                                <Text style={styles.reminderDate}>{formatDate(reminder.date)}</Text>
+                              </View>
+                              <View style={styles.reminderDateRow}>
+                                <FontAwesome5 name="clock" size={12} color="#F39C12" solid />
+                                <Text style={styles.reminderTime}>{formatTime(reminder.time)}</Text>
+                              </View>
                             </View>
                             <TouchableOpacity
                               onPress={() => handleDeleteReminder(reminder)}
                               style={styles.deleteReminderButton}
                             >
-                              <Text style={styles.deleteReminderText}>🗑️</Text>
+                              <FontAwesome5 name="trash-alt" size={16} color="#E74C3C" solid />
                             </TouchableOpacity>
                           </View>
                         ))}
@@ -449,6 +471,7 @@ const HorsesScreen = () => {
                   </View>
 
                   <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveHorse(item.id)}>
+                    <FontAwesome5 name="trash-alt" size={14} color="#fff" solid />
                     <Text style={styles.removeButtonText}>حذف الحصان</Text>
                   </TouchableOpacity>
                 </View>
@@ -458,10 +481,16 @@ const HorsesScreen = () => {
         }}
         ListFooterComponent={
           <View style={styles.formSection}>
-            <Text style={styles.formTitle}>➕ إضافة حصان جديد</Text>
+            <View style={styles.formTitleRow}>
+              <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
+              <Text style={styles.formTitle}>إضافة حصان جديد</Text>
+            </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>🐴 اسم الحصان</Text>
+              <View style={styles.labelRow}>
+                <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                <Text style={styles.label}>اسم الحصان</Text>
+              </View>
               <TextInput
                 value={name}
                 onChangeText={setName}
@@ -473,7 +502,10 @@ const HorsesScreen = () => {
 
             {/* Image Upload Section */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>📷 صورة الحصان (اختياري)</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="camera" size={14} color="#3498DB" solid />
+                <Text style={styles.label}>صورة الحصان (اختياري)</Text>
+              </View>
               {imageUri ? (
                 <View style={styles.imagePreviewContainer}>
                   <Image
@@ -485,7 +517,8 @@ const HorsesScreen = () => {
                     style={styles.removeImageButton}
                     onPress={removeImage}
                   >
-                    <Text style={styles.removeImageText}>🗑️ إزالة الصورة</Text>
+                    <FontAwesome5 name="trash-alt" size={12} color="#fff" solid />
+                    <Text style={styles.removeImageText}> إزالة الصورة</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -497,14 +530,20 @@ const HorsesScreen = () => {
                   {uploadingImage ? (
                     <ActivityIndicator size="small" color={colors.primary.main} />
                   ) : (
-                    <Text style={styles.imageUploadText}>📷 اختر صورة</Text>
+                    <>
+                      <FontAwesome5 name="camera" size={18} color="#3498DB" solid />
+                      <Text style={styles.imageUploadText}> اختر صورة</Text>
+                    </>
                   )}
                 </TouchableOpacity>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>🏇 السلالة</Text>
+              <View style={styles.labelRow}>
+                <MaterialCommunityIcons name="horse" size={16} color="#E67E22" />
+                <Text style={styles.label}>السلالة</Text>
+              </View>
               <TextInput
                 value={breed}
                 onChangeText={setBreed}
@@ -515,7 +554,10 @@ const HorsesScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>👤 المالك</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                <Text style={styles.label}>المالك</Text>
+              </View>
               <TextInput
                 value={owner}
                 onChangeText={setOwner}
@@ -526,7 +568,10 @@ const HorsesScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>🥕 جدول التغذية</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="carrot" size={14} color="#FF9800" solid />
+                <Text style={styles.label}>جدول التغذية</Text>
+              </View>
               <TextInput
                 value={feedSchedule}
                 onChangeText={setFeedSchedule}
@@ -538,7 +583,10 @@ const HorsesScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>📝 ملاحظات</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
+                <Text style={styles.label}>ملاحظات</Text>
+              </View>
               <TextInput
                 value={notes}
                 onChangeText={setNotes}
@@ -562,7 +610,10 @@ const HorsesScreen = () => {
                   <Text style={styles.addButtonText}> جاري الرفع...</Text>
                 </View>
               ) : (
-                <Text style={styles.addButtonText}>إضافة حصان</Text>
+                <>
+                  <FontAwesome5 name="plus" size={14} color="#fff" solid />
+                  <Text style={styles.addButtonText}>إضافة حصان</Text>
+                </>
               )}
             </TouchableOpacity>
           </View>
@@ -570,7 +621,7 @@ const HorsesScreen = () => {
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🐴</Text>
+            <MaterialCommunityIcons name="horse-variant" size={64} color="#F39C12" />
             <Text style={styles.emptyText}>لا توجد خيول بعد</Text>
             <Text style={styles.emptySubtext}>أضف أول حصان أدناه</Text>
           </View>
@@ -588,12 +639,18 @@ const HorsesScreen = () => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <ScrollView showsVerticalScrollIndicator={false}>
-                <Text style={styles.modalTitle}>
-                  🔔 إضافة تذكير لـ {selectedHorseForReminder?.name}
-                </Text>
+                <View style={styles.modalTitleRow}>
+                  <FontAwesome5 name="bell" size={20} color="#F39C12" solid />
+                  <Text style={styles.modalTitle}>
+                    إضافة تذكير لـ {selectedHorseForReminder?.name}
+                  </Text>
+                </View>
 
                 <View style={styles.modalInputGroup}>
-                  <Text style={styles.modalLabel}>📝 ملاحظة التذكير</Text>
+                  <View style={styles.labelRow}>
+                    <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
+                    <Text style={styles.modalLabel}>ملاحظة التذكير</Text>
+                  </View>
                   <TextInput
                     value={reminderNote}
                     onChangeText={setReminderNote}
@@ -607,7 +664,10 @@ const HorsesScreen = () => {
                 </View>
 
                 <View style={styles.modalInputGroup}>
-                  <Text style={styles.modalLabel}>📅 التاريخ</Text>
+                  <View style={styles.labelRow}>
+                    <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                    <Text style={styles.modalLabel}>التاريخ</Text>
+                  </View>
                   <TouchableOpacity
                     style={styles.datePickerButton}
                     onPress={() => setShowDatePicker(true)}
@@ -615,7 +675,7 @@ const HorsesScreen = () => {
                     <Text style={styles.datePickerText}>
                       {reminderDate.toLocaleDateString('en-US')}
                     </Text>
-                    <Text style={styles.datePickerIcon}>📅</Text>
+                    <FontAwesome5 name="calendar-alt" size={16} color="#5DADE2" solid />
                   </TouchableOpacity>
 
                   {showDatePicker && (
@@ -640,7 +700,10 @@ const HorsesScreen = () => {
                 </View>
 
                 <View style={styles.modalInputGroup}>
-                  <Text style={styles.modalLabel}>⏰ الوقت</Text>
+                  <View style={styles.labelRow}>
+                    <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                    <Text style={styles.modalLabel}>الوقت</Text>
+                  </View>
                   <TouchableOpacity
                     style={styles.datePickerButton}
                     onPress={() => setShowTimePicker(true)}
@@ -648,7 +711,7 @@ const HorsesScreen = () => {
                     <Text style={styles.datePickerText}>
                       {`${String(reminderTime.getHours()).padStart(2, '0')}:${String(reminderTime.getMinutes()).padStart(2, '0')}`}
                     </Text>
-                    <Text style={styles.datePickerIcon}>⏰</Text>
+                    <FontAwesome5 name="clock" size={16} color="#F39C12" solid />
                   </TouchableOpacity>
 
                   {showTimePicker && (
@@ -677,12 +740,14 @@ const HorsesScreen = () => {
                     style={styles.modalCancelButton}
                     onPress={() => setReminderModalVisible(false)}
                   >
+                    <FontAwesome5 name="times" size={14} color="#fff" solid />
                     <Text style={styles.modalCancelButtonText}>إلغاء</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.modalSaveButton}
                     onPress={handleAddReminder}
                   >
+                    <FontAwesome5 name="check" size={14} color="#fff" solid />
                     <Text style={styles.modalSaveButtonText}>حفظ التذكير</Text>
                   </TouchableOpacity>
                 </View>
@@ -708,6 +773,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: spacing.lg,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   pageTitle: {
     fontSize: typography.size.xxl,
@@ -782,12 +857,13 @@ const styles = StyleSheet.create({
   },
   cardRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: spacing.sm,
   },
   cardLabel: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
-    width: 90,
     fontWeight: typography.weight.semibold,
   },
   cardValue: {
@@ -840,6 +916,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   addReminderButtonText: {
     color: '#fff',
@@ -866,10 +945,15 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
     marginBottom: spacing.xs,
   },
+  reminderDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: 2,
+  },
   reminderDate: {
     fontSize: typography.size.xs,
     color: colors.text.tertiary,
-    marginBottom: 2,
   },
   reminderTime: {
     fontSize: typography.size.xs,
@@ -894,11 +978,16 @@ const styles = StyleSheet.create({
     padding: spacing.base,
     marginTop: spacing.base,
   },
+  formTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.base,
+  },
   formTitle: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
-    marginBottom: spacing.base,
   },
   inputGroup: {
     marginBottom: spacing.md,
@@ -928,8 +1017,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary.main,
     height: 48,
     borderRadius: borderRadius.md,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.xs,
     marginTop: spacing.sm,
     ...shadows.md,
   },
@@ -942,7 +1033,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.status.error,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.sm,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
     marginTop: spacing.sm,
   },
   removeButtonText: {
@@ -984,11 +1078,17 @@ const styles = StyleSheet.create({
     maxHeight: '80%',
     ...shadows.lg,
   },
+  modalTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.base,
+  },
   modalTitle: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
-    marginBottom: spacing.base,
     textAlign: 'center',
   },
   modalInputGroup: {
@@ -1054,7 +1154,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.tertiary,
     padding: spacing.md,
     borderRadius: borderRadius.md,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
   },
   modalCancelButtonText: {
     color: colors.text.secondary,
@@ -1066,7 +1169,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.status.warning,
     padding: spacing.md,
     borderRadius: borderRadius.md,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
   },
   modalSaveButtonText: {
     color: '#fff',

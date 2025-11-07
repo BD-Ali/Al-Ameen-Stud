@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
-import AnimatedButton from '../components/AnimatedButton';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 /**
  * LessonsScreen lists all scheduled lessons and allows the administrator to add
@@ -144,7 +144,10 @@ const LessonsScreen = () => {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View style={styles.headerSection}>
-            <Text style={styles.pageTitle}>📚 الدروس</Text>
+            <View style={styles.titleRow}>
+              <FontAwesome5 name="book-open" size={24} color="#9B59B6" solid />
+              <Text style={styles.pageTitle}>الدروس</Text>
+            </View>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{lessons.length}</Text>
             </View>
@@ -154,51 +157,76 @@ const LessonsScreen = () => {
           <AnimatedCard index={index} delay={80} style={styles.card}>
             <View style={styles.cardHeader}>
               <View style={styles.dateTimeContainer}>
-                <Text style={styles.lessonDateTime}>📅 {item.date}</Text>
-                <Text style={styles.lessonTime}>⏰ {item.time}</Text>
+                <View style={styles.dateTimeRow}>
+                  <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                  <Text style={styles.lessonDateTime}>{item.date}</Text>
+                </View>
+                <View style={styles.dateTimeRow}>
+                  <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                  <Text style={styles.lessonTime}>{item.time}</Text>
+                </View>
               </View>
               {item.confirmed && (
                 <View style={styles.confirmedBadge}>
-                  <Text style={styles.confirmedBadgeText}>✓ مكتمل</Text>
+                  <FontAwesome5 name="check-circle" size={14} color="#27AE60" solid />
+                  <Text style={styles.confirmedBadgeText}>مكتمل</Text>
                 </View>
               )}
               {item.status === 'cancelled' && (
                 <View style={styles.cancelledBadge}>
-                  <Text style={styles.cancelledBadgeText}>✕ ملغي</Text>
+                  <FontAwesome5 name="times-circle" size={14} color="#E74C3C" solid />
+                  <Text style={styles.cancelledBadgeText}>ملغي</Text>
                 </View>
               )}
               {item.status === 'scheduled' && !item.confirmed && (
                 <View style={styles.scheduledBadge}>
-                  <Text style={styles.scheduledBadgeText}>⏳ مجدول</Text>
+                  <FontAwesome5 name="hourglass-half" size={14} color="#F39C12" solid />
+                  <Text style={styles.scheduledBadgeText}>مجدول</Text>
                 </View>
               )}
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.cardLabel}>🐴 الحصان:</Text>
+              <View style={styles.labelRow}>
+                <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                <Text style={styles.cardLabel}>الحصان:</Text>
+              </View>
               <Text style={styles.cardValue}>{getHorseName(item.horseId)}</Text>
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.cardLabel}>👤 العميل:</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                <Text style={styles.cardLabel}>العميل:</Text>
+              </View>
               <Text style={styles.cardValue}>{getClientName(item.clientId)}</Text>
             </View>
             <View style={styles.cardRow}>
-              <Text style={styles.cardLabel}>👨‍🏫 المدرب:</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
+                <Text style={styles.cardLabel}>المدرب:</Text>
+              </View>
               <Text style={styles.cardValue}>{getWorkerName(item.instructorId)}</Text>
             </View>
             <TouchableOpacity
               style={styles.removeButton}
               onPress={() => handleRemoveLesson(item.id)}
             >
-              <Text style={styles.removeButtonText}>🗑️ حذف الدرس</Text>
+              <FontAwesome5 name="trash-alt" size={14} color="#E74C3C" solid />
+              <Text style={styles.removeButtonText}>حذف الدرس</Text>
             </TouchableOpacity>
           </AnimatedCard>
         )}
         ListFooterComponent={
           <View style={styles.formSection}>
-            <Text style={styles.formTitle}>➕ جدولة درس جديد</Text>
+            <View style={styles.formTitleRow}>
+              <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
+              <Text style={styles.formTitle}>جدولة درس جديد</Text>
+            </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>📅 اختر التاريخ</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                <Text style={styles.label}>اختر التاريخ</Text>
+              </View>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setShowDatePicker(true)}
@@ -206,7 +234,7 @@ const LessonsScreen = () => {
                 <Text style={styles.pickerButtonText}>
                   {formatDate(date)}
                 </Text>
-                <Text style={styles.dropdownArrow}>📅</Text>
+                <FontAwesome5 name="calendar-alt" size={16} color="#5DADE2" solid />
               </TouchableOpacity>
 
               {showDatePicker && (
@@ -231,7 +259,10 @@ const LessonsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>⏰ اختر الوقت</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                  <Text style={styles.label}>اختر الوقت</Text>
+              </View>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => setShowTimePicker(true)}
@@ -239,7 +270,7 @@ const LessonsScreen = () => {
                 <Text style={styles.pickerButtonText}>
                   {formatTime(time)}
                 </Text>
-                <Text style={styles.dropdownArrow}>⏰</Text>
+                <FontAwesome5 name="clock" size={16} color="#F39C12" solid />
               </TouchableOpacity>
 
               {showTimePicker && (
@@ -264,7 +295,10 @@ const LessonsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>🐴 اختر الحصان</Text>
+              <View style={styles.labelRow}>
+                <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                <Text style={styles.label}>اختر الحصان</Text>
+              </View>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => {
@@ -310,7 +344,10 @@ const LessonsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>👤 اختر العميل</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                <Text style={styles.label}>اختر العميل</Text>
+              </View>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => {
@@ -356,7 +393,10 @@ const LessonsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>👨‍🏫 اختر المدرب</Text>
+              <View style={styles.labelRow}>
+                <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
+                <Text style={styles.label}>اختر المدرب</Text>
+              </View>
               <TouchableOpacity
                 style={styles.pickerButton}
                 onPress={() => {
@@ -416,7 +456,7 @@ const LessonsScreen = () => {
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>📚</Text>
+            <FontAwesome5 name="book-open" size={64} color="#9B59B6" solid />
             <Text style={styles.emptyText}>لا توجد دروس مجدولة</Text>
             <Text style={styles.emptySubtext}>جدول أول درس أدناه</Text>
           </View>
@@ -439,6 +479,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: spacing.lg,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   pageTitle: {
     fontSize: typography.size.xxl,
@@ -487,12 +532,17 @@ const styles = StyleSheet.create({
   },
   cardRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: spacing.xs,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   cardLabel: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
-    width: 90,
     fontWeight: typography.weight.semibold,
   },
   cardValue: {
@@ -501,10 +551,13 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
   },
   removeButton: {
+    flexDirection: 'row',
     backgroundColor: colors.status.error,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.sm,
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
     marginTop: spacing.sm,
   },
   removeButtonText: {
@@ -518,11 +571,16 @@ const styles = StyleSheet.create({
     padding: spacing.base,
     marginTop: spacing.base,
   },
+  formTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.base,
+  },
   formTitle: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
-    marginBottom: spacing.base,
   },
   inputGroup: {
     marginBottom: spacing.md,
@@ -632,9 +690,17 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
   },
   dateTimeContainer: {
-    flex: 1,
+    gap: spacing.xs,
+  },
+  dateTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   confirmedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: colors.status.success,
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.sm,
@@ -646,6 +712,9 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
   },
   cancelledBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: colors.status.error,
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.sm,
@@ -657,6 +726,9 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
   },
   scheduledBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: colors.primary.main,
     borderRadius: borderRadius.sm,
     paddingHorizontal: spacing.sm,

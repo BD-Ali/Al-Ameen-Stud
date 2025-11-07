@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Text, StyleSheet, Alert, View, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import HorsesScreen from '../screens/HorsesScreen';
@@ -80,7 +80,7 @@ const AdminTabs = () => {
         headerRight: () => (
           <View style={styles.headerActions}>
             <TouchableOpacity onPress={handleProfilePress} style={styles.profileButton}>
-              <Ionicons name="person-circle-outline" size={22} color={colors.primary.main} />
+              <FontAwesome5 name="user-circle" size={22} color="#3B82F6" solid />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
               <Text style={styles.logoutText}>خروج</Text>
@@ -96,7 +96,7 @@ const AdminTabs = () => {
           title: 'الإعلانات',
           tabBarLabel: 'الإعلانات',
           tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>📢</Text>
+            <FontAwesome5 name="bullhorn" size={20} color={focused ? '#FF6B6B' : '#95A5A6'} solid />
           ),
         }}
       />
@@ -107,7 +107,7 @@ const AdminTabs = () => {
           title: 'المهام',
           tabBarLabel: 'المهام',
           tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>✓</Text>
+            <FontAwesome5 name="tasks" size={20} color={focused ? '#4ECDC4' : '#95A5A6'} solid />
           ),
         }}
       />
@@ -118,7 +118,7 @@ const AdminTabs = () => {
           title: 'جدول العمل الأسبوعي',
           tabBarLabel: 'الجدول',
           tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>📅</Text>
+            <FontAwesome5 name="calendar-alt" size={20} color={focused ? '#5DADE2' : '#95A5A6'} solid />
           ),
         }}
       />
@@ -129,7 +129,7 @@ const AdminTabs = () => {
           title: 'الخيول',
           tabBarLabel: 'الخيول',
           tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>🐴</Text>
+            <MaterialCommunityIcons name="horse-variant" size={24} color={focused ? '#F39C12' : '#95A5A6'} />
           ),
         }}
       />
@@ -140,7 +140,7 @@ const AdminTabs = () => {
           title: 'التغذية',
           tabBarLabel: 'التغذية',
           tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>🥕</Text>
+            <FontAwesome5 name="carrot" size={20} color={focused ? '#FF9800' : '#95A5A6'} solid />
           ),
         }}
       />
@@ -151,7 +151,7 @@ const AdminTabs = () => {
           title: 'الدروس',
           tabBarLabel: 'الدروس',
           tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>📚</Text>
+            <FontAwesome5 name="book-open" size={20} color={focused ? '#9B59B6' : '#95A5A6'} solid />
           ),
         }}
       />
@@ -162,7 +162,7 @@ const AdminTabs = () => {
           title: 'المستخدمين',
           tabBarLabel: 'المستخدمين',
           tabBarIcon: ({ focused }) => (
-            <Text style={{ fontSize: 20 }}>👥</Text>
+            <FontAwesome5 name="users" size={20} color={focused ? '#1ABC9C' : '#95A5A6'} solid />
           ),
         }}
       />

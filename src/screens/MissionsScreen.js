@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { DataContext } from '../context/DataContext';
-import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const MissionsScreen = () => {
   const { reminders, updateReminder } = useContext(DataContext);
@@ -91,10 +92,13 @@ const MissionsScreen = () => {
     <AnimatedCard index={index} delay={80} style={[styles.missionCard, item.completed && styles.completedCard]}>
       <View style={styles.missionHeader}>
         <View style={styles.missionTitleContainer}>
-          <Text style={styles.horseIcon}>🐴</Text>
+          <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
           <Text style={styles.horseName}>{item.horseName}</Text>
         </View>
-        <Text style={styles.missionTime}>{item.time}</Text>
+        <View style={styles.timeRow}>
+          <FontAwesome5 name="clock" size={12} color="#5DADE2" solid />
+          <Text style={styles.missionTime}>{item.time}</Text>
+        </View>
       </View>
 
       <Text style={[styles.missionNote, item.completed && styles.completedText]}>
@@ -106,14 +110,16 @@ const MissionsScreen = () => {
           style={styles.doneButton}
           onPress={() => handleMarkAsDone(item)}
         >
-          <Text style={styles.doneButtonText}>✓ تحديد كمنجز</Text>
+          <FontAwesome5 name="check" size={14} color="#fff" solid />
+          <Text style={styles.doneButtonText}>تحديد كمنجز</Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
           style={styles.undoneButton}
           onPress={() => handleMarkAsUndone(item)}
         >
-          <Text style={styles.undoneButtonText}>↺ إلغاء الإنجاز</Text>
+          <FontAwesome5 name="undo" size={14} color="#fff" solid />
+          <Text style={styles.undoneButtonText}>إلغاء الإنجاز</Text>
         </TouchableOpacity>
       )}
     </AnimatedCard>
@@ -123,14 +129,20 @@ const MissionsScreen = () => {
     <AnimatedCard index={index} delay={80} style={styles.upcomingCard}>
       <View style={styles.missionHeader}>
         <View style={styles.missionTitleContainer}>
-          <Text style={styles.horseIcon}>🐴</Text>
+          <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
           <Text style={styles.horseName}>{item.horseName}</Text>
         </View>
-        <Text style={styles.upcomingDate}>{item.date}</Text>
+        <View style={styles.dateRow}>
+          <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
+          <Text style={styles.upcomingDate}>{item.date}</Text>
+        </View>
       </View>
 
       <Text style={styles.missionNote}>{item.note}</Text>
-      <Text style={styles.upcomingTime}>⏰ {item.time}</Text>
+      <View style={styles.timeRow}>
+        <FontAwesome5 name="clock" size={12} color="#F39C12" solid />
+        <Text style={styles.upcomingTime}>{item.time}</Text>
+      </View>
     </AnimatedCard>
   );
 
@@ -139,7 +151,10 @@ const MissionsScreen = () => {
       {/* Today's Missions */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>📋 مهام اليوم</Text>
+          <View style={styles.sectionTitleRow}>
+            <FontAwesome5 name="clipboard-list" size={20} color="#9B59B6" solid />
+            <Text style={styles.sectionTitle}>مهام اليوم</Text>
+          </View>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{todayMissions.length}</Text>
           </View>
@@ -147,7 +162,7 @@ const MissionsScreen = () => {
 
         {todayMissions.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyIcon}>✓</Text>
+            <FontAwesome5 name="check-circle" size={48} color="#27AE60" solid />
             <Text style={styles.emptyText}>لا توجد مهام متبقية لليوم!</Text>
           </View>
         ) : (
@@ -164,7 +179,10 @@ const MissionsScreen = () => {
       {completedMissions.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>✅ المهام المنجزة اليوم</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <FontAwesome5 name="check-double" size={20} color="#27AE60" solid />
+              <Text style={styles.sectionTitle}>المهام المنجزة اليوم</Text>
+            </View>
             <View style={[styles.badge, styles.completedBadge]}>
               <Text style={styles.badgeText}>{completedMissions.length}</Text>
             </View>
@@ -183,7 +201,10 @@ const MissionsScreen = () => {
       {upcomingMissions.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>📅 المهام القادمة</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <FontAwesome5 name="calendar-alt" size={20} color="#5DADE2" solid />
+              <Text style={styles.sectionTitle}>المهام القادمة</Text>
+            </View>
             <View style={[styles.badge, styles.upcomingBadge]}>
               <Text style={styles.badgeText}>{upcomingMissions.length}</Text>
             </View>
@@ -214,13 +235,19 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: spacing.md,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    flex: 1,
   },
   sectionTitle: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
-    flex: 1,
   },
   badge: {
     backgroundColor: colors.primary.main,
@@ -270,6 +297,7 @@ const styles = StyleSheet.create({
   missionTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.sm,
     flex: 1,
   },
   horseIcon: {
@@ -281,8 +309,13 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
   },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   missionTime: {
-    fontSize: typography.size.base,
+    fontSize: typography.size.sm,
     color: colors.text.tertiary,
     fontWeight: typography.weight.semibold,
   },
@@ -301,7 +334,10 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
   },
   doneButtonText: {
     color: '#fff',
@@ -313,12 +349,20 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
   },
   undoneButtonText: {
     color: '#fff',
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   upcomingDate: {
     fontSize: typography.size.sm,
@@ -328,7 +372,7 @@ const styles = StyleSheet.create({
   upcomingTime: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
-    marginTop: spacing.sm,
+    fontWeight: typography.weight.semibold,
   },
   emptyState: {
     alignItems: 'center',

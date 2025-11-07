@@ -64,6 +64,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: spacing.lg,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
   pageTitle: {
     fontSize: typography.size.xxl,
     fontWeight: typography.weight.bold,
@@ -105,17 +110,18 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
   },
-  horseEmoji: {
-    fontSize: 20,
-  },
   scheduleContainer: {
+    gap: spacing.xs,
+  },
+  scheduleLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.xs,
   },
   scheduleLabel: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
     fontWeight: typography.weight.semibold,
-    marginBottom: spacing.xs,
   },
   scheduleValue: {
     fontSize: typography.size.base,

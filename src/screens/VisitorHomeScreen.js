@@ -5,6 +5,7 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import AnimatedCard from '../components/AnimatedCard';
 import { useFadeIn, useScaleIn, usePulse } from '../utils/animations';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 /**
  * VisitorHomeScreen is the public‑facing section of the app.  It shows a
@@ -12,7 +13,7 @@ import { useFadeIn, useScaleIn, usePulse } from '../utils/animations';
  * stable along with their breeds.  No sensitive information such as owner,
  * feeding schedule or value is shown.
  */
-const VisitorHomeScreen = ({ navigation }) => {
+const VisitorHomeScreen = () => {
   const { horses } = useContext(DataContext);
 
   // Animations
@@ -22,21 +23,21 @@ const VisitorHomeScreen = ({ navigation }) => {
 
   const handleContactUs = () => {
     Alert.alert(
-      '📞 تواصل معنا',
+      'تواصل معنا',
       'اختر طريقة التواصل مع الإدارة:',
       [
         {
-          text: '📧 إرسال بريد إلكتروني',
+          text: 'إرسال بريد إلكتروني',
           onPress: () => {
-            Linking.openURL('mailto:badarne3li@gmail.com').catch(err => {
+            Linking.openURL('mailto:badarne3li@gmail.com').catch(() => {
               Alert.alert('خطأ', 'لا يمكن فتح تطبيق البريد الإلكتروني');
             });
           }
         },
         {
-          text: '📱 اتصال هاتفي',
+          text: 'اتصال هاتفي',
           onPress: () => {
-            Linking.openURL('tel:0503653429').catch(err => {
+            Linking.openURL('tel:0503653429').catch(() => {
               Alert.alert('خطأ', 'لا يمكن إجراء المكالمة');
             });
           }
@@ -74,7 +75,10 @@ const VisitorHomeScreen = ({ navigation }) => {
         {/* Announcements Feed */}
         <AnnouncementsFeed userRole="visitor" />
 
-        <Text style={styles.subheading}>🏇 خيولنا</Text>
+        <View style={styles.subheadingRow}>
+          <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
+          <Text style={styles.subheading}>خيولنا</Text>
+        </View>
 
         {/* Render horses directly instead of using FlatList */}
         {horses.length > 0 ? (
@@ -88,8 +92,12 @@ const VisitorHomeScreen = ({ navigation }) => {
                 />
               )}
               <View style={styles.horseInfo}>
-                <Text style={styles.horseName}>{item.name}</Text>
+                <View style={styles.horseNameRow}>
+                  <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
+                  <Text style={styles.horseName}>{item.name}</Text>
+                </View>
                 <View style={styles.breedRow}>
+                  <MaterialCommunityIcons name="horse" size={14} color="#E67E22" />
                   <Text style={styles.breedLabel}>السلالة:</Text>
                   <Text style={styles.breedValue}>{item.breed}</Text>
                 </View>
@@ -98,7 +106,7 @@ const VisitorHomeScreen = ({ navigation }) => {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🐴</Text>
+            <MaterialCommunityIcons name="horse-variant" size={64} color="#F39C12" />
             <Text style={styles.emptyText}>لا توجد خيول لعرضها بعد</Text>
           </View>
         )}
@@ -111,7 +119,7 @@ const VisitorHomeScreen = ({ navigation }) => {
         activeOpacity={0.8}
       >
         <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-          <Text style={styles.contactButtonIcon}>📞</Text>
+          <FontAwesome5 name="phone" size={20} color="#fff" solid />
         </Animated.View>
       </TouchableOpacity>
     </View>
@@ -177,11 +185,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.base,
     lineHeight: 22,
   },
+  subheadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.base,
+    marginBottom: spacing.md,
+  },
   subheading: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
-    marginTop: spacing.base,
-    marginBottom: spacing.md,
     color: colors.text.primary,
   },
   card: {
@@ -200,14 +213,21 @@ const styles = StyleSheet.create({
   horseInfo: {
     padding: spacing.md,
   },
+  horseNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
   horseName: {
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
-    marginBottom: spacing.sm,
     color: colors.text.primary,
   },
   breedRow: {
     flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   breedLabel: {
     fontSize: typography.size.sm,

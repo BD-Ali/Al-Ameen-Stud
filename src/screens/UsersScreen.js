@@ -15,6 +15,7 @@ import {
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 /**
  * UsersScreen - Unified section for managing both Clients and Workers
@@ -333,7 +334,10 @@ const UsersScreen = () => {
                 <Text style={styles.userName}>{item.name}</Text>
                 <View style={styles.userMetaRow}>
                   {item.phoneNumber && (
-                    <Text style={styles.userMetaText}>📞 {item.phoneNumber}</Text>
+                    <View style={styles.phoneRow}>
+                      <FontAwesome5 name="phone-alt" size={12} color={colors.text.tertiary} solid />
+                      <Text style={styles.userMetaText}>{item.phoneNumber}</Text>
+                    </View>
                   )}
                   {isClient && item.amountDue > 0 && (
                     <View style={styles.dueBadge}>
@@ -352,18 +356,27 @@ const UsersScreen = () => {
           <View style={styles.expandedSection}>
             {/* Details Card */}
             <View style={styles.detailsCard}>
-              <Text style={styles.detailsTitle}>📋 المعلومات الأساسية</Text>
+              <View style={styles.detailsTitleRow}>
+                <FontAwesome5 name="clipboard-list" size={16} color={colors.primary.main} solid />
+                <Text style={styles.detailsTitle}>المعلومات الأساسية</Text>
+              </View>
 
               {item.email && (
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>📧 البريد الإلكتروني</Text>
+                  <View style={styles.labelRow}>
+                    <FontAwesome5 name="envelope" size={14} color="#3B82F6" solid />
+                    <Text style={styles.detailLabel}>البريد الإلكتروني</Text>
+                  </View>
                   <Text style={styles.detailValue}>{item.email}</Text>
                 </View>
               )}
 
               {item.phoneNumber && (
                 <View style={styles.detailRow}>
-                  <Text style={styles.detailLabel}>📞 رقم الهاتف</Text>
+                  <View style={styles.labelRow}>
+                    <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
+                    <Text style={styles.detailLabel}>رقم الهاتف</Text>
+                  </View>
                   <Text style={styles.detailValue}>{item.phoneNumber}</Text>
                 </View>
               )}
@@ -373,7 +386,10 @@ const UsersScreen = () => {
                   {isEditing ? (
                     <>
                       <View style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>💵 المبلغ المدفوع (₪)</Text>
+                        <View style={styles.labelRow}>
+                          <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
+                          <Text style={styles.detailLabel}>المبلغ المدفوع (₪)</Text>
+                        </View>
                         <TextInput
                           value={editFormData.amountPaid}
                           onChangeText={(text) => setEditFormData({...editFormData, amountPaid: text})}
@@ -385,7 +401,10 @@ const UsersScreen = () => {
                       </View>
 
                       <View style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>📋 المبلغ المستحق (₪)</Text>
+                        <View style={styles.labelRow}>
+                          <FontAwesome5 name="file-invoice-dollar" size={14} color="#F39C12" solid />
+                          <Text style={styles.detailLabel}>المبلغ المستحق (₪)</Text>
+                        </View>
                         <TextInput
                           value={editFormData.amountDue}
                           onChangeText={(text) => setEditFormData({...editFormData, amountDue: text})}
@@ -397,7 +416,10 @@ const UsersScreen = () => {
                       </View>
 
                       <View style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>📚 عدد الدروس</Text>
+                        <View style={styles.labelRow}>
+                          <FontAwesome5 name="book-open" size={14} color="#9B59B6" solid />
+                          <Text style={styles.detailLabel}>عدد الدروس</Text>
+                        </View>
                         <TextInput
                           value={editFormData.lessonCount}
                           onChangeText={(text) => setEditFormData({...editFormData, lessonCount: text})}
@@ -413,30 +435,41 @@ const UsersScreen = () => {
                           style={[styles.editButton, styles.saveButton]}
                           onPress={() => saveUserDetails(item.id)}
                         >
-                          <Text style={styles.editButtonText}>💾 حفظ</Text>
+                          <FontAwesome5 name="save" size={14} color="#fff" solid />
+                          <Text style={styles.editButtonText}>حفظ</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={[styles.editButton, styles.cancelButton]}
                           onPress={cancelEditing}
                         >
-                          <Text style={styles.editButtonText}>✖️ إلغاء</Text>
+                          <FontAwesome5 name="times" size={14} color="#fff" solid />
+                          <Text style={styles.editButtonText}>إلغاء</Text>
                         </TouchableOpacity>
                       </View>
                     </>
                   ) : (
                     <>
                       <View style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>💵 المبلغ المدفوع</Text>
+                        <View style={styles.labelRow}>
+                          <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
+                          <Text style={styles.detailLabel}>المبلغ المدفوع</Text>
+                        </View>
                         <Text style={[styles.detailValue, styles.paidText]}>₪{item.amountPaid || 0}</Text>
                       </View>
 
                       <View style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>📋 المبلغ المستحق</Text>
+                        <View style={styles.labelRow}>
+                          <FontAwesome5 name="file-invoice-dollar" size={14} color="#F39C12" solid />
+                          <Text style={styles.detailLabel}>المبلغ المستحق</Text>
+                        </View>
                         <Text style={[styles.detailValue, styles.dueText]}>₪{item.amountDue || 0}</Text>
                       </View>
 
                       <View style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>📚 عدد الدروس</Text>
+                        <View style={styles.labelRow}>
+                          <FontAwesome5 name="book-open" size={14} color="#9B59B6" solid />
+                          <Text style={styles.detailLabel}>عدد الدروس</Text>
+                        </View>
                         <Text style={styles.detailValue}>{item.lessonCount || 0}</Text>
                       </View>
 
@@ -444,7 +477,10 @@ const UsersScreen = () => {
                       {item.hasSubscription && (
                         <View style={styles.subscriptionInfoCard}>
                           <View style={styles.subscriptionInfoHeader}>
-                            <Text style={styles.subscriptionInfoTitle}>🎫 اشتراك العيادة</Text>
+                            <View style={styles.labelRow}>
+                              <FontAwesome5 name="ticket-alt" size={14} color="#9B59B6" solid />
+                              <Text style={styles.subscriptionInfoTitle}>اشتراك العيادة</Text>
+                            </View>
                             <View style={[styles.subscriptionStatusBadge, item.subscriptionActive && styles.subscriptionActiveBadge]}>
                               <Text style={styles.subscriptionStatusText}>
                                 {item.subscriptionActive ? '✓ نشط' : '✕ منتهي'}
@@ -479,7 +515,8 @@ const UsersScreen = () => {
                         style={styles.editDetailsButton}
                         onPress={() => startEditing(item)}
                       >
-                        <Text style={styles.editDetailsButtonText}>✏️ تعديل البيانات</Text>
+                        <FontAwesome5 name="edit" size={14} color="#fff" solid />
+                        <Text style={styles.editDetailsButtonText}>تعديل البيانات</Text>
                       </TouchableOpacity>
                     </>
                   )}
@@ -487,7 +524,10 @@ const UsersScreen = () => {
               ) : (
                 <>
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>💼 الوظيفة</Text>
+                    <View style={styles.labelRow}>
+                      <FontAwesome5 name="briefcase" size={14} color="#3B82F6" solid />
+                      <Text style={styles.detailLabel}>الوظيفة</Text>
+                    </View>
                     <Text style={styles.detailValue}>{item.role || 'عامل'}</Text>
                   </View>
                 </>
@@ -497,9 +537,18 @@ const UsersScreen = () => {
             {/* Client-specific: Next Lesson & Lesson History */}
             {isClient && nextLesson && (
               <View style={styles.nextLessonCard}>
-                <Text style={styles.sectionTitle}>🎯 الدرس القادم</Text>
-                <Text style={styles.lessonInfoText}>📅 {formatDate(nextLesson.date)} - {nextLesson.time}</Text>
-                <Text style={styles.lessonInfoText}>🐴 {getHorseName(nextLesson.horseId)}</Text>
+                <View style={styles.labelRow}>
+                  <FontAwesome5 name="bullseye" size={16} color="#E74C3C" solid />
+                  <Text style={styles.sectionTitle}>الدرس القادم</Text>
+                </View>
+                <View style={styles.lessonInfoRow}>
+                  <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                  <Text style={styles.lessonInfoText}>{formatDate(nextLesson.date)} - {nextLesson.time}</Text>
+                </View>
+                <View style={styles.lessonInfoRow}>
+                  <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                  <Text style={styles.lessonInfoText}>{getHorseName(nextLesson.horseId)}</Text>
+                </View>
               </View>
             )}
 
@@ -508,15 +557,24 @@ const UsersScreen = () => {
                 {upcomingLessons.length > 0 && (
                   <View style={styles.lessonGroup}>
                     <View style={styles.lessonGroupHeader}>
-                      <Text style={styles.lessonGroupTitle}>📅 الدروس القادمة</Text>
+                      <View style={styles.labelRow}>
+                        <FontAwesome5 name="calendar-check" size={14} color="#3B82F6" solid />
+                        <Text style={styles.lessonGroupTitle}>الدروس القادمة</Text>
+                      </View>
                       <View style={styles.countBadgeSmall}>
                         <Text style={styles.countBadgeSmallText}>{upcomingLessons.length}</Text>
                       </View>
                     </View>
                     {upcomingLessons.slice(0, 3).map(lesson => (
                       <View key={lesson.id} style={styles.lessonItem}>
-                        <Text style={styles.lessonItemText}>📅 {formatDate(lesson.date)} - {lesson.time}</Text>
-                        <Text style={styles.lessonItemSubtext}>🐴 {getHorseName(lesson.horseId)}</Text>
+                        <View style={styles.lessonItemRow}>
+                          <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
+                          <Text style={styles.lessonItemText}>{formatDate(lesson.date)} - {lesson.time}</Text>
+                        </View>
+                        <View style={styles.lessonItemRow}>
+                          <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
+                          <Text style={styles.lessonItemSubtext}>{getHorseName(lesson.horseId)}</Text>
+                        </View>
                       </View>
                     ))}
                     {upcomingLessons.length > 3 && (
@@ -528,15 +586,24 @@ const UsersScreen = () => {
                 {pastLessons.length > 0 && (
                   <View style={styles.lessonGroup}>
                     <View style={styles.lessonGroupHeader}>
-                      <Text style={styles.lessonGroupTitle}>📜 سجل الدروس</Text>
+                      <View style={styles.labelRow}>
+                        <FontAwesome5 name="scroll" size={14} color="#7C3AED" solid />
+                        <Text style={styles.lessonGroupTitle}>سجل الدروس</Text>
+                      </View>
                       <View style={[styles.countBadgeSmall, styles.countBadgePast]}>
                         <Text style={styles.countBadgeSmallText}>{pastLessons.length}</Text>
                       </View>
                     </View>
                     {pastLessons.slice(0, 3).map(lesson => (
                       <View key={lesson.id} style={[styles.lessonItem, styles.lessonItemPast]}>
-                        <Text style={styles.lessonItemText}>✓ {formatDate(lesson.date)} - {lesson.time}</Text>
-                        <Text style={styles.lessonItemSubtext}>🐴 {getHorseName(lesson.horseId)}</Text>
+                        <View style={styles.lessonItemRow}>
+                          <FontAwesome5 name="check-circle" size={12} color="#27AE60" solid />
+                          <Text style={styles.lessonItemText}>{formatDate(lesson.date)} - {lesson.time}</Text>
+                        </View>
+                        <View style={styles.lessonItemRow}>
+                          <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
+                          <Text style={styles.lessonItemSubtext}>{getHorseName(lesson.horseId)}</Text>
+                        </View>
                       </View>
                     ))}
                     {pastLessons.length > 3 && (
@@ -552,7 +619,10 @@ const UsersScreen = () => {
               style={styles.removeButton}
               onPress={() => handleRemoveUser(item.id, item.name)}
             >
-              <Text style={styles.removeButtonText}>🗑️ حذف {isClient ? 'العميل' : 'العامل'}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <FontAwesome5 name="trash-alt" size={14} color="#E74C3C" solid />
+                <Text style={styles.removeButtonText}>حذف {isClient ? 'العميل' : 'العامل'}</Text>
+              </View>
             </TouchableOpacity>
           </View>
         )}
@@ -565,7 +635,10 @@ const UsersScreen = () => {
       <View style={styles.container}>
         {/* Header with Tabs */}
         <View style={styles.header}>
-          <Text style={styles.pageTitle}>👥 المستخدمين</Text>
+          <View style={styles.titleRow}>
+            <FontAwesome5 name="users" size={24} color="#3B82F6" solid />
+            <Text style={styles.pageTitle}>المستخدمين</Text>
+          </View>
 
           {/* Tab Selector */}
           <View style={styles.tabContainer}>
@@ -591,7 +664,7 @@ const UsersScreen = () => {
 
           {/* Search Bar */}
           <View style={styles.searchContainer}>
-            <Text style={styles.searchIcon}>🔍</Text>
+            <FontAwesome5 name="search" size={16} color={colors.text.secondary} solid style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="ابحث بالاسم أو البريد أو الهاتف..."
@@ -601,7 +674,7 @@ const UsersScreen = () => {
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
-                <Text style={styles.clearButtonText}>✕</Text>
+                <FontAwesome5 name="times" size={14} color={colors.text.secondary} solid />
               </TouchableOpacity>
             )}
           </View>
@@ -615,7 +688,12 @@ const UsersScreen = () => {
           contentContainerStyle={styles.contentContainer}
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>{activeTab === 'clients' ? '👥' : '👷'}</Text>
+              <FontAwesome5 
+                name={activeTab === 'clients' ? 'users' : 'hard-hat'} 
+                size={64} 
+                color="#95A5A6" 
+                solid 
+              />
               <Text style={styles.emptyText}>
                 {searchQuery ? 'لا توجد نتائج' : `لا يوجد ${activeTab === 'clients' ? 'عملاء' : 'عمال'} بعد`}
               </Text>
@@ -628,13 +706,19 @@ const UsersScreen = () => {
             <View style={styles.formSection}>
               {/* Add New User Form */}
               <View style={styles.newUserForm}>
-                <Text style={styles.formTitle}>
-                  ➕ إضافة {activeTab === 'clients' ? 'عميل' : 'عامل'} جديد
-                </Text>
+                <View style={styles.formTitleRow}>
+                  <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
+                  <Text style={styles.formTitle}>
+                    إضافة {activeTab === 'clients' ? 'عميل' : 'عامل'} جديد
+                  </Text>
+                </View>
                 <Text style={styles.formSubtitle}>سيتم إنشاء حساب تلقائياً مع رقم الهاتف ككلمة مرور</Text>
 
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>👤 الاسم</Text>
+                  <View style={styles.labelRow}>
+                    <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                    <Text style={styles.label}>الاسم</Text>
+                  </View>
                   <TextInput
                     value={newUserForm.name}
                     onChangeText={(text) => setNewUserForm({...newUserForm, name: text})}
@@ -645,7 +729,10 @@ const UsersScreen = () => {
                 </View>
 
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>📧 البريد الإلكتروني</Text>
+                  <View style={styles.labelRow}>
+                    <FontAwesome5 name="envelope" size={14} color="#3B82F6" solid />
+                    <Text style={styles.label}>البريد الإلكتروني</Text>
+                  </View>
                   <TextInput
                     value={newUserForm.email}
                     onChangeText={(text) => setNewUserForm({...newUserForm, email: text})}
@@ -658,7 +745,10 @@ const UsersScreen = () => {
                 </View>
 
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>📞 رقم الهاتف</Text>
+                  <View style={styles.labelRow}>
+                    <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
+                    <Text style={styles.label}>رقم الهاتف</Text>
+                  </View>
                   <TextInput
                     value={newUserForm.phone}
                     onChangeText={(text) => setNewUserForm({...newUserForm, phone: text})}
@@ -673,7 +763,10 @@ const UsersScreen = () => {
                 {activeTab === 'clients' && (
                   <View style={styles.subscriptionSection}>
                     <View style={styles.subscriptionHeader}>
-                      <Text style={styles.subscriptionTitle}>🎫 اشتراك العيادة</Text>
+                      <View style={styles.labelRow}>
+                        <FontAwesome5 name="ticket-alt" size={16} color="#9B59B6" solid />
+                        <Text style={styles.subscriptionTitle}>اشتراك العيادة</Text>
+                      </View>
                     </View>
 
                     <TouchableOpacity
@@ -687,7 +780,9 @@ const UsersScreen = () => {
                     >
                       <View style={styles.checkboxContainer}>
                         <View style={[styles.checkbox, newUserForm.hasSubscription && styles.checkboxChecked]}>
-                          {newUserForm.hasSubscription && <Text style={styles.checkboxIcon}>✓</Text>}
+                          {newUserForm.hasSubscription && (
+                            <FontAwesome5 name="check" size={14} color="#27AE60" solid />
+                          )}
                         </View>
                         <Text style={styles.checkboxLabel}>لديه اشتراك من العيادة</Text>
                       </View>
@@ -695,7 +790,10 @@ const UsersScreen = () => {
 
                     {newUserForm.hasSubscription && (
                       <View style={styles.inputGroup}>
-                        <Text style={styles.label}>📊 عدد الدروس في الاشتراك</Text>
+                        <View style={styles.labelRow}>
+                          <FontAwesome5 name="chart-bar" size={14} color="#E67E22" solid />
+                          <Text style={styles.label}>عدد الدروس في الاشتراك</Text>
+                        </View>
                         <TextInput
                           value={newUserForm.subscriptionLessons}
                           onChangeText={(text) => setNewUserForm({...newUserForm, subscriptionLessons: text})}
@@ -885,6 +983,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
+  phoneRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   userMetaText: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
@@ -918,14 +1021,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     ...shadows.sm,
   },
-  detailsTitle: {
-    fontSize: typography.size.base,
-    fontWeight: typography.weight.bold,
-    color: colors.text.primary,
+  detailsTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
     marginBottom: spacing.md,
     paddingBottom: spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
+  },
+  detailsTitle: {
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
   },
   detailRow: {
     flexDirection: 'row',
@@ -933,6 +1041,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: spacing.sm,
     paddingVertical: spacing.xs,
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   detailLabel: {
     fontSize: typography.size.sm,
@@ -1020,6 +1133,11 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     marginBottom: spacing.xs,
   },
+  lessonInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.xs,
+  },
   lessonsSection: {
     marginBottom: spacing.md,
   },
@@ -1065,11 +1183,16 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.text.muted,
     opacity: 0.8,
   },
+  lessonItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: 2,
+  },
   lessonItemText: {
     fontSize: typography.size.sm,
     color: colors.text.secondary,
     fontWeight: typography.weight.semibold,
-    marginBottom: 2,
   },
   lessonItemSubtext: {
     fontSize: typography.size.xs,
