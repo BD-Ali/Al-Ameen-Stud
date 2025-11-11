@@ -276,12 +276,16 @@ Al-Ameen-Stable/
 └── src/
     ├── components/                 # Reusable components
     │   ├── AdminTabs.js           # Bottom tab navigation for admin
+    │   ├── AnimatedButton.js      # Animated button component
+    │   ├── AnimatedCard.js        # Animated card component
     │   ├── AnnouncementsFeed.js   # Announcements feed component
     │   ├── CompactHeader.js       # User header component
     │   └── InAppNotificationBanner.js  # Notification banner
     ├── config/                     # Configuration files
-    │   ├── cloudinaryConfig.js    # Cloudinary setup
-    │   └── firebaseConfig.js      # Firebase setup
+    │   ├── cloudinaryConfig.js    # Cloudinary setup (gitignored)
+    │   ├── cloudinaryConfig.example.js  # Example config
+    │   ├── firebaseConfig.js      # Firebase setup (gitignored)
+    │   └── firebaseConfig.example.js    # Example config
     ├── context/                    # React Context providers
     │   ├── AuthContext.js         # Authentication state
     │   └── DataContext.js         # App data state
@@ -293,6 +297,7 @@ Al-Ameen-Stable/
     │   ├── HorsesScreen.js        # Horse management
     │   ├── LessonsScreen.js       # Lesson scheduling
     │   ├── MissionsScreen.js      # Task management
+    │   ├── ProfileScreen.js       # User profile management
     │   ├── UsersScreen.js         # User management
     │   ├── VisitorHomeScreen.js   # Public interface
     │   ├── WeeklyScheduleScreen.js # Weekly schedule
@@ -301,8 +306,10 @@ Al-Ameen-Stable/
     │   ├── lessonCleanupService.js     # Auto-cleanup old lessons
     │   ├── lessonReminderService.js    # Lesson notifications
     │   └── notificationService.js      # General notifications
-    └── styles/
-        └── theme.js               # Design system theme
+    ├── styles/
+    │   └── theme.js               # Design system theme
+    └── utils/
+        └── animations.js          # Animation utilities
 ```
 
 ## 🚀 Getting Started
@@ -844,15 +851,25 @@ eas update --branch production --message "Bug fixes and improvements"
 
 ## 📄 License
 
-This project is proprietary software developed for Al-Ameen Stud.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+> **Note:** This application was originally developed for Al-Ameen Stud. If you use this code for your own stable management system, please ensure you configure it with your own Firebase and Cloudinary credentials.
 
 ## 🤝 Contributing
 
-This is a private project. For feature requests or bug reports, please contact the development team.
+Contributions are welcome! If you'd like to contribute to this project:
 
-## 👨‍💻 Development Team
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-Built with ❤️ using React Native and Expo
+Please ensure your code follows the existing code style and includes appropriate tests.
+
+For major changes, please open an issue first to discuss what you would like to change.
+
+For technical support, issues, or questions, please open an issue on the repository or contact the development team.
 
 ### Technologies Used
 - React Native for cross-platform development
