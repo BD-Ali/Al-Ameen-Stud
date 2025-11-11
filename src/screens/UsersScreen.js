@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   Alert,
   Animated,
-  ActivityIndicator
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -629,7 +631,11 @@ const UsersScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+    >
       {/* Header with Tabs */}
       <View style={styles.header}>
         <View style={styles.titleRow}>
@@ -685,6 +691,7 @@ const UsersScreen = () => {
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={true}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         nestedScrollEnabled={true}
         ListEmptyComponent={
             <View style={styles.emptyState}>
@@ -725,6 +732,8 @@ const UsersScreen = () => {
                     placeholder={`أدخل اسم ${activeTab === 'clients' ? 'العميل' : 'العامل'}`}
                     placeholderTextColor="#64748b"
                     style={styles.input}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
                   />
                 </View>
 
@@ -741,6 +750,8 @@ const UsersScreen = () => {
                     autoCapitalize="none"
                     placeholderTextColor="#64748b"
                     style={styles.input}
+                    returnKeyType="next"
+                    blurOnSubmit={false}
                   />
                 </View>
 
@@ -756,6 +767,7 @@ const UsersScreen = () => {
                     keyboardType="phone-pad"
                     placeholderTextColor="#64748b"
                     style={styles.input}
+                    returnKeyType="done"
                   />
                 </View>
 
@@ -801,6 +813,7 @@ const UsersScreen = () => {
                           keyboardType="number-pad"
                           placeholderTextColor="#64748b"
                           style={styles.input}
+                          returnKeyType="done"
                         />
                         <Text style={styles.helpText}>
                           سيتم خصم درس من الاشتراك عند تأكيد كل درس مكتمل
@@ -848,7 +861,7 @@ const UsersScreen = () => {
           <Text style={styles.toastText}>{toastMessage}</Text>
         </Animated.View>
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

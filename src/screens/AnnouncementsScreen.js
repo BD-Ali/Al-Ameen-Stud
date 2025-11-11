@@ -362,15 +362,15 @@ const AnnouncementsScreen = () => {
     return statusOptions.find(s => s.value === status) || statusOptions[0];
   };
 
-  const getTagEmoji = (tag) => {
-    const emojis = {
-      'Update': '📢',
-      'Promo': '🎁',
-      'Alert': '⚠️',
-      'Event': '🎉',
-      'Info': 'ℹ️',
+  const getTagIcon = (tag) => {
+    const icons = {
+      'Update': { name: 'bullhorn', color: '#3498DB' },
+      'Promo': { name: 'gift', color: '#E91E63' },
+      'Alert': { name: 'exclamation-triangle', color: '#E74C3C' },
+      'Event': { name: 'calendar-star', color: '#9C27B0' },
+      'Info': { name: 'info-circle', color: '#2196F3' },
     };
-    return emojis[tag] || '📌';
+    return icons[tag] || { name: 'thumbtack', color: '#F39C12' };
   };
 
   const renderAnnouncementCard = ({ item, index }) => {
@@ -685,12 +685,20 @@ const AnnouncementsScreen = () => {
                         onPress={() => setFormData({ ...formData, tag })}
                         disabled={isSubmitting}
                       >
-                        <Text style={[
-                          styles.tagChipText,
-                          formData.tag === tag && styles.tagChipTextActive,
-                        ]}>
-                          {getTagEmoji(tag)} {tag}
-                        </Text>
+                        <View style={styles.tagChipContent}>
+                          <FontAwesome5
+                            name={getTagIcon(tag).name}
+                            size={14}
+                            color={formData.tag === tag ? colors.primary.main : getTagIcon(tag).color}
+                            solid
+                          />
+                          <Text style={[
+                            styles.tagChipText,
+                            formData.tag === tag && styles.tagChipTextActive,
+                          ]}>
+                            {tag}
+                          </Text>
+                        </View>
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
@@ -1157,6 +1165,11 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
   },
+  tagChipContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   tagChipActive: {
     backgroundColor: colors.primary.main + '30',
     borderColor: colors.primary.main,
@@ -1300,10 +1313,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.md,
-  },
-  previewTag: {
-    fontSize: typography.size.xl,
-    marginRight: spacing.sm,
+    gap: spacing.sm,
   },
   previewTitle: {
     fontSize: typography.size.lg,

@@ -101,7 +101,7 @@ const LoginScreen = ({ navigation }) => {
                 resizeMode="contain"
               />
             </View>
-            <Text style={styles.title}>مربط الأمين</Text>
+            <Text style={styles.title}>مَرْبَطُ الأَمِين</Text>
             <Text style={styles.subtitle}>
               {isSignUp ? 'إنشاء حساب عميل' : 'مرحباً بعودتك'}
             </Text>
@@ -280,11 +280,16 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   title: {
-    fontSize: typography.size.xxxl,
-    fontWeight: typography.weight.bold,
-    color: colors.text.primary,
+    fontSize: 42,
+    fontWeight: '700',
+    color: '#FFFFFF',
     marginBottom: spacing.xs,
-    letterSpacing: 0.5,
+    letterSpacing: 1.5,
+    fontStyle: 'italic',
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 2, height: 3 },
+    textShadowRadius: 6,
   },
   subtitle: {
     fontSize: typography.size.md,

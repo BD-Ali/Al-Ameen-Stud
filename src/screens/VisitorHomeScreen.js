@@ -66,7 +66,7 @@ const VisitorHomeScreen = () => {
             />
             <View style={styles.logoReflection} />
           </View>
-          <Text style={styles.heading}>مرحباً بك في مربط الأمين!</Text>
+          <Text style={styles.heading}>مرحباً بك في مَرْبَط الأَمِين!</Text>
           <Text style={styles.paragraph}>
             نحن فخورون برعاية مجموعة متنوعة من الخيول الرائعة. لا تتردد في الاطلاع والتعرف عليها.
           </Text>
@@ -171,11 +171,16 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   heading: {
-    fontSize: typography.size.xxl,
-    fontWeight: typography.weight.bold,
+    fontSize: 36,
+    fontWeight: '700',
     marginBottom: spacing.sm,
-    color: colors.text.primary,
+    color: '#2C3E50',
     textAlign: 'center',
+    letterSpacing: 1.5,
+    fontStyle: 'italic',
+    textShadowColor: 'rgba(0, 0, 0, 0.15)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
   },
   paragraph: {
     fontSize: typography.size.base,

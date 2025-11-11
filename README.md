@@ -1,10 +1,10 @@
-# 🐴 Al-Ameen Stable Management App
+# 🐴 Al-Ameen Stud Management App
 
 A comprehensive React Native mobile application for managing horse stable operations, built with Expo and Firebase. The app provides role-based access for administrators, clients, workers, and visitors, with full support for Arabic (RTL).
 
 ## 📱 Overview
 
-Al-Ameen Stable is a professional stable management system that streamlines day-to-day operations including:
+Al-Ameen Stud is a professional stud management system that streamlines day-to-day operations including:
 - Horse management and care scheduling
 - Lesson scheduling and tracking
 - Client and worker management
@@ -209,7 +209,7 @@ Al-Ameen Stable is a professional stable management system that streamlines day-
   - Clients
   - Workers
   - Visitors
-- **One-tap communication** with stable management
+- **One-tap communication** with stud management
 - **Native platform integration** (iOS & Android)
 
 ### 🎨 User Interface
@@ -396,8 +396,49 @@ npm run web
 ### Using EAS (Expo Application Services)
 
 ```bash
+# Install EAS CLI globally
+npm install -g eas-cli
+
+# Login to your Expo account
+eas login
+
 # Build for iOS development
 npm run build:dev:ios
+
+# Build for Android development
+npm run build:dev:android
+
+# Build for iOS production (App Store)
+npm run build:production:ios
+
+# Build for Android production (Google Play)
+npm run build:production:android
+
+# Submit to App Store
+npm run submit:ios
+
+# Submit to Google Play
+npm run submit:android
+```
+
+### App Store Submission
+
+For complete App Store submission instructions, see:
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Step-by-step deployment process
+- **[APP_STORE_SUBMISSION_CHECKLIST.md](./APP_STORE_SUBMISSION_CHECKLIST.md)** - Complete checklist
+- **[SCREENSHOTS_GUIDE.md](./SCREENSHOTS_GUIDE.md)** - Screenshot requirements
+- **[PRIVACY_POLICY.md](./PRIVACY_POLICY.md)** - Privacy policy for App Store
+
+#### Quick Start for App Store:
+1. Purchase Apple Developer membership ($99/year)
+2. Update `eas.json` with your Apple credentials
+3. Create test accounts for reviewers
+4. Build production version: `npm run build:production:ios`
+5. Prepare screenshots and App Store listing
+6. Submit: `npm run submit:ios`
+7. Wait for Apple review (1-3 days)
+
+See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for detailed instructions.
 
 # Build for Android development
 npm run build:dev:android
@@ -803,7 +844,7 @@ eas update --branch production --message "Bug fixes and improvements"
 
 ## 📄 License
 
-This project is proprietary software developed for Al-Ameen Stable.
+This project is proprietary software developed for Al-Ameen Stud.
 
 ## 🤝 Contributing
 
@@ -858,7 +899,7 @@ Potential features for future versions:
 
 ### Version 1.0.0 (November 2025)
 - Initial release
-- Core stable management features
+- Core stud management features
 - Role-based authentication
 - Horse management with images
 - Lesson scheduling and tracking
@@ -877,5 +918,5 @@ Potential features for future versions:
 
 ---
 
-*© 2025 Al-Ameen Stable. All rights reserved.*
+*© 2025 Al-Ameen Stud. All rights reserved.*
 

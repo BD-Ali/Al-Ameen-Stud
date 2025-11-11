@@ -78,7 +78,7 @@ const ClientHomeScreen = ({ navigation }) => {
         {
           text: '📧 إرسال بريد إلكتروني',
           onPress: () => {
-            Linking.openURL('mailto:badarne3li@gmail.com').catch(err => {
+            Linking.openURL('mailto:Lina.b.96@hotmail.com').catch(err => {
               Alert.alert('خطأ', 'لا يمكن فتح تطبيق البريد الإلكتروني');
             });
           }
@@ -86,7 +86,7 @@ const ClientHomeScreen = ({ navigation }) => {
         {
           text: '📱 اتصال هاتفي',
           onPress: () => {
-            Linking.openURL('tel:0503653429').catch(err => {
+            Linking.openURL('tel:0526913008').catch(err => {
               Alert.alert('خطأ', 'لا يمكن إجراء المكالمة');
             });
           }
@@ -126,8 +126,8 @@ const ClientHomeScreen = ({ navigation }) => {
               {/* Payment Status Card */}
               <AnimatedCard index={0} delay={100} style={styles.paymentCard}>
                 <View style={styles.paymentHeader}>
-                  <Text style={styles.paymentEmoji}>💰</Text>
-                  <Text style={styles.paymentTitle}>حالة الدفع</Text>
+                  <FontAwesome5 name="money-bill-wave" size={20} color="#27AE60" solid />
+                  <Text style={styles.paymentTitle}> حالة الدفع</Text>
                 </View>
                 <View style={styles.paymentRow}>
                   <View style={styles.paymentItem}>
@@ -147,12 +147,18 @@ const ClientHomeScreen = ({ navigation }) => {
                 <AnimatedCard index={1} delay={100} style={styles.subscriptionCard}>
                   <View style={styles.subscriptionHeader}>
                     <View style={styles.subscriptionTitleContainer}>
-                      <Text style={styles.subscriptionEmoji}>🎫</Text>
+                      <FontAwesome5 name="ticket-alt" size={18} color="#9B59B6" solid />
                       <Text style={styles.subscriptionTitle}>اشتراك العيادة</Text>
                     </View>
                     <View style={[styles.subscriptionStatusBadge, selectedClient.subscriptionActive && styles.subscriptionActiveBadge]}>
+                      <FontAwesome5
+                        name={selectedClient.subscriptionActive ? 'check' : 'times'}
+                        size={10}
+                        color="#fff"
+                        solid
+                      />
                       <Text style={styles.subscriptionStatusText}>
-                        {selectedClient.subscriptionActive ? '✓ نشط' : '✕ منتهي'}
+                        {selectedClient.subscriptionActive ? ' نشط' : ' منتهي'}
                       </Text>
                     </View>
                   </View>
@@ -461,10 +467,13 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   confirmedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.status.success,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
+    gap: 2,
   },
   confirmedBadgeText: {
     color: '#fff',
@@ -472,10 +481,13 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
   },
   scheduledBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.primary.main,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
+    gap: 2,
   },
   scheduledBadgeText: {
     color: '#fff',
@@ -483,10 +495,13 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
   },
   cancelledBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.status.error,
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
+    gap: 2,
   },
   cancelledBadgeText: {
     color: '#fff',

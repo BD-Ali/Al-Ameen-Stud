@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 /**
  * FeedScreen shows a consolidated list of feeding plans for all horses.
@@ -17,7 +18,10 @@ const FeedScreen = () => {
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
           <View style={styles.headerSection}>
-            <Text style={styles.pageTitle}>🥕 جدول التغذية</Text>
+            <View style={styles.titleRow}>
+              <FontAwesome5 name="carrot" size={24} color="#FF9800" solid />
+              <Text style={styles.pageTitle}>جدول التغذية</Text>
+            </View>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{horses.length}</Text>
             </View>
@@ -27,10 +31,13 @@ const FeedScreen = () => {
           <AnimatedCard index={index} delay={80} style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.horseName}>{item.name}</Text>
-              <Text style={styles.horseEmoji}>🐴</Text>
+              <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
             </View>
             <View style={styles.scheduleContainer}>
-              <Text style={styles.scheduleLabel}>📋 أوقات التغذية:</Text>
+              <View style={styles.scheduleLabelRow}>
+                <FontAwesome5 name="clipboard-list" size={14} color="#64748b" solid />
+                <Text style={styles.scheduleLabel}>أوقات التغذية:</Text>
+              </View>
               <Text style={styles.scheduleValue}>
                 {item.feedSchedule || 'لا يوجد جدول محدد'}
               </Text>
@@ -40,7 +47,7 @@ const FeedScreen = () => {
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>🥕</Text>
+            <FontAwesome5 name="carrot" size={48} color="#FF9800" solid />
             <Text style={styles.emptyText}>لا توجد جداول تغذية</Text>
             <Text style={styles.emptySubtext}>أضف خيولاً لتعيين جداول التغذية</Text>
           </View>
@@ -131,16 +138,12 @@ const styles = StyleSheet.create({
   emptyState: {
     alignItems: 'center',
     paddingVertical: spacing.xxxl,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   emptyText: {
     fontSize: typography.size.md,
     color: colors.text.secondary,
     fontWeight: typography.weight.semibold,
-    marginBottom: spacing.xs,
   },
   emptySubtext: {
     fontSize: typography.size.sm,

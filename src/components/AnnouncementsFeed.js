@@ -15,6 +15,7 @@ import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import notificationService from '../services/notificationService';
 import { getOptimizedImageUrl } from '../config/cloudinaryConfig';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 /**
  * AnnouncementsFeed - Displays announcements to users based on their role
@@ -64,15 +65,15 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
     }
   };
 
-  const getTagEmoji = (tag) => {
-    const emojis = {
-      'Update': '📢',
-      'Promo': '🎁',
-      'Alert': '⚠️',
-      'Event': '🎉',
-      'Info': 'ℹ️',
+  const getTagIcon = (tag) => {
+    const icons = {
+      'Update': { name: 'bullhorn', color: '#3498DB' },
+      'Promo': { name: 'gift', color: '#E91E63' },
+      'Alert': { name: 'exclamation-triangle', color: '#E74C3C' },
+      'Event': { name: 'calendar-star', color: '#9C27B0' },
+      'Info': { name: 'info-circle', color: '#2196F3' },
     };
-    return emojis[tag] || '📌';
+    return icons[tag] || { name: 'thumbtack', color: '#F39C12' };
   };
 
   const getTagColor = (tag) => {
@@ -181,7 +182,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
       {/* Header */}
       {visibleAnnouncements.length > 0 && (
         <View style={styles.header}>
-          <Text style={styles.headerIcon}>📢</Text>
+          <FontAwesome5 name="bullhorn" size={20} color="#3498DB" solid />
           <Text style={styles.headerTitle}>الإعلانات والتحديثات</Text>
         </View>
       )}
@@ -202,13 +203,14 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                 >
                   {item.isPinned && (
                     <View style={styles.pinnedBadge}>
-                      <Text style={styles.pinnedText}>📌 مثبت</Text>
+                      <FontAwesome5 name="thumbtack" size={10} color="#F39C12" solid />
+                      <Text style={styles.pinnedText}>مثبت</Text>
                     </View>
                   )}
 
                   <View style={styles.cardHeader}>
                     <View style={[styles.tagBadge, { backgroundColor: tagColor + '20' }]}>
-                      <Text style={styles.tagEmoji}>{getTagEmoji(item.tag)}</Text>
+                      <FontAwesome5 name={getTagIcon(item.tag).name} size={12} color={tagColor} solid />
                       <Text style={[styles.tagText, { color: tagColor }]}>{item.tag}</Text>
                     </View>
                   </View>
@@ -250,7 +252,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
         </>
       ) : (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyEmoji}>📭</Text>
+          <FontAwesome5 name="bullhorn" size={64} color="#95A5A6" solid />
           <Text style={styles.emptyText}>لا توجد إعلانات حالياً</Text>
           <Text style={styles.emptySubtext}>سنقوم بإعلامك عند وجود تحديثات جديدة</Text>
         </View>
@@ -279,7 +281,8 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                 <>
                   {selectedAnnouncement.isPinned && (
                     <View style={[styles.pinnedBadge, { marginBottom: spacing.md }]}>
-                      <Text style={styles.pinnedText}>📌 إعلان مثبت</Text>
+                      <FontAwesome5 name="thumbtack" size={10} color="#F39C12" solid />
+                      <Text style={styles.pinnedText}>إعلان مثبت</Text>
                     </View>
                   )}
 
@@ -287,7 +290,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                     styles.tagBadge,
                     { backgroundColor: getTagColor(selectedAnnouncement.tag) + '20', alignSelf: 'flex-start' }
                   ]}>
-                    <Text style={styles.tagEmoji}>{getTagEmoji(selectedAnnouncement.tag)}</Text>
+                    <FontAwesome5 name={getTagIcon(selectedAnnouncement.tag).name} size={12} color={getTagColor(selectedAnnouncement.tag)} solid />
                     <Text style={[styles.tagText, { color: getTagColor(selectedAnnouncement.tag) }]}>
                       {selectedAnnouncement.tag}
                     </Text>
@@ -317,9 +320,12 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                   )}
 
                   <View style={styles.modalFooter}>
-                    <Text style={styles.footerText}>
-                      📅 {formatDate(selectedAnnouncement.createdAt)}
-                    </Text>
+                    <View style={styles.footerDateRow}>
+                      <FontAwesome5 name="calendar-alt" size={12} color="#64748b" solid />
+                      <Text style={styles.footerText}>
+                        {formatDate(selectedAnnouncement.createdAt)}
+                      </Text>
+                    </View>
                   </View>
                 </>
               )}
@@ -353,10 +359,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.base,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
-  },
-  headerIcon: {
-    fontSize: typography.size.xl,
-    marginRight: spacing.sm,
+    gap: spacing.sm,
   },
   headerTitle: {
     fontSize: typography.size.lg,
@@ -373,12 +376,15 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.primary.main,
   },
   pinnedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
     backgroundColor: colors.accent.amber + '30',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
     marginBottom: spacing.sm,
+    gap: 4,
   },
   pinnedText: {
     fontSize: typography.size.xs,
@@ -395,10 +401,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
     alignSelf: 'flex-start',
-  },
-  tagEmoji: {
-    fontSize: typography.size.sm,
-    marginRight: spacing.xs,
+    gap: spacing.xs,
   },
   tagText: {
     fontSize: typography.size.xs,
@@ -448,10 +451,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.xxxl,
     paddingHorizontal: spacing.base,
-  },
-  emptyEmoji: {
-    fontSize: 64,
-    marginBottom: spacing.md,
+    gap: spacing.md,
   },
   emptyText: {
     fontSize: typography.size.lg,
@@ -462,7 +462,6 @@ const styles = StyleSheet.create({
   emptySubtext: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
-    marginTop: spacing.xs,
     textAlign: 'center',
   },
   loadMoreButton: {
@@ -555,10 +554,15 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border.light,
     marginTop: spacing.md,
   },
+  footerDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+  },
   footerText: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
-    textAlign: 'center',
   },
 });
 
