@@ -10,7 +10,8 @@ import {
   Animated,
   ActivityIndicator,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Linking
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -147,6 +148,24 @@ const UsersScreen = () => {
     ]).start(() => {
       setShowToast(false);
     });
+  };
+
+  // Phone Call Handler
+  const handlePhoneCall = (phoneNumber) => {
+    const phoneUrl = `tel:${phoneNumber}`;
+
+    Linking.canOpenURL(phoneUrl)
+      .then((supported) => {
+        if (supported) {
+          return Linking.openURL(phoneUrl);
+        } else {
+          Alert.alert('خطأ', 'لا يمكن إجراء المكالمة على هذا الجهاز');
+        }
+      })
+      .catch((err) => {
+        console.error('Error opening phone dialer:', err);
+        Alert.alert('خطأ', 'فشل فتح تطبيق الهاتف');
+      });
   };
 
   // Tab Switching
@@ -334,10 +353,14 @@ const UsersScreen = () => {
                 <Text style={styles.userName}>{item.name}</Text>
                 <View style={styles.userMetaRow}>
                   {item.phoneNumber && (
-                    <View style={styles.phoneRow}>
-                      <FontAwesome5 name="phone-alt" size={12} color={colors.text.tertiary} solid />
-                      <Text style={styles.userMetaText}>{item.phoneNumber}</Text>
-                    </View>
+                    <TouchableOpacity
+                      style={styles.phoneRow}
+                      onPress={() => handlePhoneCall(item.phoneNumber)}
+                      activeOpacity={0.7}
+                    >
+                      <FontAwesome5 name="phone-alt" size={12} color={colors.primary.main} solid />
+                      <Text style={[styles.userMetaText, styles.phoneLink]}>{item.phoneNumber}</Text>
+                    </TouchableOpacity>
                   )}
                   {isClient && item.amountDue > 0 && (
                     <View style={styles.dueBadge}>
@@ -377,7 +400,9 @@ const UsersScreen = () => {
                     <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
                     <Text style={styles.detailLabel}>رقم الهاتف</Text>
                   </View>
-                  <Text style={styles.detailValue}>{item.phoneNumber}</Text>
+                  <TouchableOpacity onPress={() => handlePhoneCall(item.phoneNumber)}>
+                    <Text style={[styles.detailValue, styles.phoneLink]}>{item.phoneNumber}</Text>
+                  </TouchableOpacity>
                 </View>
               )}
 
@@ -1003,6 +1028,10 @@ const styles = StyleSheet.create({
   userMetaText: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
+  },
+  phoneLink: {
+    color: colors.primary.main,
+    textDecorationLine: 'underline',
   },
   dueBadge: {
     backgroundColor: colors.status.warning,
