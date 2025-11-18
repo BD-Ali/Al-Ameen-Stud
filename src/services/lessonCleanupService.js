@@ -1,322 +1,353 @@
 import { db } from '../config/firebaseConfig';
-import { doc, writeBatch } from 'firebase/firestore';
-import * as Notifications from 'expo-notifications';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc,
+  doc,
+  writeBatch
+} from 'firebase/firestore';
 
 /**
- * Lesson Cleanup Service
- *
- * Automatically deletes unconfirmed lessons that are more than 24 hours past their scheduled time.
- * This ensures that only completed/confirmed lessons count toward client statistics and payments.
- *
- * Features:
- * - Runs automatic cleanup checks
- * - Only deletes lessons that are unconfirmed and past the 24-hour grace period
- * - Removes associated schedules and missions
- * - Logs all cleanup activities for audit trail
- * - Provides manual cleanup override option
- * - Safe from accidentally deleting confirmed or recent lessons
+ * LessonCleanupService - Automatically deletes old lessons and related data
+ * Runs periodically to clean up completed lessons older than a specified time
  */
 class LessonCleanupService {
   constructor() {
     this.cleanupInterval = null;
-    this.cleanupInProgress = false;
-    this.lastCleanupTime = null;
-    this.cleanupLog = [];
+    this.isRunning = false;
+    this.defaultRetentionDays = 90; // Keep lessons for 90 days by default
   }
 
   /**
-   * Calculate if a lesson is past the 24-hour grace period
-   * @param {string} lessonDate - Date in YYYY-MM-DD format
-   * @param {string} lessonTime - Time in HH:MM format
-   * @returns {boolean} True if lesson is more than 24 hours old
+   * Start automatic cleanup that runs at regular intervals
+   * @param {Function} getLessons - Function that returns current lessons array
+   * @param {Function} getSchedules - Function that returns current schedules array
+   * @param {Function} getMissions - Function that returns current missions array
+   * @param {number} intervalHours - How often to run cleanup (in hours)
+   * @param {number} retentionDays - How many days to keep old lessons (default: 90)
    */
-  isLessonExpired(lessonDate, lessonTime) {
-    try {
-      // Parse lesson date and time
-      const [year, month, day] = lessonDate.split('-').map(Number);
-      const [hours, minutes] = lessonTime.split(':').map(Number);
-
-      // Create lesson datetime (month is 0-indexed in JS)
-      const lessonDateTime = new Date(year, month - 1, day, hours, minutes);
-
-      // Calculate 24 hours after lesson time
-      const expiryDateTime = new Date(lessonDateTime.getTime() + (24 * 60 * 60 * 1000));
-
-      // Check if current time is past the expiry time
-      const now = new Date();
-      return now > expiryDateTime;
-    } catch (error) {
-      console.error('Error parsing lesson date/time:', error);
-      return false;
-    }
-  }
-
-  /**
-   * Find all expired unconfirmed lessons
-   * @param {Array} lessons - All lessons from Firestore
-   * @returns {Array} Array of expired unconfirmed lessons
-   */
-  findExpiredUnconfirmedLessons(lessons) {
-    return lessons.filter(lesson => {
-      // Safety checks
-      if (!lesson.date || !lesson.time) {
-        console.warn(`Lesson ${lesson.id} missing date or time`);
-        return false;
-      }
-
-      // Confirmed or completed lessons are never deleted
-      if (lesson.confirmed === true || lesson.status === 'completed') {
-        return false;
-      }
-
-      // Cancelled lessons can be cleaned up regardless of time
-      if (lesson.status === 'cancelled') {
-        return true;
-      }
-
-      // Check if lesson is expired (24+ hours past scheduled time)
-      return this.isLessonExpired(lesson.date, lesson.time);
-    });
-  }
-
-  /**
-   * Delete a single lesson and its associated records
-   * @param {string} lessonId - Lesson ID to delete
-   * @param {Array} schedules - All schedules
-   * @param {Array} missions - All missions
-   * @returns {Promise<Object>} Cleanup result
-   */
-  async deleteLessonWithAssociations(lessonId, schedules, missions) {
-    try {
-      const batch = writeBatch(db);
-      let deleteCount = 0;
-
-      // Delete the lesson
-      batch.delete(doc(db, 'lessons', lessonId));
-      deleteCount++;
-
-      // Find and delete associated schedules
-      const associatedSchedules = schedules.filter(s => s.lessonId === lessonId);
-      associatedSchedules.forEach(schedule => {
-        batch.delete(doc(db, 'schedules', schedule.id));
-        deleteCount++;
-      });
-
-      // Find and delete associated missions
-      const associatedMissions = missions.filter(m => m.lessonId === lessonId);
-      associatedMissions.forEach(mission => {
-        batch.delete(doc(db, 'missions', mission.id));
-        deleteCount++;
-      });
-
-      // Commit the batch
-      await batch.commit();
-
-      return { success: true, deletedCount: deleteCount };
-    } catch (error) {
-      console.error(`Error deleting lesson ${lessonId}:`, error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  /**
-   * Perform automatic cleanup of expired unconfirmed lessons
-   * @param {Array} lessons - All lessons
-   * @param {Array} schedules - All schedules
-   * @param {Array} missions - All missions
-   * @param {boolean} dryRun - If true, only report what would be deleted without actually deleting
-   * @returns {Promise<Object>} Cleanup summary
-   */
-  async performCleanup(lessons, schedules, missions, dryRun = false) {
-    // Prevent concurrent cleanup operations
-    if (this.cleanupInProgress) {
-      console.log('Cleanup already in progress, skipping...');
-      return { success: false, error: 'Cleanup already in progress' };
+  startAutoCleanup(getLessons, getSchedules, getMissions, intervalHours = 12, retentionDays = 90) {
+    if (this.isRunning) {
+      console.log('Cleanup service is already running');
+      return;
     }
 
-    this.cleanupInProgress = true;
-    const startTime = Date.now();
+    this.defaultRetentionDays = retentionDays;
+    this.isRunning = true;
 
-    try {
-      console.log(`🧹 Starting lesson cleanup (${dryRun ? 'DRY RUN' : 'LIVE'})...`);
-
-      // Find expired unconfirmed lessons
-      const expiredLessons = this.findExpiredUnconfirmedLessons(lessons);
-
-      if (expiredLessons.length === 0) {
-        console.log('✅ No expired unconfirmed lessons found');
-        this.cleanupInProgress = false;
-        return {
-          success: true,
-          message: 'No expired lessons to clean up',
-          deletedLessons: 0,
-          totalDeleted: 0,
-          duration: Date.now() - startTime
-        };
-      }
-
-      console.log(`Found ${expiredLessons.length} expired unconfirmed lessons`);
-
-      // Log details of lessons to be deleted
-      const lessonsToDelete = expiredLessons.map(lesson => ({
-        id: lesson.id,
-        date: lesson.date,
-        time: lesson.time,
-        clientId: lesson.clientId,
-        status: lesson.status,
-        reason: lesson.status === 'cancelled' ? 'Cancelled lesson' : 'Expired unconfirmed lesson'
-      }));
-
-      if (dryRun) {
-        console.log('DRY RUN - Would delete:', lessonsToDelete);
-        this.cleanupInProgress = false;
-        return {
-          success: true,
-          dryRun: true,
-          lessonsToDelete,
-          deletedLessons: expiredLessons.length,
-          duration: Date.now() - startTime
-        };
-      }
-
-      // Actually delete the lessons (LIVE mode)
-      let totalDeleted = 0;
-      const results = [];
-
-      for (const lesson of expiredLessons) {
-        const result = await this.deleteLessonWithAssociations(lesson.id, schedules, missions);
-        if (result.success) {
-          totalDeleted += result.deletedCount;
-          results.push({ lessonId: lesson.id, success: true, deletedCount: result.deletedCount });
-        } else {
-          results.push({ lessonId: lesson.id, success: false, error: result.error });
-        }
-      }
-
-      const duration = Date.now() - startTime;
-      this.lastCleanupTime = new Date().toISOString();
-
-      // Log cleanup activity
-      const logEntry = {
-        timestamp: this.lastCleanupTime,
-        deletedLessons: expiredLessons.length,
-        totalDeleted,
-        duration,
-        details: lessonsToDelete
-      };
-      this.cleanupLog.push(logEntry);
-
-      // Keep only last 100 log entries
-      if (this.cleanupLog.length > 100) {
-        this.cleanupLog = this.cleanupLog.slice(-100);
-      }
-
-      console.log(`✅ Cleanup complete: Deleted ${expiredLessons.length} lessons (${totalDeleted} total records) in ${duration}ms`);
-
-      this.cleanupInProgress = false;
-      return {
-        success: true,
-        deletedLessons: expiredLessons.length,
-        totalDeleted,
-        duration,
-        details: results,
-        lessonsDeleted: lessonsToDelete
-      };
-    } catch (error) {
-      console.error('Error during cleanup:', error);
-      this.cleanupInProgress = false;
-      return { success: false, error: error.message };
-    }
-  }
-
-  /**
-   * Start automatic cleanup timer
-   * Runs cleanup every 12 hours by default
-   * @param {Function} getLessons - Function to retrieve current lessons
-   * @param {Function} getSchedules - Function to retrieve current schedules
-   * @param {Function} getMissions - Function to retrieve current missions
-   * @param {number} intervalHours - Hours between cleanup runs (default: 12)
-   */
-  startAutoCleanup(getLessons, getSchedules, getMissions, intervalHours = 12) {
-    // Clear existing interval if any
-    this.stopAutoCleanup();
-
-    const intervalMs = intervalHours * 60 * 60 * 1000;
-
-    console.log(`🚀 Starting automatic lesson cleanup (every ${intervalHours} hours)`);
+    console.log(`Starting lesson cleanup service (every ${intervalHours} hours, keeping ${retentionDays} days)`);
 
     // Run cleanup immediately on start
-    this.performCleanup(getLessons(), getSchedules(), getMissions()).catch(error => {
-      console.error('Initial cleanup failed:', error);
-    });
+    this.runCleanup(getLessons, getSchedules, getMissions);
 
-    // Set up recurring cleanup
-    this.cleanupInterval = setInterval(async () => {
-      try {
-        console.log('⏰ Running scheduled cleanup...');
-        await this.performCleanup(getLessons(), getSchedules(), getMissions());
-      } catch (error) {
-        console.error('Scheduled cleanup failed:', error);
-      }
+    // Schedule periodic cleanup
+    const intervalMs = intervalHours * 60 * 60 * 1000;
+    this.cleanupInterval = setInterval(() => {
+      this.runCleanup(getLessons, getSchedules, getMissions);
     }, intervalMs);
-
-    return { success: true, message: `Auto-cleanup started (every ${intervalHours} hours)` };
   }
 
   /**
-   * Stop automatic cleanup timer
+   * Stop automatic cleanup
    */
   stopAutoCleanup() {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
-      console.log('🛑 Automatic lesson cleanup stopped');
-      return { success: true, message: 'Auto-cleanup stopped' };
+      this.isRunning = false;
+      console.log('Lesson cleanup service stopped');
     }
-    return { success: false, message: 'No auto-cleanup was running' };
   }
 
   /**
-   * Get cleanup statistics
-   * @returns {Object} Cleanup stats
+   * Run the cleanup process
+   * @private
    */
-  getCleanupStats() {
-    return {
-      lastCleanupTime: this.lastCleanupTime,
-      cleanupInProgress: this.cleanupInProgress,
-      autoCleanupActive: this.cleanupInterval !== null,
-      totalCleanupRuns: this.cleanupLog.length,
-      recentCleanups: this.cleanupLog.slice(-10)
-    };
+  async runCleanup(getLessons, getSchedules, getMissions) {
+    try {
+      console.log('Running lesson cleanup...');
+
+      const lessons = getLessons();
+      const schedules = getSchedules();
+      const missions = getMissions();
+
+      const cutoffDate = this.calculateCutoffDate(this.defaultRetentionDays);
+
+      const deletedCount = await this.cleanupOldLessons(lessons, schedules, missions, cutoffDate);
+
+      if (deletedCount > 0) {
+        console.log(`Cleaned up ${deletedCount} old lessons and related data`);
+      } else {
+        console.log('No old lessons to clean up');
+      }
+    } catch (error) {
+      console.error('Error running cleanup:', error);
+    }
   }
 
   /**
-   * Manual cleanup trigger with notification
+   * Clean up lessons older than the cutoff date
    * @param {Array} lessons - All lessons
    * @param {Array} schedules - All schedules
    * @param {Array} missions - All missions
-   * @param {boolean} notifyUser - Whether to show notification
-   * @returns {Promise<Object>} Cleanup result
+   * @param {Date} cutoffDate - Delete lessons before this date
+   * @returns {number} - Number of items deleted
    */
-  async manualCleanup(lessons, schedules, missions, notifyUser = true) {
-    const result = await this.performCleanup(lessons, schedules, missions, false);
+  async cleanupOldLessons(lessons, schedules, missions, cutoffDate) {
+    try {
+      const batch = writeBatch(db);
+      let deletedCount = 0;
 
-    if (notifyUser && result.success && result.deletedLessons > 0) {
-      try {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'تنظيف الدروس',
-            body: `تم حذف ${result.deletedLessons} درس منتهي الصلاحية`,
-            data: { type: 'cleanup', count: result.deletedLessons }
-          },
-          trigger: null
-        });
-      } catch (error) {
-        console.warn('Could not send cleanup notification:', error);
+      // Find old completed or cancelled lessons
+      const oldLessons = lessons.filter(lesson => {
+        const lessonDate = this.parseLessonDate(lesson.date, lesson.time);
+
+        // Only delete lessons that are:
+        // 1. Older than cutoff date
+        // 2. Completed OR cancelled OR have no status
+        const isOld = lessonDate && lessonDate < cutoffDate;
+        const isDone = lesson.status === 'completed' ||
+                       lesson.status === 'cancelled' ||
+                       lesson.confirmed === true;
+
+        return isOld && isDone;
+      });
+
+      if (oldLessons.length === 0) {
+        return 0;
       }
-    }
 
-    return result;
+      console.log(`Found ${oldLessons.length} old lessons to delete`);
+
+      // Delete each old lesson and its related data
+      for (const lesson of oldLessons) {
+        // Delete the lesson
+        batch.delete(doc(db, 'lessons', lesson.id));
+        deletedCount++;
+
+        // Find and delete related schedules
+        const relatedSchedules = schedules.filter(s => s.lessonId === lesson.id);
+        for (const schedule of relatedSchedules) {
+          batch.delete(doc(db, 'schedules', schedule.id));
+          deletedCount++;
+        }
+
+        // Find and delete related missions
+        const relatedMissions = missions.filter(m => m.lessonId === lesson.id);
+        for (const mission of relatedMissions) {
+          batch.delete(doc(db, 'missions', mission.id));
+          deletedCount++;
+        }
+      }
+
+      // Commit the batch delete
+      await batch.commit();
+
+      return deletedCount;
+    } catch (error) {
+      console.error('Error cleaning up old lessons:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Manually trigger cleanup for a specific lesson and its related data
+   * @param {string} lessonId - The lesson ID to clean up
+   */
+  async cleanupLesson(lessonId) {
+    try {
+      const batch = writeBatch(db);
+
+      // Delete the lesson
+      batch.delete(doc(db, 'lessons', lessonId));
+
+      // Find and delete related schedules
+      const schedulesQuery = query(
+        collection(db, 'schedules'),
+        where('lessonId', '==', lessonId)
+      );
+      const schedulesSnapshot = await getDocs(schedulesQuery);
+      schedulesSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      // Find and delete related missions
+      const missionsQuery = query(
+        collection(db, 'missions'),
+        where('lessonId', '==', lessonId)
+      );
+      const missionsSnapshot = await getDocs(missionsQuery);
+      missionsSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+
+      console.log(`Cleaned up lesson ${lessonId} and related data`);
+      return { success: true };
+    } catch (error) {
+      console.error('Error cleaning up lesson:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Perform cleanup operation (alias for cleanupOldLessons for backward compatibility)
+   * @param {Array} lessons - All lessons
+   * @param {Array} schedules - All schedules
+   * @param {Array} missions - All missions
+   * @param {boolean} dryRun - If true, only reports what would be deleted
+   * @returns {object} - Cleanup result
+   */
+  async performCleanup(lessons, schedules, missions, dryRun = false) {
+    try {
+      const cutoffDate = this.calculateCutoffDate(this.defaultRetentionDays);
+
+      if (dryRun) {
+        // Just return statistics without deleting
+        const stats = this.getCleanupStats(lessons, this.defaultRetentionDays);
+        return {
+          success: true,
+          dryRun: true,
+          ...stats,
+        };
+      }
+
+      const deletedCount = await this.cleanupOldLessons(lessons, schedules, missions, cutoffDate);
+
+      return {
+        success: true,
+        deleted: deletedCount,
+        message: `Cleaned up ${deletedCount} old lesson records`,
+      };
+    } catch (error) {
+      console.error('Error performing cleanup:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Calculate the cutoff date (lessons before this will be deleted)
+   * @param {number} retentionDays - How many days to keep
+   * @returns {Date}
+   * @private
+   */
+  calculateCutoffDate(retentionDays) {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - retentionDays);
+    cutoff.setHours(0, 0, 0, 0); // Start of day
+    return cutoff;
+  }
+
+  /**
+   * Parse lesson date and time into a Date object
+   * @private
+   */
+  parseLessonDate(dateStr, timeStr) {
+    try {
+      // Date format: YYYY-MM-DD, Time format: HH:MM
+      const [year, month, day] = dateStr.split('-').map(Number);
+
+      let hours = 0, minutes = 0;
+      if (timeStr) {
+        [hours, minutes] = timeStr.split(':').map(Number);
+      }
+
+      const lessonDate = new Date(year, month - 1, day, hours, minutes);
+
+      if (isNaN(lessonDate.getTime())) {
+        console.error('Invalid lesson date/time:', dateStr, timeStr);
+        return null;
+      }
+
+      return lessonDate;
+    } catch (error) {
+      console.error('Error parsing lesson date:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Clean up cancelled lessons immediately
+   * @param {Array} lessons - All lessons
+   * @param {Array} schedules - All schedules
+   * @param {Array} missions - All missions
+   */
+  async cleanupCancelledLessons(lessons, schedules, missions) {
+    try {
+      const cancelledLessons = lessons.filter(lesson =>
+        lesson.status === 'cancelled'
+      );
+
+      if (cancelledLessons.length === 0) {
+        return 0;
+      }
+
+      console.log(`Cleaning up ${cancelledLessons.length} cancelled lessons`);
+
+      const batch = writeBatch(db);
+      let deletedCount = 0;
+
+      for (const lesson of cancelledLessons) {
+        // Delete the lesson
+        batch.delete(doc(db, 'lessons', lesson.id));
+        deletedCount++;
+
+        // Find and delete related schedules
+        const relatedSchedules = schedules.filter(s => s.lessonId === lesson.id);
+        for (const schedule of relatedSchedules) {
+          batch.delete(doc(db, 'schedules', schedule.id));
+          deletedCount++;
+        }
+
+        // Find and delete related missions
+        const relatedMissions = missions.filter(m => m.lessonId === lesson.id);
+        for (const mission of relatedMissions) {
+          batch.delete(doc(db, 'missions', mission.id));
+          deletedCount++;
+        }
+      }
+
+      await batch.commit();
+
+      console.log(`Cleaned up ${deletedCount} cancelled lesson records`);
+      return deletedCount;
+    } catch (error) {
+      console.error('Error cleaning up cancelled lessons:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Get statistics about what would be cleaned up
+   * @param {Array} lessons - All lessons
+   * @param {number} retentionDays - How many days to keep
+   * @returns {object} - Statistics
+   */
+  getCleanupStats(lessons, retentionDays = 90) {
+    const cutoffDate = this.calculateCutoffDate(retentionDays);
+
+    const oldLessons = lessons.filter(lesson => {
+      const lessonDate = this.parseLessonDate(lesson.date, lesson.time);
+      const isOld = lessonDate && lessonDate < cutoffDate;
+      const isDone = lesson.status === 'completed' ||
+                     lesson.status === 'cancelled' ||
+                     lesson.confirmed === true;
+
+      return isOld && isDone;
+    });
+
+    const cancelledLessons = lessons.filter(l => l.status === 'cancelled');
+
+    return {
+      totalLessons: lessons.length,
+      oldCompletedLessons: oldLessons.length,
+      cancelledLessons: cancelledLessons.length,
+      cutoffDate: cutoffDate.toISOString(),
+      retentionDays,
+    };
   }
 }
 

@@ -1,32 +1,27 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { collection, addDoc, updateDoc, doc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebaseConfig';
-import Constants from 'expo-constants';
 
 /**
- * NotificationService - Handles all announcement notifications
- * Features: Targeting, scheduling, deep-linking, read tracking, no duplicates
+ * NotificationService - Handles all notification functionality
+ * Manages permissions, channels, and notification listeners
  */
-
-// Configure notification handler
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
-
 class NotificationService {
   constructor() {
     this.notificationListener = null;
     this.responseListener = null;
+
+    // Set default notification handler
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
   }
 
   /**
-   * Request notification permissions
+   * Request notification permissions from the user
    */
   async requestPermissions() {
     try {
@@ -39,320 +34,170 @@ class NotificationService {
       }
 
       if (finalStatus !== 'granted') {
-        return { granted: false, message: 'الرجاء تفعيل الإشعارات من الإعدادات' };
+        console.warn('Notification permissions not granted');
+        return false;
       }
 
-      // Get push token for device (only for physical devices)
+      // Setup notification channel for Android
       if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'افتراضي',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+          sound: 'default',
+        });
+
+        // Create announcement channel
         await Notifications.setNotificationChannelAsync('announcements', {
           name: 'الإعلانات',
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
-          lightColor: '#3b82f6',
+          lightColor: '#3B82F6',
+          sound: 'default',
+        });
+
+        // Create lesson reminder channel
+        await Notifications.setNotificationChannelAsync('lesson_reminders', {
+          name: 'تذكيرات الدروس',
+          importance: Notifications.AndroidImportance.HIGH,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#10B981',
+          sound: 'default',
         });
       }
 
-      // Try to get push token, but don't fail if it doesn't work (e.g., on simulator)
-      let token = null;
-      try {
-        const projectId = Constants.expoConfig?.extra?.eas?.projectId;
-        if (projectId) {
-          const tokenData = await Notifications.getExpoPushTokenAsync({
-            projectId: projectId,
-          });
-          token = tokenData.data;
-        }
-      } catch (tokenError) {
-        console.log('Could not get push token (this is normal on simulators):', tokenError.message);
-        // Continue anyway - local notifications will still work
-      }
-
-      return { granted: true, token };
+      return true;
     } catch (error) {
-      console.error('Error requesting permissions:', error);
-      return { granted: false, message: 'حدث خطأ أثناء طلب الإذن' };
-    }
-  }
-
-  /**
-   * Check if user has notification preferences disabled
-   */
-  async getUserNotificationPreferences(userId) {
-    try {
-      const prefs = await AsyncStorage.getItem(`notif_prefs_${userId}`);
-      if (prefs) {
-        return JSON.parse(prefs);
-      }
-      // Default preferences
-      return {
-        enabled: true,
-        announcements: true,
-        quietHoursEnabled: false,
-        quietHoursStart: '22:00',
-        quietHoursEnd: '08:00',
-      };
-    } catch (error) {
-      console.error('Error getting notification preferences:', error);
-      return { enabled: true, announcements: true };
-    }
-  }
-
-  /**
-   * Check if current time is within quiet hours
-   */
-  isQuietHours(preferences) {
-    if (!preferences.quietHoursEnabled) return false;
-
-    const now = new Date();
-    const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-    const start = preferences.quietHoursStart;
-    const end = preferences.quietHoursEnd;
-
-    // Handle overnight quiet hours (e.g., 22:00 to 08:00)
-    if (start > end) {
-      return currentTime >= start || currentTime < end;
-    }
-
-    return currentTime >= start && currentTime < end;
-  }
-
-  /**
-   * Get users by role for targeting
-   */
-  async getUsersByRole(targetAudience) {
-    try {
-      const usersRef = collection(db, 'users');
-      let users = [];
-
-      switch (targetAudience) {
-        case 'clients':
-          const clientsQuery = query(usersRef, where('role', '==', 'client'));
-          const clientsSnapshot = await getDocs(clientsQuery);
-          users = clientsSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          break;
-        case 'workers':
-          const workersQuery = query(usersRef, where('role', '==', 'worker'));
-          const workersSnapshot = await getDocs(workersQuery);
-          users = workersSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          break;
-        case 'visitors':
-          // Visitors don't have user accounts, skip for now
-          return [];
-        case 'all':
-        default:
-          // Fetch both clients and workers explicitly
-          const clientsQ = query(usersRef, where('role', '==', 'client'));
-          const workersQ = query(usersRef, where('role', '==', 'worker'));
-
-          const [clientsSnap, workersSnap] = await Promise.all([
-            getDocs(clientsQ),
-            getDocs(workersQ)
-          ]);
-
-          const clients = clientsSnap.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-
-          const workers = workersSnap.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-
-          // Combine both arrays
-          users = [...clients, ...workers];
-          break;
-      }
-
-      return users;
-    } catch (error) {
-      console.error('Error getting users by role:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Check if notification was already sent for this announcement
-   */
-  async wasNotificationSent(announcementId, userId) {
-    try {
-      const key = `notif_sent_${announcementId}_${userId}`;
-      const sent = await AsyncStorage.getItem(key);
-      return sent === 'true';
-    } catch (error) {
-      console.error('Error checking notification sent status:', error);
+      console.error('Error requesting notification permissions:', error);
       return false;
     }
   }
 
   /**
-   * Mark notification as sent
+   * Setup notification listeners
+   * @param {Function} onNotificationReceived - Called when notification is received while app is open
+   * @param {Function} onNotificationTapped - Called when user taps on a notification
    */
-  async markNotificationSent(announcementId, userId) {
-    try {
-      const key = `notif_sent_${announcementId}_${userId}`;
-      await AsyncStorage.setItem(key, 'true');
-    } catch (error) {
-      console.error('Error marking notification as sent:', error);
+  setupListeners(onNotificationReceived, onNotificationTapped) {
+    // Listener for when a notification is received while the app is foregrounded
+    this.notificationListener = Notifications.addNotificationReceivedListener(notification => {
+      if (onNotificationReceived) {
+        onNotificationReceived(notification);
+      }
+    });
+
+    // Listener for when a user taps on or interacts with a notification
+    this.responseListener = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+
+      if (onNotificationTapped) {
+        onNotificationTapped(data);
+      }
+    });
+  }
+
+  /**
+   * Remove notification listeners
+   */
+  removeListeners() {
+    if (this.notificationListener) {
+      this.notificationListener.remove();
+      this.notificationListener = null;
+    }
+
+    if (this.responseListener) {
+      this.responseListener.remove();
+      this.responseListener = null;
     }
   }
 
   /**
-   * Send notification to specific user
+   * Send an immediate notification
+   * @param {string} title - Notification title
+   * @param {string} body - Notification body
+   * @param {object} data - Additional data to attach
+   * @param {string} channelId - Channel ID for Android
    */
-  async sendToUser(userId, announcement, userPreferences = null) {
+  async sendNotification(title, body, data = {}, channelId = 'default') {
     try {
-      // Check if already sent
-      const alreadySent = await this.wasNotificationSent(announcement.id, userId);
-      if (alreadySent) {
-        console.log(`Notification already sent to user ${userId} for announcement ${announcement.id}`);
-        return { success: false, reason: 'duplicate' };
-      }
-
-      // Get user preferences if not provided
-      if (!userPreferences) {
-        userPreferences = await this.getUserNotificationPreferences(userId);
-      }
-
-      // Check if notifications are disabled
-      if (!userPreferences.enabled || !userPreferences.announcements) {
-        return { success: false, reason: 'disabled' };
-      }
-
-      // Check quiet hours
-      if (this.isQuietHours(userPreferences)) {
-        console.log(`User ${userId} is in quiet hours, skipping notification`);
-        return { success: false, reason: 'quiet_hours' };
-      }
-
-      // Truncate title and content
-      const title = announcement.title.length > 50
-        ? announcement.title.substring(0, 47) + '...'
-        : announcement.title;
-
-      const body = announcement.content.length > 100
-        ? announcement.content.substring(0, 97) + '...'
-        : announcement.content;
-
-      // Schedule local notification
       await Notifications.scheduleNotificationAsync({
         content: {
           title,
           body,
-          data: {
-            type: 'announcement',
-            announcementId: announcement.id,
-            tag: announcement.tag,
-          },
+          data,
+          sound: true,
+        },
+        trigger: null, // Send immediately
+      });
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  }
+
+  /**
+   * Schedule a notification for a specific time
+   * @param {string} title - Notification title
+   * @param {string} body - Notification body
+   * @param {Date} triggerDate - When to trigger the notification
+   * @param {object} data - Additional data to attach
+   * @param {string} identifier - Unique identifier for the notification
+   * @returns {string} - Notification identifier
+   */
+  async scheduleNotification(title, body, triggerDate, data = {}, identifier = null) {
+    try {
+      const notificationId = await Notifications.scheduleNotificationAsync({
+        content: {
+          title,
+          body,
+          data,
           sound: true,
           priority: Notifications.AndroidNotificationPriority.HIGH,
-          channelId: 'announcements',
         },
-        trigger: null, // Immediate
+        trigger: {
+          date: triggerDate,
+          channelId: data.channelId || 'default',
+        },
+        identifier: identifier,
       });
 
-      // Mark as sent
-      await this.markNotificationSent(announcement.id, userId);
-
-      // Track in unread
-      await this.markAsUnread(userId, announcement.id);
-
-      return { success: true };
-    } catch (error) {
-      console.error('Error sending notification to user:', error);
-      return { success: false, reason: 'error', error };
-    }
-  }
-
-  /**
-   * Send notification to targeted audience
-   */
-  async sendAnnouncementNotification(announcement, sendNotification = true) {
-    try {
-      if (!sendNotification) {
-        console.log('Notification sending disabled for this announcement');
-        return { success: true, sent: 0, skipped: 0 };
-      }
-
-      // Get targeted users
-      const users = await this.getUsersByRole(announcement.targetAudience);
-
-      let sent = 0;
-      let skipped = 0;
-      const results = [];
-
-      // Send to each user
-      for (const user of users) {
-        const preferences = await this.getUserNotificationPreferences(user.id);
-        const result = await this.sendToUser(user.id, announcement, preferences);
-
-        if (result.success) {
-          sent++;
-        } else {
-          skipped++;
-        }
-
-        results.push({ userId: user.id, ...result });
-      }
-
-      // Log notification send to Firebase
-      await addDoc(collection(db, 'notificationLogs'), {
-        announcementId: announcement.id,
-        targetAudience: announcement.targetAudience,
-        sentCount: sent,
-        skippedCount: skipped,
-        sentAt: serverTimestamp(),
-        results,
-      });
-
-      return { success: true, sent, skipped, results };
-    } catch (error) {
-      console.error('Error sending announcement notification:', error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  /**
-   * Schedule notification for future announcement
-   */
-  async scheduleAnnouncementNotification(announcement, scheduledDate) {
-    try {
-      const trigger = new Date(scheduledDate);
-
-      // Store in AsyncStorage for processing when time arrives
-      const scheduledNotifs = await this.getScheduledNotifications();
-      scheduledNotifs.push({
-        announcementId: announcement.id,
-        scheduledDate: trigger.toISOString(),
-        targetAudience: announcement.targetAudience,
-        title: announcement.title,
-        content: announcement.content,
-        tag: announcement.tag,
-      });
-
-      await AsyncStorage.setItem('scheduled_notifs', JSON.stringify(scheduledNotifs));
-
-      return { success: true, scheduledFor: trigger };
+      return notificationId;
     } catch (error) {
       console.error('Error scheduling notification:', error);
-      return { success: false, error: error.message };
+      return null;
     }
   }
 
   /**
-   * Get scheduled notifications
+   * Cancel a scheduled notification
+   * @param {string} notificationId - The identifier of the notification to cancel
    */
-  async getScheduledNotifications() {
+  async cancelNotification(notificationId) {
     try {
-      const data = await AsyncStorage.getItem('scheduled_notifs');
-      return data ? JSON.parse(data) : [];
+      await Notifications.cancelScheduledNotificationAsync(notificationId);
+    } catch (error) {
+      console.error('Error canceling notification:', error);
+    }
+  }
+
+  /**
+   * Cancel all scheduled notifications
+   */
+  async cancelAllNotifications() {
+    try {
+      await Notifications.cancelAllScheduledNotificationsAsync();
+    } catch (error) {
+      console.error('Error canceling all notifications:', error);
+    }
+  }
+
+  /**
+   * Get all scheduled notifications
+   * @returns {Array} - Array of scheduled notifications
+   */
+  async getAllScheduledNotifications() {
+    try {
+      return await Notifications.getAllScheduledNotificationsAsync();
     } catch (error) {
       console.error('Error getting scheduled notifications:', error);
       return [];
@@ -360,168 +205,106 @@ class NotificationService {
   }
 
   /**
-   * Process scheduled notifications (called periodically)
+   * Clear notification badge
    */
-  async processScheduledNotifications() {
+  async clearBadge() {
     try {
-      const scheduled = await this.getScheduledNotifications();
-      const now = new Date();
-      const remaining = [];
-
-      for (const notif of scheduled) {
-        const triggerTime = new Date(notif.scheduledDate);
-
-        if (triggerTime <= now) {
-          // Time to send
-          await this.sendAnnouncementNotification(notif, true);
-        } else {
-          // Still in future
-          remaining.push(notif);
-        }
-      }
-
-      // Update scheduled list
-      await AsyncStorage.setItem('scheduled_notifs', JSON.stringify(remaining));
+      await Notifications.setBadgeCountAsync(0);
     } catch (error) {
-      console.error('Error processing scheduled notifications:', error);
+      console.error('Error clearing badge:', error);
     }
   }
 
   /**
-   * Mark announcement as unread for user
+   * Send an announcement notification to all users
+   * @param {object} announcement - The announcement object with title, content, id
+   * @param {boolean} immediate - Whether to send immediately or use the announcement's schedule
+   * @returns {object} - Result with sent and skipped counts
    */
-  async markAsUnread(userId, announcementId) {
+  async sendAnnouncementNotification(announcement, immediate = true) {
     try {
-      const unreadKey = `unread_${userId}`;
-      const data = await AsyncStorage.getItem(unreadKey);
-      const unread = data ? JSON.parse(data) : [];
+      const title = announcement.title || 'إعلان جديد';
+      const message = announcement.content || announcement.message || '';
 
-      if (!unread.includes(announcementId)) {
-        unread.push(announcementId);
-        await AsyncStorage.setItem(unreadKey, JSON.stringify(unread));
-      }
+      await this.sendNotification(
+        title,
+        message,
+        {
+          type: 'announcement',
+          announcementId: announcement.id,
+          channelId: 'announcements',
+        },
+        'announcements'
+      );
+
+      return { success: true, sent: 1, skipped: 0 };
     } catch (error) {
-      console.error('Error marking as unread:', error);
+      console.error('Error sending announcement notification:', error);
+      return { success: false, sent: 0, skipped: 1, error: error.message };
     }
   }
 
   /**
-   * Mark announcement as read for user
+   * Schedule an announcement notification for a future date
+   * @param {object} announcement - The announcement object
+   * @param {string|Date} scheduledDate - When to send the notification
+   * @returns {string} - Notification identifier
    */
-  async markAsRead(userId, announcementId) {
+  async scheduleAnnouncementNotification(announcement, scheduledDate) {
     try {
-      const unreadKey = `unread_${userId}`;
-      const data = await AsyncStorage.getItem(unreadKey);
-      const unread = data ? JSON.parse(data) : [];
+      const title = announcement.title || 'إعلان جديد';
+      const message = announcement.content || announcement.message || '';
+      const triggerDate = typeof scheduledDate === 'string' ? new Date(scheduledDate) : scheduledDate;
 
-      const filtered = unread.filter(id => id !== announcementId);
-      await AsyncStorage.setItem(unreadKey, JSON.stringify(filtered));
+      const notificationId = await this.scheduleNotification(
+        title,
+        message,
+        triggerDate,
+        {
+          type: 'announcement',
+          announcementId: announcement.id,
+          channelId: 'announcements',
+        },
+        `announcement_${announcement.id}`
+      );
 
-      return { success: true, unreadCount: filtered.length };
+      console.log(`Scheduled announcement notification for ${triggerDate.toISOString()}`);
+      return notificationId;
     } catch (error) {
-      console.error('Error marking as read:', error);
-      return { success: false, error: error.message };
+      console.error('Error scheduling announcement notification:', error);
+      return null;
     }
   }
 
   /**
-   * Mark all announcements as read for user
+   * Cancel a scheduled announcement notification
+   * @param {string} announcementId - The announcement ID
    */
-  async markAllAsRead(userId) {
+  async cancelAnnouncementNotification(announcementId) {
     try {
-      const unreadKey = `unread_${userId}`;
-      await AsyncStorage.setItem(unreadKey, JSON.stringify([]));
-      return { success: true };
+      const identifier = `announcement_${announcementId}`;
+      await this.cancelNotification(identifier);
+      console.log(`Cancelled announcement notification for ${announcementId}`);
     } catch (error) {
-      console.error('Error marking all as read:', error);
-      return { success: false, error: error.message };
+      console.error('Error cancelling announcement notification:', error);
     }
   }
 
   /**
-   * Get unread count for user
+   * Cancel a scheduled notification by identifier
+   * Alias for cancelNotification for consistency
+   * @param {string} identifier - The notification identifier
    */
-  async getUnreadCount(userId) {
+  async cancelScheduledNotification(identifier) {
     try {
-      const unreadKey = `unread_${userId}`;
-      const data = await AsyncStorage.getItem(unreadKey);
-      const unread = data ? JSON.parse(data) : [];
-      return unread.length;
+      await this.cancelNotification(`announcement_${identifier}`);
     } catch (error) {
-      console.error('Error getting unread count:', error);
-      return 0;
-    }
-  }
-
-  /**
-   * Get unread announcement IDs for user
-   */
-  async getUnreadIds(userId) {
-    try {
-      const unreadKey = `unread_${userId}`;
-      const data = await AsyncStorage.getItem(unreadKey);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Error getting unread IDs:', error);
-      return [];
-    }
-  }
-
-  /**
-   * Setup notification listeners
-   */
-  setupListeners(onNotificationReceived, onNotificationTapped) {
-    // Listener for notifications received while app is foregrounded
-    this.notificationListener = Notifications.addNotificationReceivedListener(notification => {
-      if (onNotificationReceived) {
-        onNotificationReceived(notification);
-      }
-    });
-
-    // Listener for user tapping notification
-    this.responseListener = Notifications.addNotificationResponseReceivedListener(response => {
-      const data = response.notification.request.content.data;
-      if (onNotificationTapped && data.type === 'announcement') {
-        onNotificationTapped(data.announcementId);
-      }
-    });
-  }
-
-  /**
-   * Remove listeners
-   */
-  removeListeners() {
-    if (this.notificationListener) {
-      this.notificationListener.remove();
-    }
-    if (this.responseListener) {
-      this.responseListener.remove();
-    }
-  }
-
-  /**
-   * Show in-app notification banner
-   */
-  async showInAppBanner(announcement) {
-    // This will be handled by a React component
-    return announcement;
-  }
-
-  /**
-   * Cancel all scheduled notifications for an announcement
-   */
-  async cancelScheduledNotification(announcementId) {
-    try {
-      const scheduled = await this.getScheduledNotifications();
-      const filtered = scheduled.filter(n => n.announcementId !== announcementId);
-      await AsyncStorage.setItem('scheduled_notifs', JSON.stringify(filtered));
-      return { success: true };
-    } catch (error) {
-      console.error('Error canceling scheduled notification:', error);
-      return { success: false, error: error.message };
+      console.error('Error cancelling scheduled notification:', error);
     }
   }
 }
 
-export const notificationService = new NotificationService();
+// Export singleton instance
+const notificationService = new NotificationService();
 export default notificationService;
+

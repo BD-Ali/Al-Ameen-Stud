@@ -16,8 +16,8 @@ import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-ico
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
-import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCredential, deleteUser } from 'firebase/auth';
+import { doc, updateDoc, getDoc, deleteDoc, query, collection, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import AnimatedCard from '../components/AnimatedCard';
 
@@ -27,7 +27,8 @@ import AnimatedCard from '../components/AnimatedCard';
  * - View their profile information (name, email, role)
  * - Change their password
  * - Change their email address
- * - Cannot change name or delete account (as per requirements)
+ * - Change their name (Admin only)
+ * - Delete their account and all associated data
  */
 const ProfileScreen = ({ navigation }) => {
   const { user, userRole } = useContext(AuthContext);
@@ -43,6 +44,8 @@ const ProfileScreen = ({ navigation }) => {
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [showEmailSection, setShowEmailSection] = useState(false);
   const [showNameSection, setShowNameSection] = useState(false);
+  const [showDeleteSection, setShowDeleteSection] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
   const [adminData, setAdminData] = useState(null);
 
   // Fetch admin data from users collection
@@ -272,6 +275,177 @@ const ProfileScreen = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Handle account deletion
+  const handleDeleteAccount = async () => {
+    // Validation
+    if (!deletePassword) {
+      Alert.alert('خطأ', 'الرجاء إدخال كلمة المرور للتأكيد');
+      return;
+    }
+
+    // Double confirmation
+    Alert.alert(
+      '⚠️ تحذير',
+      'هل أنت متأكد من رغبتك في حذف حسابك نهائياً؟ سيتم حذف جميع بياناتك ولن يمكن استرجاعها.',
+      [
+        {
+          text: 'إلغاء',
+          style: 'cancel',
+        },
+        {
+          text: 'حذف الحساب',
+          style: 'destructive',
+          onPress: async () => {
+            setLoading(true);
+
+            try {
+              // Reauthenticate first
+              const reauth = await reauthenticate(deletePassword);
+              if (!reauth.success) {
+                Alert.alert('خطأ', reauth.error);
+                setLoading(false);
+                return;
+              }
+
+              // Check if user has upcoming lessons or schedules
+              if (userRole === 'client') {
+                const clientLessonsQuery = query(
+                  collection(db, 'lessons'),
+                  where('clientId', '==', user.uid)
+                );
+                const lessonsSnapshot = await getDocs(clientLessonsQuery);
+                const now = new Date();
+
+                const upcomingLessons = lessonsSnapshot.docs.filter(doc => {
+                  const lesson = doc.data();
+                  const lessonDate = new Date(`${lesson.date}T${lesson.time || '00:00'}`);
+                  return lessonDate >= now || lesson.status === 'scheduled';
+                });
+
+                if (upcomingLessons.length > 0) {
+                  Alert.alert(
+                    'لا يمكن حذف الحساب',
+                    `لديك ${upcomingLessons.length} درس مجدول أو قادم. يرجى إلغاء الدروس أولاً قبل حذف حسابك.`
+                  );
+                  setLoading(false);
+                  return;
+                }
+
+                // Delete all client's past lessons
+                for (const lessonDoc of lessonsSnapshot.docs) {
+                  await deleteDoc(doc(db, 'lessons', lessonDoc.id));
+                }
+
+                // Delete client document
+                await deleteDoc(doc(db, 'clients', user.uid));
+              } else if (userRole === 'worker') {
+                const workerLessonsQuery = query(
+                  collection(db, 'lessons'),
+                  where('instructorId', '==', user.uid)
+                );
+                const lessonsSnapshot = await getDocs(workerLessonsQuery);
+                const now = new Date();
+
+                const upcomingLessons = lessonsSnapshot.docs.filter(doc => {
+                  const lesson = doc.data();
+                  const lessonDate = new Date(`${lesson.date}T${lesson.time || '00:00'}`);
+                  return lessonDate >= now || lesson.status === 'scheduled';
+                });
+
+                if (upcomingLessons.length > 0) {
+                  Alert.alert(
+                    'لا يمكن حذف الحساب',
+                    `لديك ${upcomingLessons.length} درس مجدول أو قادم. يرجى إلغاء الدروس أولاً قبل حذف حسابك.`
+                  );
+                  setLoading(false);
+                  return;
+                }
+
+                // Check for upcoming schedules
+                const schedulesQuery = query(
+                  collection(db, 'schedules'),
+                  where('workerId', '==', user.uid)
+                );
+                const schedulesSnapshot = await getDocs(schedulesQuery);
+
+                const upcomingSchedules = schedulesSnapshot.docs.filter(doc => {
+                  const schedule = doc.data();
+                  const scheduleDate = new Date(schedule.date);
+                  return scheduleDate >= now;
+                });
+
+                if (upcomingSchedules.length > 0) {
+                  Alert.alert(
+                    'لا يمكن حذف الحساب',
+                    `لديك ${upcomingSchedules.length} جدولة قادمة. يرجى إزالة الجدولات أولاً قبل حذف حسابك.`
+                  );
+                  setLoading(false);
+                  return;
+                }
+
+                // Delete all worker's past lessons
+                for (const lessonDoc of lessonsSnapshot.docs) {
+                  await deleteDoc(doc(db, 'lessons', lessonDoc.id));
+                }
+
+                // Delete all worker's past schedules
+                for (const scheduleDoc of schedulesSnapshot.docs) {
+                  await deleteDoc(doc(db, 'schedules', scheduleDoc.id));
+                }
+
+                // Delete all worker's missions
+                const missionsQuery = query(
+                  collection(db, 'missions'),
+                  where('workerId', '==', user.uid)
+                );
+                const missionsSnapshot = await getDocs(missionsQuery);
+                for (const missionDoc of missionsSnapshot.docs) {
+                  await deleteDoc(doc(db, 'missions', missionDoc.id));
+                }
+
+                // Delete worker document
+                await deleteDoc(doc(db, 'workers', user.uid));
+              }
+
+              // Delete user document from users collection
+              try {
+                await deleteDoc(doc(db, 'users', user.uid));
+              } catch (userError) {
+                console.log('User document not found or already deleted');
+              }
+
+              // Delete Firebase Auth user account
+              await deleteUser(user);
+
+              Alert.alert('تم الحذف', 'تم حذف حسابك بنجاح', [
+                {
+                  text: 'موافق',
+                  onPress: () => {
+                    // Navigation will happen automatically when user becomes null
+                  },
+                },
+              ]);
+            } catch (error) {
+              console.error('Account deletion error:', error);
+              let errorMessage = 'فشل حذف الحساب';
+
+              if (error.code === 'auth/requires-recent-login') {
+                errorMessage = 'يرجى تسجيل الخروج ثم الدخول مرة أخرى قبل حذف حسابك';
+              } else if (error.code === 'auth/network-request-failed') {
+                errorMessage = 'خطأ في الاتصال بالشبكة. يرجى المحاولة مرة أخرى';
+              }
+
+              Alert.alert('خطأ', errorMessage);
+            } finally {
+              setLoading(false);
+              setDeletePassword('');
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -525,6 +699,66 @@ const ProfileScreen = ({ navigation }) => {
                       <ActivityIndicator color={colors.text.primary} size="small" />
                     ) : (
                       <Text style={styles.actionButtonText}>✓ حفظ البريد الإلكتروني الجديد</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </AnimatedCard>
+
+          {/* Delete Account Section */}
+          <AnimatedCard index={userRole === 'admin' ? 5 : 4} delay={300} style={styles.card}>
+            <View style={styles.sectionTitleContainer}>
+              <TouchableOpacity
+                style={styles.sectionHeaderButton}
+                onPress={() => setShowDeleteSection(!showDeleteSection)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.titleWithIcon}>
+                  <FontAwesome5 name="trash-alt" size={20} color="#E74C3C" solid />
+                  <Text style={[styles.cardTitle, { color: '#E74C3C' }]}>حذف الحساب</Text>
+                </View>
+                <Ionicons name={showDeleteSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
+              </TouchableOpacity>
+            </View>
+
+            {showDeleteSection && (
+              <View style={styles.framedContent}>
+                <View style={styles.deleteWarning}>
+                  <FontAwesome5 name="exclamation-triangle" size={24} color="#E74C3C" solid style={styles.warningIcon} />
+                  <Text style={styles.deleteWarningText}>
+                    تحذير: حذف الحساب إجراء نهائي ولا يمكن التراجع عنه. سيتم حذف جميع بياناتك بشكل دائم.
+                  </Text>
+                </View>
+
+                <View style={styles.formSection}>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>كلمة المرور للتأكيد</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={deletePassword}
+                      onChangeText={setDeletePassword}
+                      secureTextEntry
+                      placeholder="أدخل كلمة المرور لتأكيد الحذف"
+                      placeholderTextColor={colors.text.muted}
+                      autoCapitalize="none"
+                      editable={!loading}
+                    />
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.deleteButton, loading && styles.actionButtonDisabled]}
+                    onPress={handleDeleteAccount}
+                    disabled={loading}
+                    activeOpacity={0.8}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color="#FFFFFF" size="small" />
+                    ) : (
+                      <>
+                        <FontAwesome5 name="trash-alt" size={16} color="#FFFFFF" solid />
+                        <Text style={styles.deleteButtonText}>حذف حسابي نهائياً</Text>
+                      </>
                     )}
                   </TouchableOpacity>
                 </View>
@@ -804,6 +1038,46 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     lineHeight: 22,
     letterSpacing: 0.3,
+  },
+  deleteWarning: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#FEE2E2',
+    padding: spacing.lg,
+    borderRadius: borderRadius.lg,
+    borderLeftWidth: 4,
+    borderLeftColor: '#DC2626',
+    marginBottom: spacing.lg,
+    gap: spacing.sm,
+  },
+  warningIcon: {
+    marginTop: 2,
+  },
+  deleteWarningText: {
+    flex: 1,
+    fontSize: typography.size.sm,
+    color: '#991B1B',
+    lineHeight: 22,
+    letterSpacing: 0.3,
+    fontWeight: typography.weight.semibold,
+  },
+  deleteButton: {
+    backgroundColor: '#DC2626',
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.lg,
+    alignItems: 'center',
+    marginTop: spacing.md,
+    minHeight: 54,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    ...shadows.lg,
+  },
+  deleteButtonText: {
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
   bottomSpacer: {
     height: spacing.xxxl,

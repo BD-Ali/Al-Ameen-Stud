@@ -821,9 +821,27 @@ export const DataProvider = ({ children }) => {
 
   /**
    * Remove a horse from the stable.
+   * Prevents deletion if horse has scheduled or upcoming lessons.
    */
   const removeHorse = async (id) => {
     try {
+      // Check if horse has any upcoming or scheduled lessons
+      const now = new Date();
+      const horseLessons = lessons.filter(lesson => {
+        if (lesson.horseId !== id) return false;
+
+        // Check if lesson is in the future or not completed
+        const lessonDate = new Date(`${lesson.date}T${lesson.time || '00:00'}`);
+        return lessonDate >= now || lesson.status === 'scheduled';
+      });
+
+      if (horseLessons.length > 0) {
+        return {
+          success: false,
+          error: `لا يمكن حذف الحصان. لديه ${horseLessons.length} درس مجدول أو قادم. يرجى إلغاء أو إزالة الدروس أولاً.`
+        };
+      }
+
       await deleteDoc(doc(db, 'horses', id));
       return { success: true };
     } catch (error) {
@@ -834,10 +852,37 @@ export const DataProvider = ({ children }) => {
 
   /**
    * Remove a client.
+   * Prevents deletion if client has scheduled or upcoming lessons.
    */
   const removeClient = async (id) => {
     try {
+      // Check if client has any upcoming or scheduled lessons
+      const now = new Date();
+      const clientLessons = lessons.filter(lesson => {
+        if (lesson.clientId !== id) return false;
+
+        // Check if lesson is in the future or not completed
+        const lessonDate = new Date(`${lesson.date}T${lesson.time || '00:00'}`);
+        return lessonDate >= now || lesson.status === 'scheduled';
+      });
+
+      if (clientLessons.length > 0) {
+        return {
+          success: false,
+          error: `لا يمكن حذف العميل. لديه ${clientLessons.length} درس مجدول أو قادم. يرجى إلغاء أو إزالة الدروس أولاً.`
+        };
+      }
+
       await deleteDoc(doc(db, 'clients', id));
+
+      // Also try to remove from users collection if exists
+      try {
+        await deleteDoc(doc(db, 'users', id));
+      } catch (userError) {
+        // User might not exist in users collection, that's okay
+        console.log('User document not found or already deleted');
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Error removing client:', error);
@@ -847,10 +892,51 @@ export const DataProvider = ({ children }) => {
 
   /**
    * Remove a worker.
+   * Prevents deletion if worker has scheduled or upcoming lessons.
    */
   const removeWorker = async (id) => {
     try {
+      // Check if worker has any upcoming or scheduled lessons
+      const now = new Date();
+      const workerLessons = lessons.filter(lesson => {
+        if (lesson.instructorId !== id) return false;
+
+        // Check if lesson is in the future or not completed
+        const lessonDate = new Date(`${lesson.date}T${lesson.time || '00:00'}`);
+        return lessonDate >= now || lesson.status === 'scheduled';
+      });
+
+      if (workerLessons.length > 0) {
+        return {
+          success: false,
+          error: `لا يمكن حذف العامل. لديه ${workerLessons.length} درس مجدول أو قادم. يرجى إلغاء أو إزالة الدروس أولاً.`
+        };
+      }
+
+      // Check if worker has upcoming schedules
+      const workerSchedules = schedules.filter(schedule => {
+        if (schedule.workerId !== id) return false;
+        const scheduleDate = new Date(schedule.date);
+        return scheduleDate >= now;
+      });
+
+      if (workerSchedules.length > 0) {
+        return {
+          success: false,
+          error: `لا يمكن حذف العامل. لديه ${workerSchedules.length} جدولة قادمة. يرجى إزالة الجدولات أولاً.`
+        };
+      }
+
       await deleteDoc(doc(db, 'workers', id));
+
+      // Also try to remove from users collection if exists
+      try {
+        await deleteDoc(doc(db, 'users', id));
+      } catch (userError) {
+        // User might not exist in users collection, that's okay
+        console.log('User document not found or already deleted');
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Error removing worker:', error);
@@ -1565,7 +1651,7 @@ export const DataProvider = ({ children }) => {
    * @returns {Object} Cleanup stats
    */
   const getCleanupStats = () => {
-    return lessonCleanupService.getCleanupStats();
+    return lessonCleanupService.getCleanupStats(lessons, 90);
   };
 
   /**
