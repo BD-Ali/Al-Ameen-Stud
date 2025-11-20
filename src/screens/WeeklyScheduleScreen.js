@@ -493,7 +493,7 @@ const WeeklyScheduleScreen = () => {
                   <Text style={styles.inputLabel}>وصف العمل</Text>
                   <TextInput
                     style={styles.textArea}
-                    placeholder="مثال: رعاية الخيول، تنظيف الإسطبل، إطعام..."
+                    placeholder="أدخل وصف العمل المطلوب"
                     placeholderTextColor={colors.text.muted}
                     value={workDescription}
                     onChangeText={setWorkDescription}

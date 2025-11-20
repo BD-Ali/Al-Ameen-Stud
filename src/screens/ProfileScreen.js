@@ -311,6 +311,22 @@ const ProfileScreen = ({ navigation }) => {
 
               // Check if user has upcoming lessons or schedules
               if (userRole === 'client') {
+                // First, check if client has outstanding balance
+                const clientDoc = await getDoc(doc(db, 'clients', user.uid));
+                if (clientDoc.exists()) {
+                  const clientData = clientDoc.data();
+                  const amountDue = clientData.amountDue || 0;
+
+                  if (amountDue > 0) {
+                    Alert.alert(
+                      'لا يمكن حذف الحساب',
+                      `لديك مبلغ مستحق ${amountDue} ريال. يرجى سداد المبلغ المستحق قبل حذف حسابك.`
+                    );
+                    setLoading(false);
+                    return;
+                  }
+                }
+
                 const clientLessonsQuery = query(
                   collection(db, 'lessons'),
                   where('clientId', '==', user.uid)
@@ -925,7 +941,6 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontWeight: typography.weight.semibold,
     letterSpacing: 0.3,
-    textAlign: 'right',
   },
   infoRow: {
     flexDirection: 'row',
@@ -995,7 +1010,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.base,
     fontSize: typography.size.md,
     color: colors.text.primary,
-    textAlign: 'right',
     minHeight: 50,
     ...shadows.sm,
   },

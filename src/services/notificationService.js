@@ -302,6 +302,312 @@ class NotificationService {
       console.error('Error cancelling scheduled notification:', error);
     }
   }
+
+  /**
+   * Send notification when a new lesson is created
+   * @param {object} lesson - The lesson object
+   * @param {object} client - The client object
+   * @param {object} instructor - The instructor object
+   * @param {object} horse - The horse object
+   */
+  async sendLessonCreatedNotification(lesson, client, instructor, horse) {
+    try {
+      const title = '✅ تم جدولة درس جديد';
+      const body = `درس مع ${client.name} في ${lesson.time} - ${lesson.date}`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'lesson_created',
+          lessonId: lesson.id,
+          clientId: client.id,
+          instructorId: instructor.id,
+          horseId: horse.id,
+          channelId: 'lesson_reminders',
+        },
+        'lesson_reminders'
+      );
+
+      console.log('Lesson created notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending lesson created notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification when a lesson is updated/rescheduled
+   * @param {object} lesson - The updated lesson object
+   * @param {object} client - The client object
+   * @param {string} changeDescription - Description of what changed
+   */
+  async sendLessonUpdatedNotification(lesson, client, changeDescription) {
+    try {
+      const title = '🔄 تم تحديث موعد الدرس';
+      const body = `درس ${client.name} - ${changeDescription}`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'lesson_updated',
+          lessonId: lesson.id,
+          clientId: client.id,
+          channelId: 'lesson_reminders',
+        },
+        'lesson_reminders'
+      );
+
+      console.log('Lesson updated notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending lesson updated notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification when a lesson is cancelled
+   * @param {object} lesson - The cancelled lesson object
+   * @param {object} client - The client object
+   * @param {string} reason - Cancellation reason
+   */
+  async sendLessonCancelledNotification(lesson, client, reason = '') {
+    try {
+      const title = '❌ تم إلغاء الدرس';
+      const body = reason
+        ? `تم إلغاء درس ${client.name} في ${lesson.time} - ${reason}`
+        : `تم إلغاء درس ${client.name} في ${lesson.time}`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'lesson_cancelled',
+          lessonId: lesson.id,
+          clientId: client.id,
+          reason,
+          channelId: 'lesson_reminders',
+        },
+        'lesson_reminders'
+      );
+
+      console.log('Lesson cancelled notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending lesson cancelled notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification when a lesson is confirmed/completed
+   * @param {object} lesson - The confirmed lesson object
+   * @param {object} client - The client object
+   */
+  async sendLessonConfirmedNotification(lesson, client) {
+    try {
+      const title = '✅ تم تأكيد إكمال الدرس';
+      const body = `تم تأكيد درس ${client.name} بنجاح`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'lesson_confirmed',
+          lessonId: lesson.id,
+          clientId: client.id,
+          channelId: 'lesson_reminders',
+        },
+        'lesson_reminders'
+      );
+
+      console.log('Lesson confirmed notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending lesson confirmed notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification when a mission is assigned to a worker
+   * @param {object} mission - The mission object
+   * @param {object} worker - The worker object
+   */
+  async sendMissionAssignedNotification(mission, worker) {
+    try {
+      const title = '📋 مهمة جديدة';
+      const body = `${mission.title} - ${mission.description || 'مهمة عمل جديدة'}`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'mission_assigned',
+          missionId: mission.id,
+          workerId: worker.id,
+          channelId: 'default',
+        },
+        'default'
+      );
+
+      console.log('Mission assigned notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending mission assigned notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification when a mission is completed
+   * @param {object} mission - The mission object
+   * @param {object} worker - The worker object
+   */
+  async sendMissionCompletedNotification(mission, worker) {
+    try {
+      const title = '✅ تم إكمال المهمة';
+      const body = `أكمل ${worker.name} المهمة: ${mission.title}`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'mission_completed',
+          missionId: mission.id,
+          workerId: worker.id,
+          channelId: 'default',
+        },
+        'default'
+      );
+
+      console.log('Mission completed notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending mission completed notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification for a reminder/task
+   * @param {object} reminder - The reminder object
+   */
+  async sendReminderNotification(reminder) {
+    try {
+      const title = '🔔 تذكير';
+      const body = reminder.description || 'لديك تذكير';
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'reminder',
+          reminderId: reminder.id,
+          horseId: reminder.horseId,
+          channelId: 'default',
+        },
+        'default'
+      );
+
+      console.log('Reminder notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending reminder notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification when a new client is registered
+   * @param {object} client - The client object
+   */
+  async sendClientRegisteredNotification(client) {
+    try {
+      const title = '👤 عميل جديد';
+      const body = `تم تسجيل عميل جديد: ${client.name}`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'client_registered',
+          clientId: client.id,
+          channelId: 'default',
+        },
+        'default'
+      );
+
+      console.log('Client registered notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending client registered notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification when subscription is about to expire
+   * @param {object} client - The client object
+   * @param {number} remainingLessons - Number of lessons remaining
+   */
+  async sendSubscriptionExpiringNotification(client, remainingLessons) {
+    try {
+      const title = '⚠️ تنبيه: الاشتراك على وشك الانتهاء';
+      const body = `لدى ${client.name} ${remainingLessons} دروس متبقية فقط`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'subscription_expiring',
+          clientId: client.id,
+          remainingLessons,
+          channelId: 'default',
+        },
+        'default'
+      );
+
+      console.log('Subscription expiring notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending subscription expiring notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * Send notification when payment is received
+   * @param {object} client - The client object
+   * @param {number} amount - Payment amount
+   */
+  async sendPaymentReceivedNotification(client, amount) {
+    try {
+      const title = '💰 تم استلام دفعة';
+      const body = `تم استلام ${amount} من ${client.name}`;
+
+      await this.sendNotification(
+        title,
+        body,
+        {
+          type: 'payment_received',
+          clientId: client.id,
+          amount,
+          channelId: 'default',
+        },
+        'default'
+      );
+
+      console.log('Payment received notification sent');
+      return { success: true };
+    } catch (error) {
+      console.error('Error sending payment received notification:', error);
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 // Export singleton instance

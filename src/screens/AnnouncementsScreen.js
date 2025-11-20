@@ -373,6 +373,7 @@ const AnnouncementsScreen = () => {
     return icons[tag] || { name: 'thumbtack', color: '#F39C12' };
   };
 
+
   const renderAnnouncementCard = ({ item, index }) => {
     const statusInfo = getStatusInfo(item.status);
     const audienceLabel = audiences.find(a => a.value === item.targetAudience)?.label || 'الجميع';
@@ -381,13 +382,20 @@ const AnnouncementsScreen = () => {
       <AnimatedCard index={index} delay={80} style={styles.card}>
         {item.isPinned && (
           <View style={styles.pinnedBadge}>
-            <Text style={styles.pinnedText}>📌 مثبت</Text>
+            <FontAwesome5 name="thumbtack" size={12} color="#F39C12" solid />
+            <Text style={styles.pinnedText}>مثبت</Text>
           </View>
         )}
 
         <View style={styles.cardHeader}>
           <View style={styles.cardTitleRow}>
-            <Text style={styles.cardTag}>{getTagEmoji(item.tag)}</Text>
+            <FontAwesome5
+              name={getTagIcon(item.tag).name}
+              size={16}
+              color={getTagIcon(item.tag).color}
+              solid
+              style={styles.cardTagIcon}
+            />
             <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
           </View>
           <View style={[styles.statusBadge, { backgroundColor: statusInfo.color + '20' }]}>
@@ -561,11 +569,18 @@ const AnnouncementsScreen = () => {
                   <View style={styles.previewCard}>
                     {formData.isPinned && (
                       <View style={styles.pinnedBadge}>
-                        <Text style={styles.pinnedText}>📌 مثبت</Text>
+                        <FontAwesome5 name="thumbtack" size={12} color="#F39C12" solid />
+                        <Text style={styles.pinnedText}>مثبت</Text>
                       </View>
                     )}
                     <View style={styles.previewHeader}>
-                      <Text style={styles.previewTag}>{getTagEmoji(formData.tag)}</Text>
+                      <FontAwesome5
+                        name={getTagIcon(formData.tag).name}
+                        size={18}
+                        color={getTagIcon(formData.tag).color}
+                        solid
+                        style={styles.previewTagIcon}
+                      />
                       <Text style={styles.previewTitle}>{formData.title || 'عنوان الإعلان'}</Text>
                     </View>
                     {formData.imageUri && (
@@ -653,7 +668,7 @@ const AnnouncementsScreen = () => {
                     style={styles.input}
                     value={formData.linkUrl}
                     onChangeText={(text) => setFormData({ ...formData, linkUrl: text })}
-                    placeholder="https://example.com"
+                    placeholder="أدخل رابط الموقع"
                     placeholderTextColor={colors.text.muted}
                     editable={!isSubmitting}
                   />
@@ -927,6 +942,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   pinnedText: {
     fontSize: typography.size.xs,
@@ -946,8 +964,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: spacing.sm,
   },
-  cardTag: {
-    fontSize: typography.size.lg,
+  cardTagIcon: {
     marginRight: spacing.sm,
   },
   cardTitle: {

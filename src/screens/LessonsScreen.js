@@ -430,7 +430,7 @@ const LessonsScreen = () => {
                           styles.pickerOptionText,
                           instructorId === worker.id && styles.pickerOptionTextSelected
                         ]}>
-                          {worker.name} {worker.email ? `(${worker.email})` : ''}
+                          {worker.name}
                         </Text>
                       </TouchableOpacity>
                     ))

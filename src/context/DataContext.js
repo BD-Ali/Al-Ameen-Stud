@@ -327,12 +327,17 @@ export const DataProvider = ({ children }) => {
    */
   const addClient = async (client) => {
     try {
-      await addDoc(collection(db, 'clients'), {
+      const clientRef = await addDoc(collection(db, 'clients'), {
         ...client,
         lessonCount: client.lessonCount || 0,
         createdAt: serverTimestamp()
       });
-      return { success: true };
+
+      // Send notification about new client registration
+      const clientWithId = { ...client, id: clientRef.id };
+      await notificationService.sendClientRegisteredNotification(clientWithId);
+
+      return { success: true, id: clientRef.id };
     } catch (error) {
       console.error('Error adding client:', error);
       return { success: false, error: error.message };
@@ -344,10 +349,31 @@ export const DataProvider = ({ children }) => {
    */
   const updateClient = async (id, updates) => {
     try {
+      const currentClient = clients.find(c => c.id === id);
+
       await updateDoc(doc(db, 'clients', id), {
         ...updates,
         updatedAt: serverTimestamp()
       });
+
+      // Send payment notification if amountPaid increased
+      if (currentClient && updates.amountPaid && updates.amountPaid > (currentClient.amountPaid || 0)) {
+        const paymentAmount = updates.amountPaid - (currentClient.amountPaid || 0);
+        const clientWithUpdates = { ...currentClient, ...updates, id };
+        await notificationService.sendPaymentReceivedNotification(clientWithUpdates, paymentAmount);
+      }
+
+      // Send subscription expiring notification if lessons are running low
+      if (updates.subscriptionLessons !== undefined) {
+        const remainingLessons = updates.subscriptionLessons;
+
+        // Notify when 3 or fewer lessons remain and subscription is active
+        if (remainingLessons > 0 && remainingLessons <= 3 && (currentClient?.subscriptionActive || updates.subscriptionActive)) {
+          const clientWithUpdates = { ...currentClient, ...updates, id };
+          await notificationService.sendSubscriptionExpiringNotification(clientWithUpdates, remainingLessons);
+        }
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Error updating client:', error);
@@ -501,6 +527,13 @@ export const DataProvider = ({ children }) => {
         await lessonReminderService.scheduleLessonReminders(lessonWithId, client);
       }
 
+      // Send notification to instructor about new lesson
+      const instructor = workerUsers.find(w => w.id === lesson.instructorId);
+      const horse = horses.find(h => h.id === lesson.horseId);
+      if (instructor && client && horse) {
+        await notificationService.sendLessonCreatedNotification(lessonWithId, client, instructor, horse);
+      }
+
       return { success: true, id: lessonRef.id };
     } catch (error) {
       console.error('Error adding lesson:', error);
@@ -567,6 +600,15 @@ export const DataProvider = ({ children }) => {
 
         if (client) {
           await lessonReminderService.rescheduleLessonReminders(id, updatedLesson, client);
+
+          // Send notification about lesson update
+          const changeDescription = dateChanged && timeChanged
+            ? `تم تغيير الموعد إلى ${updates.date} في ${updates.time}`
+            : dateChanged
+            ? `تم تغيير التاريخ إلى ${updates.date}`
+            : `تم تغيير الوقت إلى ${updates.time}`;
+
+          await notificationService.sendLessonUpdatedNotification(updatedLesson, client, changeDescription);
         }
       }
 
@@ -629,9 +671,18 @@ export const DataProvider = ({ children }) => {
           if (newSubscriptionBalance === 0) {
             updateData.subscriptionActive = false;
           }
+
+          // Send notification if subscription is running low (3 or fewer lessons)
+          if (newSubscriptionBalance > 0 && newSubscriptionBalance <= 3 && client.subscriptionActive) {
+            const clientWithUpdates = { ...client, ...updateData };
+            await notificationService.sendSubscriptionExpiringNotification(clientWithUpdates, newSubscriptionBalance);
+          }
         }
 
         await updateDoc(doc(db, 'clients', lesson.clientId), updateData);
+
+        // Send confirmation notification
+        await notificationService.sendLessonConfirmedNotification(lesson, client);
       }
 
       return { success: true };
@@ -666,6 +717,12 @@ export const DataProvider = ({ children }) => {
           completed: true,
           completedAt: serverTimestamp()
         });
+      }
+
+      // Send cancellation notification
+      const client = clients.find(c => c.id === lesson.clientId);
+      if (client) {
+        await notificationService.sendLessonCancelledNotification(lesson, client, reason);
       }
 
       return { success: true };
@@ -708,14 +765,77 @@ export const DataProvider = ({ children }) => {
 
   /**
    * Add a new reminder for a horse.
+   * Schedules 2 notifications: 2 days before and at 8 AM on the reminder date.
    */
   const addReminder = async (reminder) => {
     try {
-      await addDoc(collection(db, 'reminders'), {
+      const reminderRef = await addDoc(collection(db, 'reminders'), {
         ...reminder,
         createdAt: serverTimestamp()
       });
-      return { success: true };
+
+      const reminderWithId = { ...reminder, id: reminderRef.id };
+      const reminderDate = new Date(reminder.date);
+      const now = new Date();
+
+      // Get horse name for notifications
+      const horse = horses.find(h => h.id === reminder.horseId);
+      const horseName = horse?.name || 'الحصان';
+      const description = reminder.description || 'تذكير';
+
+      // Schedule notification 2 days before at the same time as reminder
+      const twoDaysBefore = new Date(reminderDate);
+      twoDaysBefore.setDate(twoDaysBefore.getDate() - 2);
+
+      if (reminder.time) {
+        const [hours, minutes] = reminder.time.split(':');
+        twoDaysBefore.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      } else {
+        twoDaysBefore.setHours(8, 0, 0, 0); // Default to 8 AM if no time specified
+      }
+
+      // Only schedule 2-day-before notification if it's in the future
+      if (twoDaysBefore > now) {
+        await notificationService.scheduleNotification(
+          '⏰ تذكير مسبق - قبل يومين',
+          `${horseName}: ${description} - متبقي يومان`,
+          twoDaysBefore,
+          {
+            type: 'reminder_advance',
+            reminderId: reminderRef.id,
+            horseId: reminder.horseId,
+            horseName: horseName,
+            daysUntil: 2,
+            channelId: 'default',
+          },
+          `reminder_2days_${reminderRef.id}`
+        );
+        console.log(`Scheduled 2-day advance reminder for ${horseName} at ${twoDaysBefore.toISOString()}`);
+      }
+
+      // Schedule notification at 8 AM on the reminder date
+      const reminderDay8AM = new Date(reminderDate);
+      reminderDay8AM.setHours(8, 0, 0, 0);
+
+      // Only schedule same-day notification if it's in the future
+      if (reminderDay8AM > now) {
+        await notificationService.scheduleNotification(
+          '🔔 تذكير - اليوم',
+          `${horseName}: ${description} - اليوم`,
+          reminderDay8AM,
+          {
+            type: 'reminder_today',
+            reminderId: reminderRef.id,
+            horseId: reminder.horseId,
+            horseName: horseName,
+            channelId: 'default',
+          },
+          `reminder_today_${reminderRef.id}`
+        );
+        console.log(`Scheduled same-day reminder for ${horseName} at ${reminderDay8AM.toISOString()}`);
+      }
+
+      return { success: true, id: reminderRef.id };
     } catch (error) {
       console.error('Error adding reminder:', error);
       return { success: false, error: error.message };
@@ -724,13 +844,83 @@ export const DataProvider = ({ children }) => {
 
   /**
    * Update an existing reminder.
+   * Reschedules notifications if date changes.
    */
   const updateReminder = async (id, updates) => {
     try {
+      const currentReminder = reminders.find(r => r.id === id);
+
       await updateDoc(doc(db, 'reminders', id), {
         ...updates,
         updatedAt: serverTimestamp()
       });
+
+      // If date changed, reschedule notifications
+      if (updates.date && currentReminder && updates.date !== currentReminder.date) {
+        // Cancel old notifications
+        await notificationService.cancelNotification(`reminder_2days_${id}`);
+        await notificationService.cancelNotification(`reminder_today_${id}`);
+
+        // Schedule new notifications with updated date
+        const updatedReminder = { ...currentReminder, ...updates, id };
+        const reminderDate = new Date(updates.date);
+        const now = new Date();
+
+        const horse = horses.find(h => h.id === updatedReminder.horseId);
+        const horseName = horse?.name || 'الحصان';
+        const description = updatedReminder.description || 'تذكير';
+
+        // Schedule 2 days before
+        const twoDaysBefore = new Date(reminderDate);
+        twoDaysBefore.setDate(twoDaysBefore.getDate() - 2);
+
+        if (updatedReminder.time) {
+          const [hours, minutes] = updatedReminder.time.split(':');
+          twoDaysBefore.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+        } else {
+          twoDaysBefore.setHours(8, 0, 0, 0);
+        }
+
+        if (twoDaysBefore > now) {
+          await notificationService.scheduleNotification(
+            '⏰ تذكير مسبق - قبل يومين',
+            `${horseName}: ${description} - متبقي يومان`,
+            twoDaysBefore,
+            {
+              type: 'reminder_advance',
+              reminderId: id,
+              horseId: updatedReminder.horseId,
+              horseName: horseName,
+              daysUntil: 2,
+              channelId: 'default',
+            },
+            `reminder_2days_${id}`
+          );
+        }
+
+        // Schedule at 8 AM on reminder date
+        const reminderDay8AM = new Date(reminderDate);
+        reminderDay8AM.setHours(8, 0, 0, 0);
+
+        if (reminderDay8AM > now) {
+          await notificationService.scheduleNotification(
+            '🔔 تذكير - اليوم',
+            `${horseName}: ${description} - اليوم`,
+            reminderDay8AM,
+            {
+              type: 'reminder_today',
+              reminderId: id,
+              horseId: updatedReminder.horseId,
+              horseName: horseName,
+              channelId: 'default',
+            },
+            `reminder_today_${id}`
+          );
+        }
+
+        console.log(`Rescheduled notifications for reminder ${id}`);
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Error updating reminder:', error);
@@ -740,10 +930,17 @@ export const DataProvider = ({ children }) => {
 
   /**
    * Remove a reminder.
+   * Also cancels scheduled notifications (2-day advance and same-day).
    */
   const removeReminder = async (id) => {
     try {
+      // Cancel both scheduled notifications for this reminder
+      await notificationService.cancelNotification(`reminder_2days_${id}`);
+      await notificationService.cancelNotification(`reminder_today_${id}`);
+
       await deleteDoc(doc(db, 'reminders', id));
+
+      console.log(`Removed reminder ${id} and cancelled notifications`);
       return { success: true };
     } catch (error) {
       console.error('Error removing reminder:', error);
@@ -763,7 +960,7 @@ export const DataProvider = ({ children }) => {
       });
 
       // Automatically create a mission for the worker
-      await addDoc(collection(db, 'missions'), {
+      const missionRef = await addDoc(collection(db, 'missions'), {
         workerId: schedule.workerId,
         title: schedule.description || 'مهمة عمل',
         description: `مجدول في ${schedule.timeSlot}`,
@@ -775,6 +972,23 @@ export const DataProvider = ({ children }) => {
         completed: false,
         createdAt: serverTimestamp()
       });
+
+      // Send notification to worker about new schedule/mission
+      if (schedule.workerId) {
+        const worker = workerUsers.find(w => w.id === schedule.workerId) ||
+                       workers.find(w => w.id === schedule.workerId);
+        if (worker) {
+          const missionData = {
+            id: missionRef.id,
+            workerId: schedule.workerId,
+            title: schedule.description || 'مهمة عمل',
+            description: `مجدول في ${schedule.timeSlot}`,
+            dueDate: schedule.date,
+            time: schedule.timeSlot,
+          };
+          await notificationService.sendMissionAssignedNotification(missionData, worker);
+        }
+      }
 
       return { success: true };
     } catch (error) {
@@ -949,11 +1163,22 @@ export const DataProvider = ({ children }) => {
    */
   const addMission = async (mission) => {
     try {
-      await addDoc(collection(db, 'missions'), {
+      const missionRef = await addDoc(collection(db, 'missions'), {
         ...mission,
         createdAt: serverTimestamp()
       });
-      return { success: true };
+
+      // Send notification to worker about new mission
+      if (mission.workerId) {
+        const worker = workerUsers.find(w => w.id === mission.workerId) ||
+                       workers.find(w => w.id === mission.workerId);
+        if (worker) {
+          const missionWithId = { ...mission, id: missionRef.id };
+          await notificationService.sendMissionAssignedNotification(missionWithId, worker);
+        }
+      }
+
+      return { success: true, id: missionRef.id };
     } catch (error) {
       console.error('Error adding mission:', error);
       return { success: false, error: error.message };
@@ -965,10 +1190,25 @@ export const DataProvider = ({ children }) => {
    */
   const updateMission = async (id, updates) => {
     try {
+      const currentMission = missions.find(m => m.id === id);
+
       await updateDoc(doc(db, 'missions', id), {
         ...updates,
         updatedAt: serverTimestamp()
       });
+
+      // Send notification when mission is marked as completed
+      if (updates.completed === true && currentMission && !currentMission.completed) {
+        if (currentMission.workerId) {
+          const worker = workerUsers.find(w => w.id === currentMission.workerId) ||
+                         workers.find(w => w.id === currentMission.workerId);
+          if (worker) {
+            const updatedMission = { ...currentMission, ...updates, id };
+            await notificationService.sendMissionCompletedNotification(updatedMission, worker);
+          }
+        }
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Error updating mission:', error);

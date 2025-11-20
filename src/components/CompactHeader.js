@@ -18,12 +18,9 @@ const CompactHeader = ({
 }) => {
   const [pressAnim] = useState(new Animated.Value(1));
 
-  // Get time-based greeting
+  // Get greeting - now just returns "Welcome"
   const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'صباح الخير';
-    if (hour < 18) return 'مساء الخير';
-    return 'مساء الخير';
+    return 'أهلاً';
   };
 
   // Get initials from name
@@ -109,17 +106,8 @@ const CompactHeader = ({
           )}
 
           <View style={styles.userInfo}>
-            <View style={styles.greetingRow}>
-              <Text style={styles.greeting}>{getGreeting()}</Text>
-              <View style={[styles.roleBadge, { backgroundColor: roleInfo.color + '20' }]}>
-                <FontAwesome5 name={roleInfo.icon} size={10} color={roleInfo.iconColor} solid style={styles.roleIcon} />
-                <Text style={[styles.roleText, { color: roleInfo.color }]}>
-                  {roleInfo.label}
-                </Text>
-              </View>
-            </View>
-            <Text style={styles.userName} numberOfLines={1}>
-              {loading ? 'جاري التحميل...' : userName || 'مستخدم'}
+            <Text style={styles.welcomeText} numberOfLines={1}>
+              {loading ? 'جاري التحميل...' : `${getGreeting()} ${userName || 'مستخدم'}`}
             </Text>
           </View>
         </TouchableOpacity>
@@ -187,33 +175,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  greetingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  greeting: {
-    fontSize: typography.size.xs,
-    color: colors.text.tertiary,
-    marginRight: spacing.xs,
-  },
-  roleBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.xs,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
-    gap: 3,
-  },
-  roleIcon: {
-    marginTop: 1,
-  },
-  roleText: {
-    fontSize: typography.size.xs - 1,
-    fontWeight: typography.weight.semibold,
-  },
-  userName: {
-    fontSize: typography.size.md,
+  welcomeText: {
+    fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
   },
@@ -239,4 +202,3 @@ const styles = StyleSheet.create({
 });
 
 export default CompactHeader;
-

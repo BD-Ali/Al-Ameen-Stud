@@ -770,7 +770,7 @@ const UsersScreen = () => {
                   <TextInput
                     value={newUserForm.email}
                     onChangeText={(text) => setNewUserForm({...newUserForm, email: text})}
-                    placeholder="example@email.com"
+                    placeholder="أدخل البريد الإلكتروني"
                     keyboardType="email-address"
                     autoCapitalize="none"
                     placeholderTextColor="#64748b"
@@ -834,7 +834,7 @@ const UsersScreen = () => {
                         <TextInput
                           value={newUserForm.subscriptionLessons}
                           onChangeText={(text) => setNewUserForm({...newUserForm, subscriptionLessons: text})}
-                          placeholder="مثال: 10"
+                          placeholder="عدد الدروس"
                           keyboardType="number-pad"
                           placeholderTextColor="#64748b"
                           style={styles.input}

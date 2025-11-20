@@ -576,7 +576,7 @@ const HorsesScreen = () => {
                 value={feedSchedule}
                 onChangeText={setFeedSchedule}
                 style={styles.input}
-                placeholder="مثال: 08:00 تبن؛ 18:00 حبوب"
+                placeholder="أدخل جدول التغذية"
                 placeholderTextColor="#64748b"
                 multiline
               />
@@ -655,7 +655,7 @@ const HorsesScreen = () => {
                     value={reminderNote}
                     onChangeText={setReminderNote}
                     style={[styles.modalInput, styles.modalNotesInput]}
-                    placeholder="مثال: موعد الطبيب البيطري، تطعيم، فحص..."
+                    placeholder="أدخل ملاحظات التذكير"
                     placeholderTextColor="#64748b"
                     multiline
                     numberOfLines={3}
