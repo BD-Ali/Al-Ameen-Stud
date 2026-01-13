@@ -92,9 +92,9 @@ temp/
 # OS generated files
 Thumbs.db
 
-# Firebase (DO NOT commit real credentials)
-# Uncomment if storing credentials in separate file:
-# src/config/firebaseConfig.js
+# Config files with real credentials (DO NOT commit)
+src/config/firebaseConfig.js
+src/config/cloudinaryConfig.js
 
 # Trash folder (cleanup staging)
 _trash/
