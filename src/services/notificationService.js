@@ -127,6 +127,7 @@ class NotificationService {
           body,
           data,
           sound: true,
+          ...(Platform.OS === 'android' && { channelId }),
         },
         trigger: null, // Send immediately
       });
@@ -146,6 +147,22 @@ class NotificationService {
    */
   async scheduleNotification(title, body, triggerDate, data = {}, identifier = null) {
     try {
+      // Ensure triggerDate is a valid Date object
+      const scheduledDate = triggerDate instanceof Date ? triggerDate : new Date(triggerDate);
+
+      if (isNaN(scheduledDate.getTime())) {
+        console.error('Invalid trigger date for notification:', triggerDate);
+        return null;
+      }
+
+      // Don't schedule notifications in the past
+      if (scheduledDate <= new Date()) {
+        console.warn('Skipping notification scheduled in the past:', scheduledDate.toISOString());
+        return null;
+      }
+
+      const channelId = data.channelId || 'default';
+
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title,
@@ -153,14 +170,17 @@ class NotificationService {
           data,
           sound: true,
           priority: Notifications.AndroidNotificationPriority.HIGH,
+          ...(Platform.OS === 'android' && { channelId }),
         },
         trigger: {
-          date: triggerDate,
-          channelId: data.channelId || 'default',
+          type: 'date',
+          date: scheduledDate,
+          ...(Platform.OS === 'android' && { channelId }),
         },
-        identifier: identifier,
+        ...(identifier && { identifier }),
       });
 
+      console.log(`Notification scheduled for ${scheduledDate.toISOString()} (id: ${notificationId})`);
       return notificationId;
     } catch (error) {
       console.error('Error scheduling notification:', error);

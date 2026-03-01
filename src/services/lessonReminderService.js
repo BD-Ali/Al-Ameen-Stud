@@ -166,6 +166,17 @@ class LessonReminderService {
       const title = `تذكير بالدرس ${interval.name}`;
       const body = `لديك درس مجدول في ${lesson.time} - ${client.name}`;
 
+      // Ensure reminderTime is a valid Date and in the future
+      if (!(reminderTime instanceof Date) || isNaN(reminderTime.getTime())) {
+        console.error('Invalid reminder time:', reminderTime);
+        return null;
+      }
+
+      if (reminderTime <= new Date()) {
+        console.warn('Skipping reminder scheduled in the past:', reminderTime.toISOString());
+        return null;
+      }
+
       const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title,
@@ -181,10 +192,12 @@ class LessonReminderService {
           sound: true,
           priority: Notifications.AndroidNotificationPriority.HIGH,
           categoryIdentifier: 'lesson_reminder',
+          ...(Platform.OS === 'android' && { channelId: 'lesson_reminders' }),
         },
         trigger: {
+          type: 'date',
           date: reminderTime,
-          channelId: 'lesson_reminders',
+          ...(Platform.OS === 'android' && { channelId: 'lesson_reminders' }),
         },
       });
 
