@@ -462,9 +462,81 @@ export const DataProvider = ({ children }) => {
   };
 
   /**
-   * Add a new lesson.
-   * Automatically creates a schedule entry, mission, and schedules reminder notifications.
+   * Check if client is available at the given date and time (no overlapping lessons)
    */
+  const isClientAvailable = (clientId, date, time, excludeLessonId = null) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const lessonStartTime = hours * 60 + minutes;
+    const lessonEndTime = lessonStartTime + 60; // 1 hour lesson duration
+
+    const clientLessons = lessons.filter(l =>
+      l.clientId === clientId &&
+      l.date === date &&
+      l.id !== excludeLessonId &&
+      l.status !== 'cancelled'
+    );
+
+    for (const existingLesson of clientLessons) {
+      const [existingHours, existingMinutes] = existingLesson.time.split(':').map(Number);
+      const existingStartTime = existingHours * 60 + existingMinutes;
+      const existingEndTime = existingStartTime + 60;
+
+      if (
+        (lessonStartTime >= existingStartTime && lessonStartTime < existingEndTime) ||
+        (lessonEndTime > existingStartTime && lessonEndTime <= existingEndTime) ||
+        (lessonStartTime <= existingStartTime && lessonEndTime >= existingEndTime)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * Helper: get date string for a given day of the current week
+   * Converts a weekStart + day key to a YYYY-MM-DD string
+   */
+  const getDateForDayKey = (weekStart, dayKey) => {
+    const dayMapping = {
+      'saturday': 0, 'sunday': 1, 'monday': 2, 'tuesday': 3,
+      'wednesday': 4, 'thursday': 5, 'friday': 6
+    };
+    const [year, month, day] = weekStart.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
+    d.setDate(d.getDate() + (dayMapping[dayKey] || 0));
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
+  };
+
+  /**
+   * Helper: get weekId and weekStart from a date string (YYYY-MM-DD)
+   */
+  const getWeekInfoFromDate = (dateStr) => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
+    // Get Saturday-based week start
+    const jsDay = d.getDay(); // 0=Sun .. 6=Sat
+    const diff = (jsDay + 1) % 7;
+    const weekStartDate = new Date(d);
+    weekStartDate.setDate(d.getDate() - diff);
+    const ws = `${weekStartDate.getFullYear()}-${String(weekStartDate.getMonth() + 1).padStart(2, '0')}-${String(weekStartDate.getDate()).padStart(2, '0')}`;
+
+    // Week number
+    const utc = new Date(Date.UTC(weekStartDate.getFullYear(), weekStartDate.getMonth(), weekStartDate.getDate()));
+    const dayNum = utc.getUTCDay() || 7;
+    utc.setUTCDate(utc.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(utc.getUTCFullYear(), 0, 1));
+    const weekNum = Math.ceil((((utc - yearStart) / 86400000) + 1) / 7);
+    const wId = `${weekStartDate.getFullYear()}-W${String(weekNum).padStart(2, '0')}`;
+
+    // Day key
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayKey = dayNames[d.getDay()];
+
+    return { weekId: wId, weekStart: ws, dayKey };
+  };
   const addLesson = async (lesson) => {
     try {
       // Validate worker availability
@@ -482,6 +554,15 @@ export const DataProvider = ({ children }) => {
         return {
           success: false,
           error: t('dataContext.horseUnavailable', { name: horseName })
+        };
+      }
+
+      // Validate client availability (prevent double-booking a client)
+      if (!isClientAvailable(lesson.clientId, lesson.date, lesson.time)) {
+        const clientName = clients.find(c => c.id === lesson.clientId)?.name || t('dataContext.theClient');
+        return {
+          success: false,
+          error: t('dataContext.clientUnavailable', { name: clientName })
         };
       }
 
@@ -523,6 +604,26 @@ export const DataProvider = ({ children }) => {
         createdAt: serverTimestamp()
       });
 
+      // Automatically add lesson to weekly schedule so it shows in WeeklyScheduleScreen
+      try {
+        const { weekId, weekStart, dayKey } = getWeekInfoFromDate(lesson.date);
+        const clientName = clients.find(c => c.id === lesson.clientId)?.name || '';
+        const horseName = horses.find(h => h.id === lesson.horseId)?.name || '';
+        await addDoc(collection(db, 'weeklySchedules'), {
+          weekId,
+          weekStart,
+          day: dayKey,
+          timeSlot: lesson.time,
+          workerId: lesson.instructorId,
+          description: `${t('dataContext.trainingLesson')} — ${clientName} (${horseName})`,
+          type: 'lesson',
+          lessonId: lessonRef.id,
+          createdAt: serverTimestamp()
+        });
+      } catch (weeklyErr) {
+        console.warn('Could not add lesson to weekly schedule:', weeklyErr);
+      }
+
       // Schedule automatic lesson reminder notifications for the client
       const client = clients.find(c => c.id === lesson.clientId);
       if (client) {
@@ -554,20 +655,24 @@ export const DataProvider = ({ children }) => {
         return { success: false, error: 'Lesson not found' };
       }
 
-      // Check if date or time changed
+      // Check which fields changed
       const dateChanged = updates.date && updates.date !== currentLesson.date;
       const timeChanged = updates.time && updates.time !== currentLesson.time;
       const workerChanged = updates.instructorId && updates.instructorId !== currentLesson.instructorId;
       const horseChanged = updates.horseId && updates.horseId !== currentLesson.horseId;
+      const clientChanged = updates.clientId && updates.clientId !== currentLesson.clientId;
+
+      // Resolved values after updates
+      const resolvedInstructorId = updates.instructorId || currentLesson.instructorId;
+      const resolvedDate = updates.date || currentLesson.date;
+      const resolvedTime = updates.time || currentLesson.time;
+      const resolvedHorseId = updates.horseId || currentLesson.horseId;
+      const resolvedClientId = updates.clientId || currentLesson.clientId;
 
       // Validate worker availability if changed
       if (workerChanged || dateChanged || timeChanged) {
-        const instructorId = updates.instructorId || currentLesson.instructorId;
-        const date = updates.date || currentLesson.date;
-        const time = updates.time || currentLesson.time;
-
-        if (!isWorkerAvailable(instructorId, date, time, id)) {
-          const workerName = workerUsers.find(w => w.id === instructorId)?.name || t('notifications.theInstructor');
+        if (!isWorkerAvailable(resolvedInstructorId, resolvedDate, resolvedTime, id)) {
+          const workerName = workerUsers.find(w => w.id === resolvedInstructorId)?.name || t('notifications.theInstructor');
           return {
             success: false,
             error: t('dataContext.instructorUnavailable', { name: workerName })
@@ -577,15 +682,22 @@ export const DataProvider = ({ children }) => {
 
       // Validate horse availability if changed
       if (horseChanged || dateChanged || timeChanged) {
-        const horseId = updates.horseId || currentLesson.horseId;
-        const date = updates.date || currentLesson.date;
-        const time = updates.time || currentLesson.time;
-
-        if (!isHorseAvailable(horseId, date, time, id)) {
-          const horseName = horses.find(h => h.id === horseId)?.name || t('notifications.theHorse');
+        if (!isHorseAvailable(resolvedHorseId, resolvedDate, resolvedTime, id)) {
+          const horseName = horses.find(h => h.id === resolvedHorseId)?.name || t('notifications.theHorse');
           return {
             success: false,
             error: t('dataContext.horseUnavailable', { name: horseName })
+          };
+        }
+      }
+
+      // Validate client availability if changed
+      if (clientChanged || dateChanged || timeChanged) {
+        if (!isClientAvailable(resolvedClientId, resolvedDate, resolvedTime, id)) {
+          const clientName = clients.find(c => c.id === resolvedClientId)?.name || t('dataContext.theClient');
+          return {
+            success: false,
+            error: t('dataContext.clientUnavailable', { name: clientName })
           };
         }
       }
@@ -594,6 +706,74 @@ export const DataProvider = ({ children }) => {
         ...updates,
         updatedAt: serverTimestamp()
       });
+
+      // Sync associated schedule entries when relevant fields change
+      if (dateChanged || timeChanged || workerChanged) {
+        const associatedSchedules = schedules.filter(s => s.lessonId === id);
+        for (const schedule of associatedSchedules) {
+          const scheduleUpdates = {};
+          if (dateChanged) scheduleUpdates.date = resolvedDate;
+          if (timeChanged) scheduleUpdates.timeSlot = resolvedTime;
+          if (workerChanged) scheduleUpdates.workerId = resolvedInstructorId;
+          await updateDoc(doc(db, 'schedules', schedule.id), scheduleUpdates);
+        }
+      }
+
+      // Sync associated mission entries when relevant fields change
+      if (dateChanged || timeChanged || workerChanged || horseChanged || clientChanged) {
+        const associatedMissions = missions.filter(m => m.lessonId === id);
+        for (const mission of associatedMissions) {
+          const missionUpdates = {};
+          if (dateChanged) missionUpdates.dueDate = resolvedDate;
+          if (timeChanged) {
+            missionUpdates.time = resolvedTime;
+            missionUpdates.description = t('dataContext.lessonScheduledAt', { time: resolvedTime });
+          }
+          if (workerChanged) missionUpdates.workerId = resolvedInstructorId;
+          if (horseChanged) missionUpdates.horseId = resolvedHorseId;
+          if (clientChanged) missionUpdates.clientId = resolvedClientId;
+          await updateDoc(doc(db, 'missions', mission.id), missionUpdates);
+        }
+      }
+
+      // Sync associated weeklySchedules entries when relevant fields change
+      if (dateChanged || timeChanged || workerChanged || horseChanged || clientChanged) {
+        try {
+          const associatedWeekly = weeklySchedules.filter(s => s.lessonId === id);
+          if (dateChanged || timeChanged) {
+            // Date/time change means the slot moved — remove old, create new
+            for (const ws of associatedWeekly) {
+              await deleteDoc(doc(db, 'weeklySchedules', ws.id));
+            }
+            const { weekId, weekStart, dayKey } = getWeekInfoFromDate(resolvedDate);
+            const clientName = clients.find(c => c.id === resolvedClientId)?.name || '';
+            const horseName = horses.find(h => h.id === resolvedHorseId)?.name || '';
+            await addDoc(collection(db, 'weeklySchedules'), {
+              weekId,
+              weekStart,
+              day: dayKey,
+              timeSlot: resolvedTime,
+              workerId: resolvedInstructorId,
+              description: `${t('dataContext.trainingLesson')} — ${clientName} (${horseName})`,
+              type: 'lesson',
+              lessonId: id,
+              createdAt: serverTimestamp()
+            });
+          } else {
+            // Only worker/horse/client changed — update in-place
+            for (const ws of associatedWeekly) {
+              const wsUpdates = {};
+              if (workerChanged) wsUpdates.workerId = resolvedInstructorId;
+              const clientName = clients.find(c => c.id === resolvedClientId)?.name || '';
+              const horseName = horses.find(h => h.id === resolvedHorseId)?.name || '';
+              wsUpdates.description = `${t('dataContext.trainingLesson')} — ${clientName} (${horseName})`;
+              await updateDoc(doc(db, 'weeklySchedules', ws.id), wsUpdates);
+            }
+          }
+        } catch (weeklyErr) {
+          console.warn('Could not sync weeklySchedules for lesson update:', weeklyErr);
+        }
+      }
 
       // If date or time changed, reschedule reminders
       if (dateChanged || timeChanged) {
@@ -721,6 +901,25 @@ export const DataProvider = ({ children }) => {
         });
       }
 
+      // Remove associated schedule entries (no longer needed)
+      const associatedSchedules = schedules.filter(s => s.lessonId === lessonId);
+      for (const schedule of associatedSchedules) {
+        await deleteDoc(doc(db, 'schedules', schedule.id));
+      }
+
+      // Remove associated weeklySchedules entries
+      try {
+        const associatedWeekly = weeklySchedules.filter(s => s.lessonId === lessonId);
+        for (const ws of associatedWeekly) {
+          await deleteDoc(doc(db, 'weeklySchedules', ws.id));
+        }
+      } catch (weeklyErr) {
+        console.warn('Could not clean weeklySchedules on cancel:', weeklyErr);
+      }
+
+      // Cancel lesson reminder notifications
+      await lessonReminderService.cancelLessonReminders(lessonId);
+
       // Send cancellation notification
       const client = clients.find(c => c.id === lesson.clientId);
       if (client) {
@@ -756,6 +955,16 @@ export const DataProvider = ({ children }) => {
       const associatedMissions = missions.filter(m => m.lessonId === id);
       for (const mission of associatedMissions) {
         await deleteDoc(doc(db, 'missions', mission.id));
+      }
+
+      // Remove associated weeklySchedules entries
+      try {
+        const associatedWeekly = weeklySchedules.filter(s => s.lessonId === id);
+        for (const ws of associatedWeekly) {
+          await deleteDoc(doc(db, 'weeklySchedules', ws.id));
+        }
+      } catch (weeklyErr) {
+        console.warn('Could not clean weeklySchedules on remove:', weeklyErr);
       }
 
       return { success: true };
@@ -1989,6 +2198,10 @@ export const DataProvider = ({ children }) => {
         getConfirmedLessons,
         getConfirmedLessonCount,
         getScheduledLessons,
+        // Availability checks
+        isWorkerAvailable,
+        isHorseAvailable,
+        isClientAvailable,
       }}
     >
       {children}

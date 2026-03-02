@@ -23,7 +23,7 @@ import { useFadeIn } from '../utils/animations';
 import { useTranslation } from '../i18n/LanguageContext';
 
 const WeeklyScheduleScreen = () => {
-  const { weeklySchedules, workerUsers, addWeeklySchedule, updateWeeklySchedule, removeWeeklySchedule } = useContext(DataContext);
+  const { weeklySchedules, workerUsers, addWeeklySchedule, updateWeeklySchedule, removeWeeklySchedule, lessons, isWorkerAvailable } = useContext(DataContext);
   const { t } = useTranslation();
 
   const [currentWeekStart, setCurrentWeekStart] = useState(null);
@@ -155,6 +155,24 @@ const WeeklyScheduleScreen = () => {
     );
   };
 
+  // Get YYYY-MM-DD date string for a given day key in the current week
+  const getDateStringForDay = (dayKey) => {
+    if (!currentWeekStart) return null;
+    const dayMapping = {
+      'saturday': 0, 'sunday': 1, 'monday': 2, 'tuesday': 3,
+      'wednesday': 4, 'thursday': 5, 'friday': 6
+    };
+    const dayOffset = dayMapping[dayKey];
+    const [year, month, dayOfMonth] = currentWeekStart.split('-').map(Number);
+    const weekStartDate = new Date(year, month - 1, dayOfMonth);
+    const dayDate = new Date(weekStartDate);
+    dayDate.setDate(weekStartDate.getDate() + dayOffset);
+    const y = dayDate.getFullYear();
+    const m = String(dayDate.getMonth() + 1).padStart(2, '0');
+    const d = String(dayDate.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
   // Get worker name by ID
   const getWorkerName = (workerId) => {
     const worker = workerUsers?.find((w) => w.id === workerId);
@@ -224,6 +242,30 @@ const WeeklyScheduleScreen = () => {
     setLoading(true);
 
     try {
+      // Check if the worker already has a lesson at any of the selected time slots
+      const dateStr = getDateStringForDay(selectedDay);
+      if (dateStr) {
+        const conflictSlots = [];
+        const slotsToCheck = editMode ? [selectedSlots[0]] : selectedSlots;
+        for (const timeSlot of slotsToCheck) {
+          if (!isWorkerAvailable(selectedWorker, dateStr, timeSlot)) {
+            conflictSlots.push(timeSlot);
+          }
+        }
+        if (conflictSlots.length > 0) {
+          const workerName = workerUsers?.find(w => w.id === selectedWorker)?.name || t('common.unknown');
+          Alert.alert(
+            t('common.error'),
+            t('weeklySchedule.workerHasLesson', {
+              name: workerName,
+              slots: conflictSlots.join(', ')
+            })
+          );
+          setLoading(false);
+          return;
+        }
+      }
+
       if (editMode) {
         // Update existing schedule
         const result = await updateWeeklySchedule(editingScheduleId, {

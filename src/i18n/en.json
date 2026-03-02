@@ -508,7 +508,8 @@
     "september": "September",
     "october": "October",
     "november": "November",
-    "december": "December"
+    "december": "December",
+    "workerHasLesson": "{{name}} already has a lesson at: {{slots}}. Please choose a different time or worker."
   },
   "dataContext": {
     "lessonWithClient": "Lesson with client",
@@ -516,6 +517,8 @@
     "lessonScheduledAt": "Lesson scheduled at {{time}}",
     "instructorUnavailable": "{{name}} is not available at this time. They have another lesson at the requested time.",
     "horseUnavailable": "{{name}} is not available at this time. They have another lesson at the requested time.",
+    "clientUnavailable": "{{name}} already has a lesson booked at this time.",
+    "theClient": "Client",
     "dateChangedTo": "Date changed to {{date}}",
     "timeChangedTo": "Time changed to {{time}}",
     "dateTimeChangedTo": "Date/time changed to {{date}} at {{time}}",

@@ -508,7 +508,8 @@
     "september": "سبتمبر",
     "october": "أكتوبر",
     "november": "نوفمبر",
-    "december": "ديسمبر"
+    "december": "ديسمبر",
+    "workerHasLesson": "{{name}} لديه درس في: {{slots}}. اختر وقتاً أو عاملاً آخر."
   },
   "dataContext": {
     "lessonWithClient": "درس مع عميل",
@@ -516,6 +517,8 @@
     "lessonScheduledAt": "درس مجدول في {{time}}",
     "instructorUnavailable": "{{name}} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.",
     "horseUnavailable": "{{name}} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.",
+    "clientUnavailable": "{{name}} لديه درس محجوز بالفعل في هذا الوقت.",
+    "theClient": "العميل",
     "dateChangedTo": "تم تغيير التاريخ إلى {{date}}",
     "timeChangedTo": "تم تغيير الوقت إلى {{time}}",
     "dateTimeChangedTo": "تم تغيير الموعد إلى {{date}} في {{time}}",

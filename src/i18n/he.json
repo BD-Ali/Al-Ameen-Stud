@@ -508,7 +508,8 @@
     "september": "ספטמבר",
     "october": "אוקטובר",
     "november": "נובמבר",
-    "december": "דצמבר"
+    "december": "דצמבר",
+    "workerHasLesson": "ל-{{name}} כבר יש שיעור ב: {{slots}}. בחר שעה או עובד אחר."
   },
   "dataContext": {
     "lessonWithClient": "שיעור עם לקוח",
@@ -516,6 +517,8 @@
     "lessonScheduledAt": "שיעור מתוכנן ב-{{time}}",
     "instructorUnavailable": "{{name}} לא זמין בשעה זו. יש לו שיעור אחר בשעה המבוקשת.",
     "horseUnavailable": "{{name}} לא זמין בשעה זו. יש לו שיעור אחר בשעה המבוקשת.",
+    "clientUnavailable": "ל-{{name}} כבר יש שיעור מוזמן בשעה זו.",
+    "theClient": "לקוח",
     "dateChangedTo": "התאריך שונה ל-{{date}}",
     "timeChangedTo": "השעה שונתה ל-{{time}}",
     "dateTimeChangedTo": "המועד שונה ל-{{date}} ב-{{time}}",
