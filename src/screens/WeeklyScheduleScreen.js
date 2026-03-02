@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { DataContext } from '../context/DataContext';
-import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import { useFadeIn } from '../utils/animations';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -538,6 +538,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
+    ...shadows.sm,
   },
   weekInfo: {
     alignItems: 'center',
@@ -574,7 +575,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.semibold,
   },
   dayButtonTextActive: {
-    color: '#fff',
+    color: colors.text.primary,
   },
   dayButtonDate: {
     fontSize: typography.size.sm,
@@ -594,6 +595,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     borderLeftWidth: 3,
     borderLeftColor: colors.border.medium,
+    ...shadows.sm,
   },
   timeSlotCardAssigned: {
     borderLeftColor: colors.status.success,
@@ -677,7 +679,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.border.medium,
   },
   clearButtonText: {
-    color: '#fff',
+    color: colors.text.primary,
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
   },
@@ -688,7 +690,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary.main,
   },
   assignButtonText: {
-    color: '#fff',
+    color: colors.text.primary,
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
   },
@@ -703,6 +705,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: borderRadius.xl,
     maxHeight: '85%',
     paddingBottom: spacing.xl,
+    ...shadows.lg,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -800,7 +803,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: '#fff',
+    color: colors.text.primary,
     fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
   },

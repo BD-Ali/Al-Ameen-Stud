@@ -5,7 +5,7 @@ import { TouchableOpacity, Text, StyleSheet, Alert, View, Image } from 'react-na
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { useTranslation } from '../i18n/LanguageContext';
-import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import HorsesScreen from '../screens/HorsesScreen';
 import FeedScreen from '../screens/FeedScreen';
 import LessonsScreen from '../screens/LessonsScreen';
@@ -95,7 +95,7 @@ const AdminTabs = () => {
           title: t('nav.announcements'),
           tabBarLabel: t('nav.announcements'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="bullhorn" size={20} color={focused ? '#FF6B6B' : '#95A5A6'} solid />
+            <FontAwesome5 name="bullhorn" size={20} color={focused ? colors.status.error : colors.text.tertiary} solid />
           ),
         }}
       />
@@ -106,7 +106,7 @@ const AdminTabs = () => {
           title: t('nav.missions'),
           tabBarLabel: t('nav.missions'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="tasks" size={20} color={focused ? '#4ECDC4' : '#95A5A6'} solid />
+            <FontAwesome5 name="tasks" size={20} color={focused ? colors.accent.teal : colors.text.tertiary} solid />
           ),
         }}
       />
@@ -117,7 +117,7 @@ const AdminTabs = () => {
           title: t('nav.schedule'),
           tabBarLabel: t('nav.schedule'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="calendar-alt" size={20} color={focused ? '#5DADE2' : '#95A5A6'} solid />
+            <FontAwesome5 name="calendar-alt" size={20} color={focused ? colors.primary.light : colors.text.tertiary} solid />
           ),
         }}
       />
@@ -128,7 +128,7 @@ const AdminTabs = () => {
           title: t('nav.horses'),
           tabBarLabel: t('nav.horses'),
           tabBarIcon: ({ focused }) => (
-            <MaterialCommunityIcons name="horse-variant" size={24} color={focused ? '#F39C12' : '#95A5A6'} />
+            <MaterialCommunityIcons name="horse-variant" size={24} color={focused ? colors.accent.amber : colors.text.tertiary} />
           ),
         }}
       />
@@ -139,7 +139,7 @@ const AdminTabs = () => {
           title: t('nav.feed'),
           tabBarLabel: t('nav.feed'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="carrot" size={20} color={focused ? '#FF9800' : '#95A5A6'} solid />
+            <FontAwesome5 name="carrot" size={20} color={focused ? colors.status.warning : colors.text.tertiary} solid />
           ),
         }}
       />
@@ -150,7 +150,7 @@ const AdminTabs = () => {
           title: t('nav.lessons'),
           tabBarLabel: t('nav.lessons'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="book-open" size={20} color={focused ? '#9B59B6' : '#95A5A6'} solid />
+            <FontAwesome5 name="book-open" size={20} color={focused ? colors.accent.purple : colors.text.tertiary} solid />
           ),
         }}
       />
@@ -161,7 +161,7 @@ const AdminTabs = () => {
           title: t('nav.users'),
           tabBarLabel: t('nav.users'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="users" size={20} color={focused ? '#1ABC9C' : '#95A5A6'} solid />
+            <FontAwesome5 name="users" size={20} color={focused ? colors.status.info : colors.text.tertiary} solid />
           ),
         }}
       />
@@ -177,9 +177,10 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface.elevated,
     justifyContent: 'center',
     alignItems: 'center',
+    ...shadows.sm,
   },
   headerLogo: {
     width: '100%',

@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: '700',
     marginBottom: spacing.sm,
-    color: '#2C3E50',
+    color: colors.text.primary,
     textAlign: 'center',
     letterSpacing: 1.5,
     fontStyle: 'italic',
@@ -211,6 +211,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 3,
     borderLeftColor: colors.primary.main,
     overflow: 'hidden',
+    ...shadows.sm,
   },
   horseImage: {
     width: '100%',

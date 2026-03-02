@@ -11,6 +11,8 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  LayoutAnimation,
+  UIManager,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
@@ -36,6 +38,21 @@ const ProfileScreen = ({ navigation }) => {
   const { user, userRole } = useContext(AuthContext);
   const { clients, workers } = useContext(DataContext);
   const { t } = useTranslation();
+
+  // Enable LayoutAnimation on Android
+  if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+
+  // Smooth toggle animation helper
+  const toggleSection = (setter) => {
+    LayoutAnimation.configureNext(LayoutAnimation.create(
+      250,
+      LayoutAnimation.Types.easeInEaseOut,
+      LayoutAnimation.Properties.opacity
+    ));
+    setter(prev => !prev);
+  };
 
   // Form states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -499,7 +516,7 @@ const ProfileScreen = ({ navigation }) => {
           <AnimatedCard index={1} delay={150} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <View style={styles.titleWithIcon}>
-                <FontAwesome5 name="clipboard-list" size={22} color="#4A90E2" solid />
+                <FontAwesome5 name="clipboard-list" size={22} color={colors.primary.light} solid />
                 <Text style={styles.cardTitle}>{t('profile.accountInfo')}</Text>
               </View>
             </View>
@@ -523,7 +540,7 @@ const ProfileScreen = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.infoNote}>
-              <FontAwesome5 name="info-circle" size={18} color="#3498DB" solid style={styles.infoNoteIcon} />
+              <FontAwesome5 name="info-circle" size={18} color={colors.status.info} solid style={styles.infoNoteIcon} />
               <Text style={styles.infoNoteText}>
                 {userRole === 'admin'
                   ? t('profile.adminNameChangeNote')
@@ -538,11 +555,11 @@ const ProfileScreen = ({ navigation }) => {
               <View style={styles.sectionTitleContainer}>
                 <TouchableOpacity
                   style={styles.sectionHeaderButton}
-                  onPress={() => setShowNameSection(!showNameSection)}
+                  onPress={() => toggleSection(setShowNameSection)}
                   activeOpacity={0.7}
                 >
                   <View style={styles.titleWithIcon}>
-                    <FontAwesome5 name="user-edit" size={20} color="#1ABC9C" solid />
+                    <FontAwesome5 name="user-edit" size={20} color={colors.accent.teal} solid />
                     <Text style={styles.cardTitle}>{t('profile.changeName')}</Text>
                   </View>
                   <Ionicons name={showNameSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
@@ -588,11 +605,11 @@ const ProfileScreen = ({ navigation }) => {
             <View style={styles.sectionTitleContainer}>
               <TouchableOpacity
                 style={styles.sectionHeaderButton}
-                onPress={() => setShowPasswordSection(!showPasswordSection)}
+                onPress={() => toggleSection(setShowPasswordSection)}
                 activeOpacity={0.7}
               >
                 <View style={styles.titleWithIcon}>
-                  <FontAwesome5 name="lock" size={22} color="#F39C12" solid />
+                  <FontAwesome5 name="lock" size={22} color={colors.accent.amber} solid />
                   <Text style={styles.cardTitle}>{t('profile.changePassword')}</Text>
                 </View>
                 <Ionicons name={showPasswordSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
@@ -666,11 +683,11 @@ const ProfileScreen = ({ navigation }) => {
             <View style={styles.sectionTitleContainer}>
               <TouchableOpacity
                 style={styles.sectionHeaderButton}
-                onPress={() => setShowEmailSection(!showEmailSection)}
+                onPress={() => toggleSection(setShowEmailSection)}
                 activeOpacity={0.7}
               >
                 <View style={styles.titleWithIcon}>
-                  <FontAwesome5 name="envelope" size={20} color="#E74C3C" solid />
+                  <FontAwesome5 name="envelope" size={20} color={colors.status.error} solid />
                   <Text style={styles.cardTitle}>{t('profile.changeEmail')}</Text>
                 </View>
                 <Ionicons name={showEmailSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
@@ -730,12 +747,12 @@ const ProfileScreen = ({ navigation }) => {
             <View style={styles.sectionTitleContainer}>
               <TouchableOpacity
                 style={styles.sectionHeaderButton}
-                onPress={() => setShowDeleteSection(!showDeleteSection)}
+                onPress={() => toggleSection(setShowDeleteSection)}
                 activeOpacity={0.7}
               >
                 <View style={styles.titleWithIcon}>
-                  <FontAwesome5 name="trash-alt" size={20} color="#E74C3C" solid />
-                  <Text style={[styles.cardTitle, { color: '#E74C3C' }]}>{t('profile.deleteAccount')}</Text>
+                  <FontAwesome5 name="trash-alt" size={20} color={colors.status.error} solid />
+                  <Text style={[styles.cardTitle, { color: colors.status.error }]}>{t('profile.deleteAccount')}</Text>
                 </View>
                 <Ionicons name={showDeleteSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
@@ -744,7 +761,7 @@ const ProfileScreen = ({ navigation }) => {
             {showDeleteSection && (
               <View style={styles.framedContent}>
                 <View style={styles.deleteWarning}>
-                  <FontAwesome5 name="exclamation-triangle" size={24} color="#E74C3C" solid style={styles.warningIcon} />
+                  <FontAwesome5 name="exclamation-triangle" size={24} color={colors.status.error} solid style={styles.warningIcon} />
                   <Text style={styles.deleteWarningText}>
                     {t('profile.deleteWarning')}
                   </Text>
@@ -772,10 +789,10 @@ const ProfileScreen = ({ navigation }) => {
                     activeOpacity={0.8}
                   >
                     {loading ? (
-                      <ActivityIndicator color="#FFFFFF" size="small" />
+                      <ActivityIndicator color={colors.text.primary} size="small" />
                     ) : (
                       <>
-                        <FontAwesome5 name="trash-alt" size={16} color="#FFFFFF" solid />
+                        <FontAwesome5 name="trash-alt" size={16} color={colors.text.primary} solid />
                         <Text style={styles.deleteButtonText}>{t('profile.deletePermanently')}</Text>
                       </>
                     )}
@@ -789,7 +806,7 @@ const ProfileScreen = ({ navigation }) => {
           <AnimatedCard index={userRole === 'admin' ? 6 : 5} delay={350} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <View style={styles.titleWithIcon}>
-                <FontAwesome5 name="globe" size={22} color="#3498DB" solid />
+                <FontAwesome5 name="globe" size={22} color={colors.primary.light} solid />
                 <Text style={styles.cardTitle}>{t('language.title')}</Text>
               </View>
             </View>
@@ -800,7 +817,7 @@ const ProfileScreen = ({ navigation }) => {
 
           {/* Security Note */}
           <View style={styles.securityNote}>
-            <FontAwesome5 name="shield-alt" size={22} color="#27AE60" solid style={styles.securityNoteIcon} />
+            <FontAwesome5 name="shield-alt" size={22} color={colors.status.success} solid style={styles.securityNoteIcon} />
             <Text style={styles.securityNoteText}>
               {t('profile.securityNote')}
             </Text>
@@ -1072,11 +1089,11 @@ const styles = StyleSheet.create({
   deleteWarning: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#FEE2E2',
+    backgroundColor: colors.status.error + '15',
     padding: spacing.lg,
     borderRadius: borderRadius.lg,
     borderLeftWidth: 4,
-    borderLeftColor: '#DC2626',
+    borderLeftColor: colors.status.error,
     marginBottom: spacing.lg,
     gap: spacing.sm,
   },
@@ -1086,13 +1103,13 @@ const styles = StyleSheet.create({
   deleteWarningText: {
     flex: 1,
     fontSize: typography.size.sm,
-    color: '#991B1B',
+    color: colors.status.error,
     lineHeight: 22,
     letterSpacing: 0.3,
     fontWeight: typography.weight.semibold,
   },
   deleteButton: {
-    backgroundColor: '#DC2626',
+    backgroundColor: colors.status.error,
     borderRadius: borderRadius.lg,
     paddingVertical: spacing.lg,
     alignItems: 'center',
@@ -1106,7 +1123,7 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
-    color: '#FFFFFF',
+    color: colors.text.primary,
     letterSpacing: 0.5,
   },
   bottomSpacer: {

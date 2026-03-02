@@ -22,7 +22,7 @@ import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
-import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
 import AnimatedCard from '../components/AnimatedCard';
 import AnimatedButton from '../components/AnimatedButton';
@@ -916,6 +916,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: borderRadius.md,
     alignItems: 'center',
+    ...shadows.sm,
   },
   statNumber: {
     fontSize: typography.size.xxl,
@@ -935,6 +936,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     borderLeftWidth: 3,
     borderLeftColor: colors.primary.main,
+    ...shadows.sm,
   },
   pinnedBadge: {
     position: 'absolute',

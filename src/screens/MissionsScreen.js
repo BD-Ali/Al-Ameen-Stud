@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { DataContext } from '../context/DataContext';
-import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.status.warning,
   },
   badgeText: {
-    color: '#fff',
+    color: colors.text.primary,
     fontWeight: typography.weight.bold,
     fontSize: typography.size.sm,
   },
@@ -277,6 +277,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     borderLeftWidth: 3,
     borderLeftColor: colors.primary.main,
+    ...shadows.sm,
   },
   completedCard: {
     borderLeftColor: colors.status.success,
@@ -289,6 +290,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     borderLeftWidth: 3,
     borderLeftColor: colors.status.warning,
+    ...shadows.sm,
   },
   missionHeader: {
     flexDirection: 'row',

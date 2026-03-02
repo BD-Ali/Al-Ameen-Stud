@@ -121,11 +121,11 @@ const LoginScreen = ({ navigation }) => {
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>{t('auth.fullName')}</Text>
                 <View style={styles.inputWrapper}>
-                  <FontAwesome5 name="user" size={18} color="#95A5A6" solid style={styles.inputIcon} />
+                  <FontAwesome5 name="user" size={18} color={colors.text.muted} solid style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
                     placeholder={t('auth.enterFullName')}
-                    placeholderTextColor="#95a5a6"
+                    placeholderTextColor={colors.text.muted}
                     value={name}
                     onChangeText={setName}
                     autoCapitalize="words"
@@ -138,11 +138,11 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>{t('auth.email')}</Text>
               <View style={styles.inputWrapper}>
-                <FontAwesome5 name="envelope" size={16} color="#95A5A6" solid style={styles.inputIcon} />
+                <FontAwesome5 name="envelope" size={16} color={colors.text.muted} solid style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="your@email.com"
-                  placeholderTextColor="#95a5a6"
+                  placeholderTextColor={colors.text.muted}
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
@@ -155,11 +155,11 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <Text style={styles.label}>{t('auth.password')}</Text>
               <View style={styles.inputWrapper}>
-                <FontAwesome5 name="lock" size={18} color="#95A5A6" solid style={styles.inputIcon} />
+                <FontAwesome5 name="lock" size={18} color={colors.text.muted} solid style={styles.inputIcon} />
                 <TextInput
                   style={styles.input}
                   placeholder="••••••••"
-                  placeholderTextColor="#95a5a6"
+                  placeholderTextColor={colors.text.muted}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
@@ -231,7 +231,7 @@ const LoginScreen = ({ navigation }) => {
             >
               <Animated.View style={[styles.visitorButtonContent, { transform: [{ scale: visitorButtonScale }] }]}>
                 <View style={styles.buttonReflection} />
-                <FontAwesome5 name="eye" size={18} color="#7F8C8D" solid style={styles.visitorIcon} />
+                <FontAwesome5 name="eye" size={18} color={colors.text.tertiary} solid style={styles.visitorIcon} />
                 <Text style={styles.visitorButtonText}>{t('auth.continueAsVisitor')}</Text>
               </Animated.View>
             </TouchableOpacity>
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.base,
     borderRadius: 50,
     overflow: 'hidden',
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface.elevated,
     justifyContent: 'center',
     alignItems: 'center',
     ...shadows.lg,
@@ -295,8 +295,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 42,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
     marginBottom: spacing.xs,
     letterSpacing: 1.5,
     fontStyle: 'italic',
@@ -380,13 +380,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   primaryButtonText: {
-    color: '#fff',
+    color: colors.text.primary,
     fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
     marginRight: spacing.sm,
   },
   buttonArrow: {
-    color: '#fff',
+    color: colors.text.primary,
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
   },

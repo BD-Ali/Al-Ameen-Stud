@@ -13,7 +13,7 @@ import {
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { useTranslation } from '../i18n/LanguageContext';
-import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import notificationService from '../services/notificationService';
 import { getOptimizedImageUrl } from '../config/cloudinaryConfig';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -376,6 +376,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     borderLeftWidth: 3,
     borderLeftColor: colors.primary.main,
+    ...shadows.sm,
   },
   pinnedBadge: {
     flexDirection: 'row',
