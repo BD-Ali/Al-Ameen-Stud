@@ -6,35 +6,30 @@ import { colors } from '../styles/theme';
 const LanguageSwitcher = ({ style }) => {
   const { language, setLanguage, t } = useTranslation();
 
+  const languages = [
+    { code: 'ar', label: t('language.arabic') },
+    { code: 'he', label: t('language.hebrew') },
+    { code: 'en', label: t('language.english') },
+  ];
+
   return (
     <View style={[styles.container, style]}>
-      <TouchableOpacity
-        style={[
-          styles.option,
-          styles.optionRight,
-          language === 'ar' && styles.activeOption,
-        ]}
-        onPress={() => setLanguage('ar')}
-        activeOpacity={0.7}
-      >
-        <Text style={[styles.optionText, language === 'ar' && styles.activeText]}>
-          {t('language.arabic')}
-        </Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[
-          styles.option,
-          styles.optionLeft,
-          language === 'he' && styles.activeOption,
-        ]}
-        onPress={() => setLanguage('he')}
-        activeOpacity={0.7}
-      >
-        <Text style={[styles.optionText, language === 'he' && styles.activeText]}>
-          {t('language.hebrew')}
-        </Text>
-      </TouchableOpacity>
+      {languages.map((lang, index) => (
+        <TouchableOpacity
+          key={lang.code}
+          style={[
+            styles.option,
+            index < languages.length - 1 && styles.optionBorder,
+            language === lang.code && styles.activeOption,
+          ]}
+          onPress={() => setLanguage(lang.code)}
+          activeOpacity={0.7}
+        >
+          <Text style={[styles.optionText, language === lang.code && styles.activeText]}>
+            {lang.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };
@@ -52,11 +47,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     backgroundColor: 'transparent',
   },
-  optionRight: {
+  optionBorder: {
     borderRightWidth: 1,
     borderRightColor: colors.primary.main,
   },
-  optionLeft: {},
   activeOption: {
     backgroundColor: colors.primary.main,
   },

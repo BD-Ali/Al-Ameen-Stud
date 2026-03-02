@@ -1,11 +1,16 @@
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { I18nManager } from 'react-native';
 import ar from './ar.json';
 import he from './he.json';
+import en from './en.json';
 
 const LANGUAGE_KEY = '@app_language';
 
-const translations = { ar, he };
+const translations = { ar, he, en };
+
+/** RTL languages */
+const RTL_LANGUAGES = ['ar', 'he'];
 
 // Module-level language tracker for non-React code (services)
 let currentLanguage = 'ar';
@@ -26,6 +31,9 @@ const resolve = (obj, path) => {
  */
 export const translate = (key, params) => {
   let text = resolve(translations[currentLanguage], key);
+  if (text === undefined && currentLanguage !== 'en') {
+    text = resolve(translations.en, key);
+  }
   if (text === undefined && currentLanguage !== 'ar') {
     text = resolve(translations.ar, key);
   }
@@ -60,6 +68,14 @@ export const LanguageProvider = ({ children }) => {
     if (translations[lang]) {
       setLanguageState(lang);
       currentLanguage = lang;
+
+      // Update RTL based on language
+      const shouldBeRTL = RTL_LANGUAGES.includes(lang);
+      if (I18nManager.isRTL !== shouldBeRTL) {
+        I18nManager.allowRTL(shouldBeRTL);
+        I18nManager.forceRTL(shouldBeRTL);
+      }
+
       try {
         await AsyncStorage.setItem(LANGUAGE_KEY, lang);
       } catch (e) {
@@ -76,7 +92,10 @@ export const LanguageProvider = ({ children }) => {
     (key, params) => {
       let text = resolve(translations[language], key);
 
-      // Fallback to Arabic
+      // Fallback to English, then Arabic
+      if (text === undefined && language !== 'en') {
+        text = resolve(translations.en, key);
+      }
       if (text === undefined && language !== 'ar') {
         text = resolve(translations.ar, key);
       }
