@@ -92,9 +92,9 @@ temp/
 # OS generated files
 Thumbs.db
 
-# Config files with real credentials (DO NOT commit)
-src/config/firebaseConfig.js
-src/config/cloudinaryConfig.js
+# Config example files (actual configs are committed since they are client-side keys)
+# src/config/firebaseConfig.js
+# src/config/cloudinaryConfig.js
 
 # Trash folder (cleanup staging)
 _trash/
