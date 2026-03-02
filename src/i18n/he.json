@@ -44,7 +44,8 @@
     "lessons": "שיעורים",
     "users": "משתמשים",
     "profile": "פרופיל",
-    "visitorArea": "אזור מבקרים"
+    "visitorArea": "אזור מבקרים",
+    "userHistory": "היסטוריית משתמש"
   },
   "auth": {
     "brandName": "חוות אל-אמין",
@@ -376,7 +377,34 @@
     "remaining": "נותר",
     "used": "נוצל",
     "total": "סה\"כ",
-    "startDate": "תאריך התחלה: {{date}}"
+    "startDate": "תאריך התחלה: {{date}}",
+    "viewHistory": "צפייה בהיסטוריה המלאה"
+  },
+  "userHistory": {
+    "all": "הכל",
+    "lessons": "שיעורים",
+    "missions": "משימות",
+    "schedules": "משימות לוח זמנים",
+    "lesson": "שיעור",
+    "mission": "משימה",
+    "scheduleTask": "לוח זמנים",
+    "completed": "הושלם",
+    "cancelled": "בוטל",
+    "scheduled": "מתוכנן",
+    "pending": "ממתין",
+    "instructor": "מדריך",
+    "client": "לקוח",
+    "clientRole": "לקוח",
+    "workerRole": "עובד / מדריך",
+    "noHistory": "אין היסטוריה עדיין",
+    "noHistoryDesc": "פעילות תופיע כאן לאחר הקצאת שיעורים או משימות",
+    "saturday": "שבת",
+    "sunday": "ראשון",
+    "monday": "שני",
+    "tuesday": "שלישי",
+    "wednesday": "רביעי",
+    "thursday": "חמישי",
+    "friday": "שישי"
   },
   "announcements": {
     "title": "הודעות",

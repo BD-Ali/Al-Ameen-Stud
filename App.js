@@ -11,6 +11,7 @@ import ClientHomeScreen from './src/screens/ClientHomeScreen';
 import WorkerHomeScreen from './src/screens/WorkerHomeScreen';
 import VisitorHomeScreen from './src/screens/VisitorHomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import UserHistoryScreen from './src/screens/UserHistoryScreen';
 import InAppNotificationBanner from './src/components/InAppNotificationBanner';
 import notificationService from './src/services/notificationService';
 import lessonReminderService from './src/services/lessonReminderService';
@@ -149,6 +150,16 @@ function AppNavigator() {
                 options={{
                   headerShown: true,
                   title: t('nav.profile'),
+                  headerStyle: { backgroundColor: '#141b2d' },
+                  headerTintColor: '#fff',
+                }}
+              />
+              <Stack.Screen
+                name="UserHistory"
+                component={UserHistoryScreen}
+                options={{
+                  headerShown: true,
+                  title: t('nav.userHistory'),
                   headerStyle: { backgroundColor: '#141b2d' },
                   headerTintColor: '#fff',
                 }}

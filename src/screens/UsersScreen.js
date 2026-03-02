@@ -18,6 +18,7 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import AnimatedCard from '../components/AnimatedCard';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
+import { useNavigation } from '@react-navigation/native';
 
 /**
  * UsersScreen - Unified section for managing both Clients and Workers
@@ -25,6 +26,7 @@ import { useTranslation } from '../i18n/LanguageContext';
  */
 const UsersScreen = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const {
     clients,
     workers,
@@ -639,6 +641,22 @@ const UsersScreen = () => {
               </View>
             )}
 
+            {/* History Button */}
+            <TouchableOpacity
+              style={styles.historyButton}
+              onPress={() => navigation.navigate('UserHistory', {
+                userId: item.id,
+                userName: item.name,
+                userType: activeTab === 'clients' ? 'client' : 'worker',
+              })}
+              activeOpacity={0.7}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <FontAwesome5 name="history" size={14} color="#fff" solid />
+                <Text style={styles.historyButtonText}>{t('users.viewHistory')}</Text>
+              </View>
+            </TouchableOpacity>
+
             {/* Delete Button */}
             <TouchableOpacity
               style={styles.removeButton}
@@ -1243,6 +1261,19 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: spacing.xs,
+  },
+  historyButton: {
+    backgroundColor: colors.accent.purple,
+    borderRadius: borderRadius.md,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    marginTop: spacing.sm,
+    ...shadows.sm,
+  },
+  historyButtonText: {
+    color: colors.text.primary,
+    fontWeight: typography.weight.bold,
+    fontSize: typography.size.base,
   },
   removeButton: {
     backgroundColor: colors.status.error,

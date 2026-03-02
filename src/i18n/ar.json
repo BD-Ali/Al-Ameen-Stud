@@ -44,7 +44,8 @@
     "lessons": "الدروس",
     "users": "المستخدمين",
     "profile": "الملف الشخصي",
-    "visitorArea": "منطقة الزوار"
+    "visitorArea": "منطقة الزوار",
+    "userHistory": "سجل المستخدم"
   },
   "auth": {
     "brandName": "مَرْبَطُ الأَمِين",
@@ -376,7 +377,34 @@
     "remaining": "المتبقي",
     "used": "المستخدم",
     "total": "الإجمالي",
-    "startDate": "تاريخ البدء: {{date}}"
+    "startDate": "تاريخ البدء: {{date}}",
+    "viewHistory": "عرض السجل الكامل"
+  },
+  "userHistory": {
+    "all": "الكل",
+    "lessons": "الدروس",
+    "missions": "المهام",
+    "schedules": "مهام الجدول",
+    "lesson": "درس",
+    "mission": "مهمة",
+    "scheduleTask": "جدول",
+    "completed": "مكتمل",
+    "cancelled": "ملغى",
+    "scheduled": "مجدول",
+    "pending": "قيد الانتظار",
+    "instructor": "المدرب",
+    "client": "العميل",
+    "clientRole": "عميل",
+    "workerRole": "عامل / مدرب",
+    "noHistory": "لا يوجد سجل بعد",
+    "noHistoryDesc": "سيظهر النشاط هنا بمجرد تعيين دروس أو مهام",
+    "saturday": "السبت",
+    "sunday": "الأحد",
+    "monday": "الاثنين",
+    "tuesday": "الثلاثاء",
+    "wednesday": "الأربعاء",
+    "thursday": "الخميس",
+    "friday": "الجمعة"
   },
   "announcements": {
     "title": "الإعلانات",

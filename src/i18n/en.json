@@ -44,7 +44,8 @@
     "lessons": "Lessons",
     "users": "Users",
     "profile": "Profile",
-    "visitorArea": "Visitor Area"
+    "visitorArea": "Visitor Area",
+    "userHistory": "User History"
   },
   "auth": {
     "brandName": "Al-Ameen Farm",
@@ -376,7 +377,34 @@
     "remaining": "Remaining",
     "used": "Used",
     "total": "Total",
-    "startDate": "Start Date: {{date}}"
+    "startDate": "Start Date: {{date}}",
+    "viewHistory": "View Full History"
+  },
+  "userHistory": {
+    "all": "All",
+    "lessons": "Lessons",
+    "missions": "Missions",
+    "schedules": "Schedule Tasks",
+    "lesson": "Lesson",
+    "mission": "Mission",
+    "scheduleTask": "Schedule",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "scheduled": "Scheduled",
+    "pending": "Pending",
+    "instructor": "Instructor",
+    "client": "Client",
+    "clientRole": "Client",
+    "workerRole": "Worker / Instructor",
+    "noHistory": "No history yet",
+    "noHistoryDesc": "Activity will appear here once lessons or tasks are assigned",
+    "saturday": "Saturday",
+    "sunday": "Sunday",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday"
   },
   "announcements": {
     "title": "Announcements",
