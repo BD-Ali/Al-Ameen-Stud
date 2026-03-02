@@ -8,6 +8,7 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
 import AnimatedCard from '../components/AnimatedCard';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -19,6 +20,7 @@ Notifications.setNotificationHandler({
 });
 
 const HorsesScreen = () => {
+  const { t } = useTranslation();
   const { horses, addHorse, removeHorse, reminders, addReminder, removeReminder } = useContext(DataContext);
 
   const [name, setName] = useState('');
@@ -54,7 +56,7 @@ const HorsesScreen = () => {
     }
 
     if (finalStatus !== 'granted') {
-      Alert.alert('تنبيه', 'يجب منح إذن الإشعارات لتلقي التذكيرات');
+      Alert.alert(t('common.alert'), t('horses.notificationPermission'));
     }
   };
 
@@ -65,13 +67,13 @@ const HorsesScreen = () => {
       if (useCamera) {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('خطأ', 'نحتاج إلى إذن الوصول للكاميرا');
+          Alert.alert(t('common.error'), t('horses.needCameraPermission'));
           return;
         }
       } else {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert('خطأ', 'نحتاج إلى إذن الوصول للمعرض');
+          Alert.alert(t('common.error'), t('horses.needGalleryPermission'));
           return;
         }
       }
@@ -93,31 +95,31 @@ const HorsesScreen = () => {
         setImageUri(result.assets[0].uri);
       }
     } catch (error) {
-      Alert.alert('خطأ', 'حدث خطأ أثناء اختيار الصورة');
+      Alert.alert(t('common.error'), t('horses.imagePickError'));
       console.error('Image picker error:', error);
     }
   };
 
   const showImagePickerOptions = () => {
     Alert.alert(
-      'اختر صورة للحصان',
-      'من أين تريد اختيار الصورة؟',
+      t('horses.chooseHorseImage'),
+      t('horses.imageSourceQuestion'),
       [
-        { text: 'إلغاء', style: 'cancel' },
-        { text: 'الكاميرا', onPress: () => pickImage(true) },
-        { text: 'المعرض', onPress: () => pickImage(false) },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('horses.camera'), onPress: () => pickImage(true) },
+        { text: t('horses.gallery'), onPress: () => pickImage(false) },
       ]
     );
   };
 
   const removeImage = () => {
     Alert.alert(
-      'إزالة الصورة',
-      'هل أنت متأكد من إزالة الصورة؟',
+      t('horses.removeImage'),
+      t('horses.confirmRemoveImage'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'إزالة',
+          text: t('common.remove'),
           style: 'destructive',
           onPress: () => setImageUri(''),
         },
@@ -131,7 +133,7 @@ const HorsesScreen = () => {
       const now = new Date();
 
       if (notificationDate <= now) {
-        Alert.alert('خطأ', 'يجب أن يكون موعد التذكير في المستقبل');
+        Alert.alert(t('common.error'), t('horses.reminderMustBeFuture'));
         return null;
       }
 
@@ -142,7 +144,7 @@ const HorsesScreen = () => {
 
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: `تذكير: ${reminder.horseName}`,
+          title: t('horses.reminderTitle', { name: reminder.horseName }),
           body: reminder.note,
           sound: true,
           priority: Notifications.AndroidNotificationPriority.HIGH,
@@ -151,7 +153,7 @@ const HorsesScreen = () => {
       });
     } catch (error) {
       console.error('Error scheduling notification:', error);
-      Alert.alert('خطأ', 'فشل جدولة الإشعار');
+      Alert.alert(t('common.error'), t('horses.notificationScheduleFailed'));
       return null;
     }
   };
@@ -164,7 +166,7 @@ const HorsesScreen = () => {
 
   const handleAddHorse = async () => {
     if (!name) {
-      Alert.alert('خطأ', 'الرجاء إدخال اسم الحصان');
+      Alert.alert(t('common.error'), t('horses.enterHorseNameRequired'));
       return;
     }
 
@@ -178,7 +180,7 @@ const HorsesScreen = () => {
         if (uploadResult.success) {
           cloudinaryImageUrl = uploadResult.url;
         } else {
-          Alert.alert('خطأ', 'فشل رفع الصورة: ' + uploadResult.error);
+          Alert.alert(t('common.error'), t('horses.uploadFailed') + uploadResult.error);
           setUploadingImage(false);
           return;
         }
@@ -201,13 +203,13 @@ const HorsesScreen = () => {
         setFeedSchedule('');
         setNotes('');
         setImageUri('');
-        Alert.alert('نجح', 'تم إضافة الحصان بنجاح');
+        Alert.alert(t('common.success'), t('horses.horseAdded'));
       } else {
-        Alert.alert('خطأ', result.error || 'فشل إضافة الحصان');
+        Alert.alert(t('common.error'), result.error || t('horses.horseAddFailed'));
       }
     } catch (error) {
       console.error('Error adding horse:', error);
-      Alert.alert('خطأ', 'حدث خطأ غير متوقع');
+      Alert.alert(t('common.error'), t('common.unexpectedError'));
     } finally {
       setUploadingImage(false);
     }
@@ -215,15 +217,15 @@ const HorsesScreen = () => {
 
   const handleRemoveHorse = (id) => {
     Alert.alert(
-      "حذف الحصان",
-      "هل أنت متأكد أنك تريد حذف هذا الحصان؟",
+      t('horses.deleteHorse'),
+      t('horses.confirmDeleteHorse'),
       [
         {
-          text: "إلغاء",
+          text: t('common.cancel'),
           style: "cancel"
         },
         {
-          text: "موافق",
+          text: t('common.ok'),
           onPress: () => removeHorse(id)
         }
       ]
@@ -245,7 +247,7 @@ const HorsesScreen = () => {
 
   const handleAddReminder = async () => {
     if (!reminderNote.trim()) {
-      Alert.alert('خطأ', 'يرجى إدخال ملاحظة للتذكير');
+      Alert.alert(t('common.error'), t('horses.enterReminderNote'));
       return;
     }
 
@@ -271,22 +273,22 @@ const HorsesScreen = () => {
     const result = await addReminder(reminderData);
 
     if (result.success) {
-      Alert.alert('نجح', 'تم إضافة التذكير وجدولة الإشعار بنجاح');
+      Alert.alert(t('common.success'), t('horses.reminderAdded'));
       setReminderModalVisible(false);
       setReminderNote('');
     } else {
-      Alert.alert('خطأ', result.error || 'فشل إضافة التذكير');
+      Alert.alert(t('common.error'), result.error || t('horses.reminderAddFailed'));
     }
   };
 
   const handleDeleteReminder = (reminder) => {
     Alert.alert(
-      'حذف التذكير',
-      'هل أنت متأكد أنك تريد حذف هذا التذكير؟',
+      t('horses.deleteReminder'),
+      t('horses.confirmDeleteReminder'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'حذف',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             // Cancel notification if exists
@@ -296,7 +298,7 @@ const HorsesScreen = () => {
 
             const result = await removeReminder(reminder.id);
             if (result.success) {
-              Alert.alert('نجح', 'تم حذف التذكير وإلغاء الإشعار بنجاح');
+              Alert.alert(t('common.success'), t('horses.reminderDeleted'));
             }
           }
         }
@@ -354,7 +356,7 @@ const HorsesScreen = () => {
           <View style={styles.headerSection}>
             <View style={styles.titleRow}>
               <MaterialCommunityIcons name="horse-variant" size={28} color="#F39C12" />
-              <Text style={styles.pageTitle}>الخيول</Text>
+              <Text style={styles.pageTitle}>{t('horses.title')}</Text>
             </View>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{horses.length}</Text>
@@ -397,29 +399,29 @@ const HorsesScreen = () => {
                   <View style={styles.cardRow}>
                     <View style={styles.labelRow}>
                       <MaterialCommunityIcons name="horse" size={16} color="#E67E22" />
-                      <Text style={styles.cardLabel}>السلالة:</Text>
+                      <Text style={styles.cardLabel}>{t('horses.breed')}</Text>
                     </View>
-                    <Text style={styles.cardValue}>{item.breed || 'غير محدد'}</Text>
+                    <Text style={styles.cardValue}>{item.breed || t('common.notSpecified')}</Text>
                   </View>
                   <View style={styles.cardRow}>
                     <View style={styles.labelRow}>
                       <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
-                      <Text style={styles.cardLabel}>المالك:</Text>
+                      <Text style={styles.cardLabel}>{t('horses.owner')}</Text>
                     </View>
-                    <Text style={styles.cardValue}>{item.owner || 'غير محدد'}</Text>
+                    <Text style={styles.cardValue}>{item.owner || t('common.notSpecified')}</Text>
                   </View>
                   <View style={styles.cardRow}>
                     <View style={styles.labelRow}>
                       <FontAwesome5 name="carrot" size={14} color="#FF9800" solid />
-                      <Text style={styles.cardLabel}>التغذية:</Text>
+                      <Text style={styles.cardLabel}>{t('horses.feedLabel')}</Text>
                     </View>
-                    <Text style={styles.cardValue}>{item.feedSchedule || 'غير محدد'}</Text>
+                    <Text style={styles.cardValue}>{item.feedSchedule || t('common.notSpecified')}</Text>
                   </View>
                   {item.notes && (
                     <View style={styles.notesSection}>
                       <View style={styles.labelRow}>
                         <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
-                        <Text style={styles.notesLabel}>ملاحظات:</Text>
+                        <Text style={styles.notesLabel}>{t('horses.notes')}</Text>
                       </View>
                       <Text style={styles.notesValue}>{item.notes}</Text>
                     </View>
@@ -430,14 +432,14 @@ const HorsesScreen = () => {
                     <View style={styles.remindersSectionHeader}>
                       <View style={styles.labelRow}>
                         <FontAwesome5 name="bell" size={16} color="#F39C12" solid />
-                        <Text style={styles.remindersSectionTitle}>التذكيرات</Text>
+                        <Text style={styles.remindersSectionTitle}>{t('horses.reminders')}</Text>
                       </View>
                       <TouchableOpacity
                         style={styles.addReminderButton}
                         onPress={() => openReminderModal(item)}
                       >
                         <FontAwesome5 name="plus" size={12} color="#fff" solid />
-                        <Text style={styles.addReminderButtonText}>إضافة تذكير</Text>
+                        <Text style={styles.addReminderButtonText}>{t('horses.addReminder')}</Text>
                       </TouchableOpacity>
                     </View>
 
@@ -466,13 +468,13 @@ const HorsesScreen = () => {
                         ))}
                       </View>
                     ) : (
-                      <Text style={styles.noRemindersText}>لا توجد تذكيرات</Text>
+                      <Text style={styles.noRemindersText}>{t('horses.noReminders')}</Text>
                     )}
                   </View>
 
                   <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveHorse(item.id)}>
                     <FontAwesome5 name="trash-alt" size={14} color="#fff" solid />
-                    <Text style={styles.removeButtonText}>حذف الحصان</Text>
+                    <Text style={styles.removeButtonText}>{t('horses.deleteHorse')}</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -483,19 +485,19 @@ const HorsesScreen = () => {
           <View style={styles.formSection}>
             <View style={styles.formTitleRow}>
               <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
-              <Text style={styles.formTitle}>إضافة حصان جديد</Text>
+              <Text style={styles.formTitle}>{t('horses.addNewHorse')}</Text>
             </View>
 
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-                <Text style={styles.label}>اسم الحصان</Text>
+                <Text style={styles.label}>{t('horses.horseName')}</Text>
               </View>
               <TextInput
                 value={name}
                 onChangeText={setName}
                 style={styles.input}
-                placeholder="أدخل اسم الحصان"
+                placeholder={t('horses.enterHorseName')}
                 placeholderTextColor="#64748b"
               />
             </View>
@@ -504,7 +506,7 @@ const HorsesScreen = () => {
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="camera" size={14} color="#3498DB" solid />
-                <Text style={styles.label}>صورة الحصان (اختياري)</Text>
+                <Text style={styles.label}>{t('horses.horseImage')}</Text>
               </View>
               {imageUri ? (
                 <View style={styles.imagePreviewContainer}>
@@ -518,7 +520,7 @@ const HorsesScreen = () => {
                     onPress={removeImage}
                   >
                     <FontAwesome5 name="trash-alt" size={12} color="#fff" solid />
-                    <Text style={styles.removeImageText}> إزالة الصورة</Text>
+                    <Text style={styles.removeImageText}> {t('horses.removeImage')}</Text>
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -532,7 +534,7 @@ const HorsesScreen = () => {
                   ) : (
                     <>
                       <FontAwesome5 name="camera" size={18} color="#3498DB" solid />
-                      <Text style={styles.imageUploadText}> اختر صورة</Text>
+                      <Text style={styles.imageUploadText}> {t('horses.chooseImage')}</Text>
                     </>
                   )}
                 </TouchableOpacity>
@@ -542,13 +544,13 @@ const HorsesScreen = () => {
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <MaterialCommunityIcons name="horse" size={16} color="#E67E22" />
-                <Text style={styles.label}>السلالة</Text>
+                <Text style={styles.label}>{t('horses.breedLabel')}</Text>
               </View>
               <TextInput
                 value={breed}
                 onChangeText={setBreed}
                 style={styles.input}
-                placeholder="عربي، كوارتر، إلخ."
+                placeholder={t('horses.breedPlaceholder')}
                 placeholderTextColor="#64748b"
               />
             </View>
@@ -556,13 +558,13 @@ const HorsesScreen = () => {
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
-                <Text style={styles.label}>المالك</Text>
+                <Text style={styles.label}>{t('horses.ownerLabel')}</Text>
               </View>
               <TextInput
                 value={owner}
                 onChangeText={setOwner}
                 style={styles.input}
-                placeholder="اسم المالك"
+                placeholder={t('horses.ownerPlaceholder')}
                 placeholderTextColor="#64748b"
               />
             </View>
@@ -570,13 +572,13 @@ const HorsesScreen = () => {
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="carrot" size={14} color="#FF9800" solid />
-                <Text style={styles.label}>جدول التغذية</Text>
+                <Text style={styles.label}>{t('horses.feedScheduleLabel')}</Text>
               </View>
               <TextInput
                 value={feedSchedule}
                 onChangeText={setFeedSchedule}
                 style={styles.input}
-                placeholder="أدخل جدول التغذية"
+                placeholder={t('horses.enterFeedSchedule')}
                 placeholderTextColor="#64748b"
                 multiline
               />
@@ -585,13 +587,13 @@ const HorsesScreen = () => {
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
-                <Text style={styles.label}>ملاحظات</Text>
+                <Text style={styles.label}>{t('horses.notesLabel')}</Text>
               </View>
               <TextInput
                 value={notes}
                 onChangeText={setNotes}
                 style={[styles.input, styles.notesInput]}
-                placeholder="أي ملاحظات إضافية عن الحصان..."
+                placeholder={t('horses.notesPlaceholder')}
                 placeholderTextColor="#64748b"
                 multiline
                 numberOfLines={4}
@@ -607,12 +609,12 @@ const HorsesScreen = () => {
               {uploadingImage ? (
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="small" color={colors.text.primary} />
-                  <Text style={styles.addButtonText}> جاري الرفع...</Text>
+                  <Text style={styles.addButtonText}> {t('horses.uploading')}</Text>
                 </View>
               ) : (
                 <>
                   <FontAwesome5 name="plus" size={14} color="#fff" solid />
-                  <Text style={styles.addButtonText}>إضافة حصان</Text>
+                  <Text style={styles.addButtonText}>{t('horses.addHorse')}</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -622,8 +624,8 @@ const HorsesScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <MaterialCommunityIcons name="horse-variant" size={64} color="#F39C12" />
-            <Text style={styles.emptyText}>لا توجد خيول بعد</Text>
-            <Text style={styles.emptySubtext}>أضف أول حصان أدناه</Text>
+            <Text style={styles.emptyText}>{t('horses.noHorsesYet')}</Text>
+            <Text style={styles.emptySubtext}>{t('horses.addFirstHorse')}</Text>
           </View>
         }
       />
@@ -642,20 +644,20 @@ const HorsesScreen = () => {
                 <View style={styles.modalTitleRow}>
                   <FontAwesome5 name="bell" size={20} color="#F39C12" solid />
                   <Text style={styles.modalTitle}>
-                    إضافة تذكير لـ {selectedHorseForReminder?.name}
+                    {t('horses.addReminderFor', { name: selectedHorseForReminder?.name })}
                   </Text>
                 </View>
 
                 <View style={styles.modalInputGroup}>
                   <View style={styles.labelRow}>
                     <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
-                    <Text style={styles.modalLabel}>ملاحظة التذكير</Text>
+                    <Text style={styles.modalLabel}>{t('horses.reminderNoteLabel')}</Text>
                   </View>
                   <TextInput
                     value={reminderNote}
                     onChangeText={setReminderNote}
                     style={[styles.modalInput, styles.modalNotesInput]}
-                    placeholder="أدخل ملاحظات التذكير"
+                    placeholder={t('horses.enterReminderNotes')}
                     placeholderTextColor="#64748b"
                     multiline
                     numberOfLines={3}
@@ -666,7 +668,7 @@ const HorsesScreen = () => {
                 <View style={styles.modalInputGroup}>
                   <View style={styles.labelRow}>
                     <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                    <Text style={styles.modalLabel}>التاريخ</Text>
+                    <Text style={styles.modalLabel}>{t('horses.date')}</Text>
                   </View>
                   <TouchableOpacity
                     style={styles.datePickerButton}
@@ -692,7 +694,7 @@ const HorsesScreen = () => {
                           style={styles.confirmButton}
                           onPress={() => setShowDatePicker(false)}
                         >
-                          <Text style={styles.confirmButtonText}>موافق</Text>
+                          <Text style={styles.confirmButtonText}>{t('common.ok')}</Text>
                         </TouchableOpacity>
                       )}
                     </>
@@ -702,7 +704,7 @@ const HorsesScreen = () => {
                 <View style={styles.modalInputGroup}>
                   <View style={styles.labelRow}>
                     <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-                    <Text style={styles.modalLabel}>الوقت</Text>
+                    <Text style={styles.modalLabel}>{t('horses.time')}</Text>
                   </View>
                   <TouchableOpacity
                     style={styles.datePickerButton}
@@ -728,7 +730,7 @@ const HorsesScreen = () => {
                           style={styles.confirmButton}
                           onPress={() => setShowTimePicker(false)}
                         >
-                          <Text style={styles.confirmButtonText}>موافق</Text>
+                          <Text style={styles.confirmButtonText}>{t('common.ok')}</Text>
                         </TouchableOpacity>
                       )}
                     </>
@@ -741,14 +743,14 @@ const HorsesScreen = () => {
                     onPress={() => setReminderModalVisible(false)}
                   >
                     <FontAwesome5 name="times" size={14} color="#fff" solid />
-                    <Text style={styles.modalCancelButtonText}>إلغاء</Text>
+                    <Text style={styles.modalCancelButtonText}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.modalSaveButton}
                     onPress={handleAddReminder}
                   >
                     <FontAwesome5 name="check" size={14} color="#fff" solid />
-                    <Text style={styles.modalSaveButtonText}>حفظ التذكير</Text>
+                    <Text style={styles.modalSaveButtonText}>{t('horses.saveReminder')}</Text>
                   </TouchableOpacity>
                 </View>
               </ScrollView>

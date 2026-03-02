@@ -4,12 +4,14 @@ import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * FeedScreen shows a consolidated list of feeding plans for all horses.
  */
 const FeedScreen = () => {
   const { horses } = useContext(DataContext);
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
@@ -20,7 +22,7 @@ const FeedScreen = () => {
           <View style={styles.headerSection}>
             <View style={styles.titleRow}>
               <FontAwesome5 name="carrot" size={24} color="#FF9800" solid />
-              <Text style={styles.pageTitle}>جدول التغذية</Text>
+              <Text style={styles.pageTitle}>{t('feed.title')}</Text>
             </View>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{horses.length}</Text>
@@ -36,10 +38,10 @@ const FeedScreen = () => {
             <View style={styles.scheduleContainer}>
               <View style={styles.scheduleLabelRow}>
                 <FontAwesome5 name="clipboard-list" size={14} color="#64748b" solid />
-                <Text style={styles.scheduleLabel}>أوقات التغذية:</Text>
+                <Text style={styles.scheduleLabel}>{t('feed.feedTimes')}</Text>
               </View>
               <Text style={styles.scheduleValue}>
-                {item.feedSchedule || 'لا يوجد جدول محدد'}
+                {item.feedSchedule || t('feed.noScheduleSet')}
               </Text>
             </View>
           </AnimatedCard>
@@ -48,8 +50,8 @@ const FeedScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <FontAwesome5 name="carrot" size={48} color="#FF9800" solid />
-            <Text style={styles.emptyText}>لا توجد جداول تغذية</Text>
-            <Text style={styles.emptySubtext}>أضف خيولاً لتعيين جداول التغذية</Text>
+            <Text style={styles.emptyText}>{t('feed.noFeedSchedules')}</Text>
+            <Text style={styles.emptySubtext}>{t('feed.addHorsesForFeed')}</Text>
           </View>
         }
       />

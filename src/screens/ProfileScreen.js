@@ -20,6 +20,8 @@ import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCrede
 import { doc, updateDoc, getDoc, deleteDoc, query, collection, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import AnimatedCard from '../components/AnimatedCard';
+import { useTranslation } from '../i18n/LanguageContext';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 /**
  * ProfileScreen - User profile management screen
@@ -33,6 +35,7 @@ import AnimatedCard from '../components/AnimatedCard';
 const ProfileScreen = ({ navigation }) => {
   const { user, userRole } = useContext(AuthContext);
   const { clients, workers } = useContext(DataContext);
+  const { t } = useTranslation();
 
   // Form states
   const [currentPassword, setCurrentPassword] = useState('');
@@ -79,15 +82,15 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   const userData = getUserData();
-  const displayName = userData?.name || user?.email?.split('@')[0] || 'مستخدم';
+  const displayName = userData?.name || user?.email?.split('@')[0] || t('profile.defaultUser');
   const displayEmail = user?.email || '';
 
   // Get role display info
   const getRoleInfo = (role) => {
     const roleMap = {
-      'client': { label: 'عميل', color: colors.accent.teal, icon: 'user', iconFamily: 'FontAwesome5', iconColor: '#1ABC9C' },
-      'worker': { label: 'عامل', color: colors.accent.pink, icon: 'hard-hat', iconFamily: 'FontAwesome5', iconColor: '#E91E63' },
-      'admin': { label: 'مدير', color: colors.accent.purple, icon: 'user-shield', iconFamily: 'FontAwesome5', iconColor: '#9B59B6' },
+      'client': { label: t('roles.client'), color: colors.accent.teal, icon: 'user', iconFamily: 'FontAwesome5', iconColor: '#1ABC9C' },
+      'worker': { label: t('roles.worker'), color: colors.accent.pink, icon: 'hard-hat', iconFamily: 'FontAwesome5', iconColor: '#E91E63' },
+      'admin': { label: t('roles.admin'), color: colors.accent.purple, icon: 'user-shield', iconFamily: 'FontAwesome5', iconColor: '#9B59B6' },
     };
     return roleMap[role?.toLowerCase()] || roleMap['client'];
   };
@@ -101,11 +104,11 @@ const ProfileScreen = ({ navigation }) => {
       await reauthenticateWithCredential(user, credential);
       return { success: true };
     } catch (error) {
-      let errorMessage = 'فشل التحقق من كلمة المرور';
+      let errorMessage = t('profile.passwordVerifyFailed');
       if (error.code === 'auth/wrong-password') {
-        errorMessage = 'كلمة المرور الحالية غير صحيحة';
+        errorMessage = t('profile.wrongPassword');
       } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'محاولات كثيرة جداً. حاول مرة أخرى لاحقاً';
+        errorMessage = t('profile.tooManyAttempts');
       }
       return { success: false, error: errorMessage };
     }
@@ -115,17 +118,17 @@ const ProfileScreen = ({ navigation }) => {
   const handleChangePassword = async () => {
     // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
-      Alert.alert('خطأ', 'الرجاء ملء جميع الحقول');
+      Alert.alert(t('common.error'), t('common.fillAllFields'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      Alert.alert('خطأ', 'كلمة المرور الجديدة وتأكيد كلمة المرور غير متطابقتين');
+      Alert.alert(t('common.error'), t('profile.passwordsDoNotMatch'));
       return;
     }
 
     if (newPassword.length < 6) {
-      Alert.alert('خطأ', 'يجب أن تكون كلمة المرور الجديدة 6 أحرف على الأقل');
+      Alert.alert(t('common.error'), t('profile.passwordMinChars'));
       return;
     }
 
@@ -135,7 +138,7 @@ const ProfileScreen = ({ navigation }) => {
       // Reauthenticate first
       const reauth = await reauthenticate(currentPassword);
       if (!reauth.success) {
-        Alert.alert('خطأ', reauth.error);
+        Alert.alert(t('common.error'), reauth.error);
         setLoading(false);
         return;
       }
@@ -149,18 +152,18 @@ const ProfileScreen = ({ navigation }) => {
       setConfirmPassword('');
       setShowPasswordSection(false);
 
-      Alert.alert('نجح ✓', 'تم تغيير كلمة المرور بنجاح');
+      Alert.alert(t('common.successCheck'), t('profile.passwordChanged'));
     } catch (error) {
       console.error('Password change error:', error);
-      let errorMessage = 'فشل تغيير كلمة المرور';
+      let errorMessage = t('profile.passwordChangeFailed');
 
       if (error.code === 'auth/weak-password') {
-        errorMessage = 'كلمة المرور ضعيفة جداً';
+        errorMessage = t('auth.weakPassword');
       } else if (error.code === 'auth/requires-recent-login') {
-        errorMessage = 'يرجى تسجيل الخروج ثم الدخول مرة أخرى';
+        errorMessage = t('common.reLoginRequired');
       }
 
-      Alert.alert('خطأ', errorMessage);
+      Alert.alert(t('common.error'), errorMessage);
     } finally {
       setLoading(false);
     }
@@ -170,17 +173,17 @@ const ProfileScreen = ({ navigation }) => {
   const handleChangeEmail = async () => {
     // Validation
     if (!currentPassword || !newEmail) {
-      Alert.alert('خطأ', 'الرجاء ملء جميع الحقول');
+      Alert.alert(t('common.error'), t('common.fillAllFields'));
       return;
     }
 
     if (!newEmail.includes('@') || !newEmail.includes('.')) {
-      Alert.alert('خطأ', 'الرجاء إدخال بريد إلكتروني صحيح');
+      Alert.alert(t('common.error'), t('profile.enterValidEmail'));
       return;
     }
 
     if (newEmail === user.email) {
-      Alert.alert('خطأ', 'البريد الإلكتروني الجديد هو نفسه البريد الحالي');
+      Alert.alert(t('common.error'), t('profile.sameEmail'));
       return;
     }
 
@@ -190,7 +193,7 @@ const ProfileScreen = ({ navigation }) => {
       // Reauthenticate first
       const reauth = await reauthenticate(currentPassword);
       if (!reauth.success) {
-        Alert.alert('خطأ', reauth.error);
+        Alert.alert(t('common.error'), reauth.error);
         setLoading(false);
         return;
       }
@@ -220,20 +223,20 @@ const ProfileScreen = ({ navigation }) => {
       setNewEmail('');
       setShowEmailSection(false);
 
-      Alert.alert('نجح ✓', 'تم تغيير البريد الإلكتروني بنجاح');
+      Alert.alert(t('common.successCheck'), t('profile.emailChanged'));
     } catch (error) {
       console.error('Email change error:', error);
-      let errorMessage = 'فشل تغيير البريد الإلكتروني';
+      let errorMessage = t('profile.emailChangeFailed');
 
       if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل';
+        errorMessage = t('profile.emailAlreadyInUse');
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'البريد الإلكتروني غير صحيح';
+        errorMessage = t('auth.invalidEmail');
       } else if (error.code === 'auth/requires-recent-login') {
-        errorMessage = 'يرجى تسجيل الخروج ثم الدخول مرة أخرى';
+        errorMessage = t('common.reLoginRequired');
       }
 
-      Alert.alert('خطأ', errorMessage);
+      Alert.alert(t('common.error'), errorMessage);
     } finally {
       setLoading(false);
     }
@@ -243,12 +246,12 @@ const ProfileScreen = ({ navigation }) => {
   const handleChangeName = async () => {
     // Validation
     if (!newName || newName.trim().length === 0) {
-      Alert.alert('خطأ', 'الرجاء إدخال اسم صحيح');
+      Alert.alert(t('common.error'), t('profile.enterValidName'));
       return;
     }
 
     if (newName === displayName) {
-      Alert.alert('خطأ', 'الاسم الجديد هو نفسه الاسم الحالي');
+      Alert.alert(t('common.error'), t('profile.sameName'));
       return;
     }
 
@@ -268,10 +271,10 @@ const ProfileScreen = ({ navigation }) => {
       setNewName('');
       setShowNameSection(false);
 
-      Alert.alert('نجح ✓', 'تم تغيير الاسم بنجاح');
+      Alert.alert(t('common.successCheck'), t('profile.nameChanged'));
     } catch (error) {
       console.error('Name change error:', error);
-      Alert.alert('خطأ', 'فشل تغيير الاسم');
+      Alert.alert(t('common.error'), t('profile.nameChangeFailed'));
     } finally {
       setLoading(false);
     }
@@ -281,21 +284,21 @@ const ProfileScreen = ({ navigation }) => {
   const handleDeleteAccount = async () => {
     // Validation
     if (!deletePassword) {
-      Alert.alert('خطأ', 'الرجاء إدخال كلمة المرور للتأكيد');
+      Alert.alert(t('common.error'), t('profile.enterPasswordToConfirm'));
       return;
     }
 
     // Double confirmation
     Alert.alert(
-      '⚠️ تحذير',
-      'هل أنت متأكد من رغبتك في حذف حسابك نهائياً؟ سيتم حذف جميع بياناتك ولن يمكن استرجاعها.',
+      '⚠️ ' + t('common.warning'),
+      t('profile.deleteConfirmQuestion'),
       [
         {
-          text: 'إلغاء',
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'حذف الحساب',
+          text: t('profile.deleteAccount'),
           style: 'destructive',
           onPress: async () => {
             setLoading(true);
@@ -304,7 +307,7 @@ const ProfileScreen = ({ navigation }) => {
               // Reauthenticate first
               const reauth = await reauthenticate(deletePassword);
               if (!reauth.success) {
-                Alert.alert('خطأ', reauth.error);
+                Alert.alert(t('common.error'), reauth.error);
                 setLoading(false);
                 return;
               }
@@ -319,8 +322,8 @@ const ProfileScreen = ({ navigation }) => {
 
                   if (amountDue > 0) {
                     Alert.alert(
-                      'لا يمكن حذف الحساب',
-                      `لديك مبلغ مستحق ${amountDue} ريال. يرجى سداد المبلغ المستحق قبل حذف حسابك.`
+                      t('profile.cannotDeleteAccount'),
+                      t('profile.outstandingBalance', { amount: amountDue })
                     );
                     setLoading(false);
                     return;
@@ -342,8 +345,8 @@ const ProfileScreen = ({ navigation }) => {
 
                 if (upcomingLessons.length > 0) {
                   Alert.alert(
-                    'لا يمكن حذف الحساب',
-                    `لديك ${upcomingLessons.length} درس مجدول أو قادم. يرجى إلغاء الدروس أولاً قبل حذف حسابك.`
+                    t('profile.cannotDeleteAccount'),
+                    t('profile.hasUpcomingLessons', { count: upcomingLessons.length })
                   );
                   setLoading(false);
                   return;
@@ -372,8 +375,8 @@ const ProfileScreen = ({ navigation }) => {
 
                 if (upcomingLessons.length > 0) {
                   Alert.alert(
-                    'لا يمكن حذف الحساب',
-                    `لديك ${upcomingLessons.length} درس مجدول أو قادم. يرجى إلغاء الدروس أولاً قبل حذف حسابك.`
+                    t('profile.cannotDeleteAccount'),
+                    t('profile.hasUpcomingLessons', { count: upcomingLessons.length })
                   );
                   setLoading(false);
                   return;
@@ -394,8 +397,8 @@ const ProfileScreen = ({ navigation }) => {
 
                 if (upcomingSchedules.length > 0) {
                   Alert.alert(
-                    'لا يمكن حذف الحساب',
-                    `لديك ${upcomingSchedules.length} جدولة قادمة. يرجى إزالة الجدولات أولاً قبل حذف حسابك.`
+                    t('profile.cannotDeleteAccount'),
+                    t('profile.hasUpcomingSchedules', { count: upcomingSchedules.length })
                   );
                   setLoading(false);
                   return;
@@ -435,9 +438,9 @@ const ProfileScreen = ({ navigation }) => {
               // Delete Firebase Auth user account
               await deleteUser(user);
 
-              Alert.alert('تم الحذف', 'تم حذف حسابك بنجاح', [
+              Alert.alert(t('profile.accountDeleted'), t('profile.accountDeletedSuccess'), [
                 {
-                  text: 'موافق',
+                  text: t('common.ok'),
                   onPress: () => {
                     // Navigation will happen automatically when user becomes null
                   },
@@ -445,15 +448,15 @@ const ProfileScreen = ({ navigation }) => {
               ]);
             } catch (error) {
               console.error('Account deletion error:', error);
-              let errorMessage = 'فشل حذف الحساب';
+              let errorMessage = t('profile.deleteAccountFailed');
 
               if (error.code === 'auth/requires-recent-login') {
-                errorMessage = 'يرجى تسجيل الخروج ثم الدخول مرة أخرى قبل حذف حسابك';
+                errorMessage = t('profile.reloginBeforeDelete');
               } else if (error.code === 'auth/network-request-failed') {
-                errorMessage = 'خطأ في الاتصال بالشبكة. يرجى المحاولة مرة أخرى';
+                errorMessage = t('common.networkError');
               }
 
-              Alert.alert('خطأ', errorMessage);
+              Alert.alert(t('common.error'), errorMessage);
             } finally {
               setLoading(false);
               setDeletePassword('');
@@ -497,25 +500,25 @@ const ProfileScreen = ({ navigation }) => {
             <View style={styles.sectionTitleContainer}>
               <View style={styles.titleWithIcon}>
                 <FontAwesome5 name="clipboard-list" size={22} color="#4A90E2" solid />
-                <Text style={styles.cardTitle}>معلومات الحساب</Text>
+                <Text style={styles.cardTitle}>{t('profile.accountInfo')}</Text>
               </View>
             </View>
             <View style={styles.infoContainer}>
               {/* Name Frame */}
               <View style={styles.infoItemFrame}>
-                <Text style={styles.infoItemLabel}>الاسم:</Text>
+                <Text style={styles.infoItemLabel}>{t('profile.name')}</Text>
                 <Text style={styles.infoItemValue}>{displayName}</Text>
               </View>
 
               {/* Email Frame */}
               <View style={styles.infoItemFrame}>
-                <Text style={styles.infoItemLabel}>البريد الإلكتروني:</Text>
+                <Text style={styles.infoItemLabel}>{t('profile.emailLabel')}</Text>
                 <Text style={styles.infoItemValue}>{displayEmail}</Text>
               </View>
 
               {/* Role Frame */}
               <View style={[styles.infoItemFrame, { borderColor: roleInfo.color }]}>
-                <Text style={styles.infoItemLabel}>الدور:</Text>
+                <Text style={styles.infoItemLabel}>{t('profile.roleLabel')}</Text>
                 <Text style={[styles.infoItemValue, { color: roleInfo.color }]}>{roleInfo.label}</Text>
               </View>
             </View>
@@ -523,8 +526,8 @@ const ProfileScreen = ({ navigation }) => {
               <FontAwesome5 name="info-circle" size={18} color="#3498DB" solid style={styles.infoNoteIcon} />
               <Text style={styles.infoNoteText}>
                 {userRole === 'admin'
-                  ? 'يمكنك تغيير اسمك من خلال قسم "تغيير الاسم" أدناه.'
-                  : 'لا يمكن تغيير الاسم. للقيام بذلك، تواصل مع الإدارة.'}
+                  ? t('profile.adminNameChangeNote')
+                  : t('profile.nonAdminNameChangeNote')}
               </Text>
             </View>
           </AnimatedCard>
@@ -540,7 +543,7 @@ const ProfileScreen = ({ navigation }) => {
                 >
                   <View style={styles.titleWithIcon}>
                     <FontAwesome5 name="user-edit" size={20} color="#1ABC9C" solid />
-                    <Text style={styles.cardTitle}>تغيير الاسم</Text>
+                    <Text style={styles.cardTitle}>{t('profile.changeName')}</Text>
                   </View>
                   <Ionicons name={showNameSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
                 </TouchableOpacity>
@@ -550,12 +553,12 @@ const ProfileScreen = ({ navigation }) => {
                 <View style={styles.framedContent}>
                   <View style={styles.formSection}>
                     <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>الاسم الجديد</Text>
+                      <Text style={styles.inputLabel}>{t('profile.newName')}</Text>
                       <TextInput
                         style={styles.input}
                         value={newName}
                         onChangeText={setNewName}
-                        placeholder="أدخل الاسم الجديد"
+                        placeholder={t('profile.enterNewName')}
                         placeholderTextColor={colors.text.muted}
                         autoCapitalize="words"
                         editable={!loading}
@@ -571,7 +574,7 @@ const ProfileScreen = ({ navigation }) => {
                       {loading ? (
                         <ActivityIndicator color={colors.text.primary} size="small" />
                       ) : (
-                        <Text style={styles.actionButtonText}>✓ حفظ الاسم الجديد</Text>
+                        <Text style={styles.actionButtonText}>{t('profile.saveNewName')}</Text>
                       )}
                     </TouchableOpacity>
                   </View>
@@ -590,7 +593,7 @@ const ProfileScreen = ({ navigation }) => {
               >
                 <View style={styles.titleWithIcon}>
                   <FontAwesome5 name="lock" size={22} color="#F39C12" solid />
-                  <Text style={styles.cardTitle}>تغيير كلمة المرور</Text>
+                  <Text style={styles.cardTitle}>{t('profile.changePassword')}</Text>
                 </View>
                 <Ionicons name={showPasswordSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
@@ -600,13 +603,13 @@ const ProfileScreen = ({ navigation }) => {
               <View style={styles.framedContent}>
                 <View style={styles.formSection}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>كلمة المرور الحالية</Text>
+                    <Text style={styles.inputLabel}>{t('profile.currentPassword')}</Text>
                     <TextInput
                       style={styles.input}
                       value={currentPassword}
                       onChangeText={setCurrentPassword}
                       secureTextEntry
-                      placeholder="أدخل كلمة المرور الحالية"
+                      placeholder={t('profile.enterCurrentPassword')}
                       placeholderTextColor={colors.text.muted}
                       autoCapitalize="none"
                       editable={!loading}
@@ -614,13 +617,13 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>كلمة المرور الجديدة</Text>
+                    <Text style={styles.inputLabel}>{t('profile.newPassword')}</Text>
                     <TextInput
                       style={styles.input}
                       value={newPassword}
                       onChangeText={setNewPassword}
                       secureTextEntry
-                      placeholder="أدخل كلمة المرور الجديدة (6 أحرف على الأقل)"
+                      placeholder={t('profile.enterNewPassword')}
                       placeholderTextColor={colors.text.muted}
                       autoCapitalize="none"
                       editable={!loading}
@@ -628,13 +631,13 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>تأكيد كلمة المرور الجديدة</Text>
+                    <Text style={styles.inputLabel}>{t('profile.confirmNewPassword')}</Text>
                     <TextInput
                       style={styles.input}
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
                       secureTextEntry
-                      placeholder="أعد إدخال كلمة المرور الجديدة"
+                      placeholder={t('profile.reenterNewPassword')}
                       placeholderTextColor={colors.text.muted}
                       autoCapitalize="none"
                       editable={!loading}
@@ -650,7 +653,7 @@ const ProfileScreen = ({ navigation }) => {
                     {loading ? (
                       <ActivityIndicator color={colors.text.primary} size="small" />
                     ) : (
-                      <Text style={styles.actionButtonText}>✓ حفظ كلمة المرور الجديدة</Text>
+                      <Text style={styles.actionButtonText}>{t('profile.saveNewPassword')}</Text>
                     )}
                   </TouchableOpacity>
                 </View>
@@ -668,7 +671,7 @@ const ProfileScreen = ({ navigation }) => {
               >
                 <View style={styles.titleWithIcon}>
                   <FontAwesome5 name="envelope" size={20} color="#E74C3C" solid />
-                  <Text style={styles.cardTitle}>تغيير البريد الإلكتروني</Text>
+                  <Text style={styles.cardTitle}>{t('profile.changeEmail')}</Text>
                 </View>
                 <Ionicons name={showEmailSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
@@ -678,13 +681,13 @@ const ProfileScreen = ({ navigation }) => {
               <View style={styles.framedContent}>
                 <View style={styles.formSection}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>كلمة المرور الحالية</Text>
+                    <Text style={styles.inputLabel}>{t('profile.currentPassword')}</Text>
                     <TextInput
                       style={styles.input}
                       value={currentPassword}
                       onChangeText={setCurrentPassword}
                       secureTextEntry
-                      placeholder="أدخل كلمة المرور للتحقق"
+                      placeholder={t('profile.enterPasswordToVerify')}
                       placeholderTextColor={colors.text.muted}
                       autoCapitalize="none"
                       editable={!loading}
@@ -692,12 +695,12 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>البريد الإلكتروني الجديد</Text>
+                    <Text style={styles.inputLabel}>{t('profile.newEmail')}</Text>
                     <TextInput
                       style={styles.input}
                       value={newEmail}
                       onChangeText={setNewEmail}
-                      placeholder="أدخل البريد الإلكتروني الجديد"
+                      placeholder={t('profile.enterNewEmail')}
                       placeholderTextColor={colors.text.muted}
                       keyboardType="email-address"
                       autoCapitalize="none"
@@ -714,7 +717,7 @@ const ProfileScreen = ({ navigation }) => {
                     {loading ? (
                       <ActivityIndicator color={colors.text.primary} size="small" />
                     ) : (
-                      <Text style={styles.actionButtonText}>✓ حفظ البريد الإلكتروني الجديد</Text>
+                      <Text style={styles.actionButtonText}>{t('profile.saveNewEmail')}</Text>
                     )}
                   </TouchableOpacity>
                 </View>
@@ -732,7 +735,7 @@ const ProfileScreen = ({ navigation }) => {
               >
                 <View style={styles.titleWithIcon}>
                   <FontAwesome5 name="trash-alt" size={20} color="#E74C3C" solid />
-                  <Text style={[styles.cardTitle, { color: '#E74C3C' }]}>حذف الحساب</Text>
+                  <Text style={[styles.cardTitle, { color: '#E74C3C' }]}>{t('profile.deleteAccount')}</Text>
                 </View>
                 <Ionicons name={showDeleteSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
@@ -743,19 +746,19 @@ const ProfileScreen = ({ navigation }) => {
                 <View style={styles.deleteWarning}>
                   <FontAwesome5 name="exclamation-triangle" size={24} color="#E74C3C" solid style={styles.warningIcon} />
                   <Text style={styles.deleteWarningText}>
-                    تحذير: حذف الحساب إجراء نهائي ولا يمكن التراجع عنه. سيتم حذف جميع بياناتك بشكل دائم.
+                    {t('profile.deleteWarning')}
                   </Text>
                 </View>
 
                 <View style={styles.formSection}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>كلمة المرور للتأكيد</Text>
+                    <Text style={styles.inputLabel}>{t('profile.passwordForConfirm')}</Text>
                     <TextInput
                       style={styles.input}
                       value={deletePassword}
                       onChangeText={setDeletePassword}
                       secureTextEntry
-                      placeholder="أدخل كلمة المرور لتأكيد الحذف"
+                      placeholder={t('profile.enterPasswordToDelete')}
                       placeholderTextColor={colors.text.muted}
                       autoCapitalize="none"
                       editable={!loading}
@@ -773,7 +776,7 @@ const ProfileScreen = ({ navigation }) => {
                     ) : (
                       <>
                         <FontAwesome5 name="trash-alt" size={16} color="#FFFFFF" solid />
-                        <Text style={styles.deleteButtonText}>حذف حسابي نهائياً</Text>
+                        <Text style={styles.deleteButtonText}>{t('profile.deletePermanently')}</Text>
                       </>
                     )}
                   </TouchableOpacity>
@@ -782,11 +785,24 @@ const ProfileScreen = ({ navigation }) => {
             )}
           </AnimatedCard>
 
+          {/* Language Switcher */}
+          <AnimatedCard index={userRole === 'admin' ? 6 : 5} delay={350} style={styles.card}>
+            <View style={styles.sectionTitleContainer}>
+              <View style={styles.titleWithIcon}>
+                <FontAwesome5 name="globe" size={22} color="#3498DB" solid />
+                <Text style={styles.cardTitle}>{t('language.title')}</Text>
+              </View>
+            </View>
+            <View style={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>
+              <LanguageSwitcher />
+            </View>
+          </AnimatedCard>
+
           {/* Security Note */}
           <View style={styles.securityNote}>
             <FontAwesome5 name="shield-alt" size={22} color="#27AE60" solid style={styles.securityNoteIcon} />
             <Text style={styles.securityNoteText}>
-              لحماية حسابك، يرجى استخدام كلمة مرور قوية وعدم مشاركتها مع أي شخص.
+              {t('profile.securityNote')}
             </Text>
           </View>
 

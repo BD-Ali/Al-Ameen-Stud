@@ -8,6 +8,7 @@ import CompactHeader from '../components/CompactHeader';
 import AnimatedCard from '../components/AnimatedCard';
 import { useFadeIn, usePulse } from '../utils/animations';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * ClientHomeScreen displays a client's upcoming and past lessons along with
@@ -17,6 +18,7 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 const ClientHomeScreen = ({ navigation }) => {
   const { clients, lessons, horses, workers, getConfirmedLessons, getScheduledLessons } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
+  const { t } = useTranslation();
 
   // Animations
   const fadeAnim = useFadeIn(600);
@@ -56,12 +58,12 @@ const ClientHomeScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     Alert.alert(
-      'تسجيل الخروج',
-      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+      t('auth.logout'),
+      t('auth.logoutConfirm'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'تسجيل الخروج',
+          text: t('auth.logout'),
           onPress: async () => {
             await logOut();
           },
@@ -72,27 +74,27 @@ const ClientHomeScreen = ({ navigation }) => {
 
   const handleContactUs = () => {
     Alert.alert(
-      '📞 تواصل معنا',
-      'اختر طريقة التواصل مع الإدارة:',
+      `📞 ${t('clientHome.contactUs')}`,
+      t('visitorHome.contactChooseMethod'),
       [
         {
-          text: '📧 إرسال بريد إلكتروني',
+          text: `📧 ${t('visitorHome.sendEmail')}`,
           onPress: () => {
             Linking.openURL('mailto:Lina.b.96@hotmail.com').catch(err => {
-              Alert.alert('خطأ', 'لا يمكن فتح تطبيق البريد الإلكتروني');
+              Alert.alert(t('common.error'), t('visitorHome.cannotOpenEmail'));
             });
           }
         },
         {
-          text: '📱 اتصال هاتفي',
+          text: `📱 ${t('visitorHome.phoneCall')}`,
           onPress: () => {
             Linking.openURL('tel:0526913008').catch(err => {
-              Alert.alert('خطأ', 'لا يمكن إجراء المكالمة');
+              Alert.alert(t('common.error'), t('visitorHome.cannotMakeCall'));
             });
           }
         },
         {
-          text: 'إلغاء',
+          text: t('common.cancel'),
           style: 'cancel'
         }
       ]
@@ -127,16 +129,16 @@ const ClientHomeScreen = ({ navigation }) => {
               <AnimatedCard index={0} delay={100} style={styles.paymentCard}>
                 <View style={styles.paymentHeader}>
                   <FontAwesome5 name="money-bill-wave" size={20} color="#27AE60" solid />
-                  <Text style={styles.paymentTitle}> حالة الدفع</Text>
+                  <Text style={styles.paymentTitle}> {t('clientHome.paymentStatus')}</Text>
                 </View>
                 <View style={styles.paymentRow}>
                   <View style={styles.paymentItem}>
-                    <Text style={styles.paymentLabel}>المدفوع</Text>
+                    <Text style={styles.paymentLabel}>{t('clientHome.amountPaid')}</Text>
                     <Text style={styles.paymentAmountPaid}>₪{selectedClient.amountPaid || 0}</Text>
                   </View>
                   <View style={styles.paymentDivider} />
                   <View style={styles.paymentItem}>
-                    <Text style={styles.paymentLabel}>المستحق</Text>
+                    <Text style={styles.paymentLabel}>{t('clientHome.amountDue')}</Text>
                     <Text style={styles.paymentAmountDue}>₪{selectedClient.amountDue || 0}</Text>
                   </View>
                 </View>
@@ -148,7 +150,7 @@ const ClientHomeScreen = ({ navigation }) => {
                   <View style={styles.subscriptionHeader}>
                     <View style={styles.subscriptionTitleContainer}>
                       <FontAwesome5 name="ticket-alt" size={18} color="#9B59B6" solid />
-                      <Text style={styles.subscriptionTitle}>اشتراك العيادة</Text>
+                      <Text style={styles.subscriptionTitle}>{t('clientHome.clinicSubscription')}</Text>
                     </View>
                     <View style={[styles.subscriptionStatusBadge, selectedClient.subscriptionActive && styles.subscriptionActiveBadge]}>
                       <FontAwesome5
@@ -158,23 +160,23 @@ const ClientHomeScreen = ({ navigation }) => {
                         solid
                       />
                       <Text style={styles.subscriptionStatusText}>
-                        {selectedClient.subscriptionActive ? ' نشط' : ' منتهي'}
+                        {selectedClient.subscriptionActive ? ` ${t('clientHome.active')}` : ` ${t('clientHome.expired')}`}
                       </Text>
                     </View>
                   </View>
                   <View style={styles.subscriptionStats}>
                     <View style={styles.subscriptionStatItem}>
-                      <Text style={styles.subscriptionStatLabel}>الدروس المتبقية</Text>
+                      <Text style={styles.subscriptionStatLabel}>{t('clientHome.remainingLessons')}</Text>
                       <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionLessons || 0}</Text>
                     </View>
                     <View style={styles.subscriptionDivider} />
                     <View style={styles.subscriptionStatItem}>
-                      <Text style={styles.subscriptionStatLabel}>الدروس المستخدمة</Text>
+                      <Text style={styles.subscriptionStatLabel}>{t('clientHome.usedLessons')}</Text>
                       <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionUsedLessons || 0}</Text>
                     </View>
                     <View style={styles.subscriptionDivider} />
                     <View style={styles.subscriptionStatItem}>
-                      <Text style={styles.subscriptionStatLabel}>إجمالي الاشتراك</Text>
+                      <Text style={styles.subscriptionStatLabel}>{t('clientHome.totalLessons')}</Text>
                       <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionTotalLessons || 0}</Text>
                     </View>
                   </View>
@@ -183,7 +185,7 @@ const ClientHomeScreen = ({ navigation }) => {
                       <View style={styles.subscriptionDateRow}>
                         <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
                         <Text style={styles.subscriptionDate}>
-                          تاريخ البدء: {formatDate(selectedClient.subscriptionStartDate)}
+                          {t('clientHome.startDate')} {formatDate(selectedClient.subscriptionStartDate)}
                         </Text>
                       </View>
                     </View>
@@ -197,7 +199,7 @@ const ClientHomeScreen = ({ navigation }) => {
                   <View style={styles.horsesHeader}>
                     <View style={styles.sectionTitleRow}>
                       <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
-                      <Text style={styles.sectionTitle}>خيولنا</Text>
+                      <Text style={styles.sectionTitle}>{t('workerHome.ourHorses')}</Text>
                     </View>
                     <View style={styles.horsesBadge}>
                       <Text style={styles.horsesBadgeText}>{horses.length}</Text>
@@ -236,7 +238,7 @@ const ClientHomeScreen = ({ navigation }) => {
               <View style={styles.lessonsHeader}>
                 <View style={styles.sectionTitleRow}>
                   <FontAwesome5 name="calendar-check" size={22} color="#9B59B6" solid />
-                  <Text style={styles.sectionTitle}>دروسك</Text>
+                  <Text style={styles.sectionTitle}>{t('clientHome.yourLessons')}</Text>
                 </View>
                 <View style={styles.lessonsBadge}>
                   <Text style={styles.lessonsBadgeText}>{clientLessons.length}</Text>
@@ -267,19 +269,19 @@ const ClientHomeScreen = ({ navigation }) => {
                     {isConfirmed && (
                       <View style={styles.confirmedBadge}>
                         <FontAwesome5 name="check-circle" size={12} color="#27AE60" solid />
-                        <Text style={styles.confirmedBadgeText}> مكتمل</Text>
+                        <Text style={styles.confirmedBadgeText}> {t('clientHome.completed')}</Text>
                       </View>
                     )}
                     {!isConfirmed && !isCancelled && (
                       <View style={styles.scheduledBadge}>
                         <FontAwesome5 name="hourglass-half" size={12} color="#F39C12" solid />
-                        <Text style={styles.scheduledBadgeText}> مجدول</Text>
+                        <Text style={styles.scheduledBadgeText}> {t('clientHome.scheduled')}</Text>
                       </View>
                     )}
                     {isCancelled && (
                       <View style={styles.cancelledBadge}>
                         <FontAwesome5 name="times-circle" size={12} color="#E74C3C" solid />
-                        <Text style={styles.cancelledBadgeText}> ملغي</Text>
+                        <Text style={styles.cancelledBadgeText}> {t('clientHome.cancelled')}</Text>
                       </View>
                     )}
                   </View>
@@ -304,8 +306,8 @@ const ClientHomeScreen = ({ navigation }) => {
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <FontAwesome5 name="calendar-times" size={48} color="#95A5A6" solid />
-              <Text style={styles.emptyText}>لا توجد دروس مجدولة بعد</Text>
-              <Text style={styles.emptySubtext}>اتصل بنا لحجز درسك الأول!</Text>
+              <Text style={styles.emptyText}>{t('clientHome.noScheduledLessons')}</Text>
+              <Text style={styles.emptySubtext}>{t('clientHome.contactToBook')}</Text>
             </View>
           }
           contentContainerStyle={styles.content}
@@ -313,7 +315,7 @@ const ClientHomeScreen = ({ navigation }) => {
       ) : (
         <View style={styles.loadingContainer}>
           <FontAwesome5 name="spinner" size={48} color="#3B82F6" />
-          <Text style={styles.loadingText}>جاري تحميل معلوماتك...</Text>
+          <Text style={styles.loadingText}>{t('clientHome.loadingInfo')}</Text>
         </View>
       )}
 

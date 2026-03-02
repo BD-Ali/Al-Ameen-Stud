@@ -7,6 +7,7 @@ import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import CompactHeader from '../components/CompactHeader';
 import { useFadeIn, usePulse } from '../utils/animations';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
@@ -14,6 +15,7 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 const WorkerHomeScreen = ({ navigation }) => {
   const { schedules, horses, workers, lessons, clients, weeklySchedules, loading, confirmLesson, cancelLesson } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
+  const { t } = useTranslation();
 
   // Animations
   const fadeAnim = useFadeIn(600);
@@ -108,12 +110,12 @@ const WorkerHomeScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     Alert.alert(
-      'تسجيل الخروج',
-      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+      t('auth.logout'),
+      t('auth.logoutConfirm'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'تسجيل الخروج',
+          text: t('auth.logout'),
           onPress: async () => {
             await logOut();
           },
@@ -124,27 +126,27 @@ const WorkerHomeScreen = ({ navigation }) => {
 
   const handleContactUs = () => {
     Alert.alert(
-      'تواصل معنا',
-      'اختر طريقة التواصل مع الإدارة:',
+      t('visitorHome.contactUs'),
+      t('visitorHome.contactChooseMethod'),
       [
         {
-          text: 'إرسال بريد إلكتروني',
+          text: t('visitorHome.sendEmail'),
           onPress: () => {
             Linking.openURL('mailto:badarne3li@gmail.com').catch(() => {
-              Alert.alert('خطأ', 'لا يمكن فتح تطبيق البريد الإلكتروني');
+              Alert.alert(t('common.error'), t('visitorHome.cannotOpenEmail'));
             });
           }
         },
         {
-          text: 'اتصال هاتفي',
+          text: t('visitorHome.phoneCall'),
           onPress: () => {
             Linking.openURL('tel:0503653429').catch(() => {
-              Alert.alert('خطأ', 'لا يمكن إجراء المكالمة');
+              Alert.alert(t('common.error'), t('visitorHome.cannotMakeCall'));
             });
           }
         },
         {
-          text: 'إلغاء',
+          text: t('common.cancel'),
           style: 'cancel'
         }
       ]
@@ -162,18 +164,18 @@ const WorkerHomeScreen = ({ navigation }) => {
 
   const handleConfirmLesson = async (lessonId) => {
     Alert.alert(
-      'تأكيد إتمام الدرس',
-      'هل تريد تأكيد أن هذا الدرس قد تم بنجاح؟ سيتم تحديث عدد دروس العميل تلقائياً.',
+      t('workerHome.confirmLesson'),
+      t('workerHome.confirmLessonQuestion'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'تأكيد',
+          text: t('common.confirm'),
           onPress: async () => {
             const result = await confirmLesson(lessonId);
             if (result.success) {
-              Alert.alert('نجح', 'تم تأكيد إتمام الدرس بنجاح ✓');
+              Alert.alert(t('common.success'), t('workerHome.lessonConfirmed'));
             } else {
-              Alert.alert('خطأ', result.error || 'فشل تأكيد الدرس');
+              Alert.alert(t('common.error'), result.error || t('workerHome.confirmLessonFailed'));
             }
           }
         }
@@ -183,19 +185,19 @@ const WorkerHomeScreen = ({ navigation }) => {
 
   const handleCancelLesson = async (lessonId) => {
     Alert.alert(
-      'إلغاء الدرس',
-      'هل تريد إلغاء هذا الدرس؟ لن يتم تحديث عدد دروس العميل.',
+      t('workerHome.cancelLesson'),
+      t('workerHome.cancelLessonQuestion'),
       [
-        { text: 'رجوع', style: 'cancel' },
+        { text: t('common.back'), style: 'cancel' },
         {
-          text: 'إلغاء الدرس',
+          text: t('workerHome.cancelLesson'),
           style: 'destructive',
           onPress: async () => {
-            const result = await cancelLesson(lessonId, 'ألغي من قبل المدرب');
+            const result = await cancelLesson(lessonId, t('workerHome.cancelledByInstructor'));
             if (result.success) {
-              Alert.alert('تم', 'تم إلغاء الدرس');
+              Alert.alert(t('common.done'), t('workerHome.lessonCancelled'));
             } else {
-              Alert.alert('خطأ', result.error || 'فشل إلغاء الدرس');
+              Alert.alert(t('common.error'), result.error || t('workerHome.cancelLessonFailed'));
             }
           }
         }
@@ -227,7 +229,7 @@ const WorkerHomeScreen = ({ navigation }) => {
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
                 <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
-                <Text style={styles.sectionTitle}>خيولنا</Text>
+                <Text style={styles.sectionTitle}>{t('workerHome.ourHorses')}</Text>
               </View>
               <View style={styles.horsesBadge}>
                 <Text style={styles.horsesBadgeText}>{horses.length}</Text>
@@ -268,7 +270,7 @@ const WorkerHomeScreen = ({ navigation }) => {
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
                 <FontAwesome5 name="calendar-alt" size={24} color="#5DADE2" solid />
-                <Text style={styles.sectionTitle}>جدول اليوم</Text>
+                <Text style={styles.sectionTitle}>{t('workerHome.todaySchedule')}</Text>
               </View>
             </View>
 
@@ -279,7 +281,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                   <View style={styles.taskGroup}>
                     <View style={styles.taskGroupTitleRow}>
                       <FontAwesome5 name="clock" size={16} color="#27AE60" solid />
-                      <Text style={styles.taskGroupTitle}>المهمة الحالية</Text>
+                      <Text style={styles.taskGroupTitle}>{t('workerHome.currentTask')}</Text>
                     </View>
                     {currentTasks.map((schedule) => (
                       <View key={schedule.id} style={[styles.scheduleCard, styles.currentTaskCard]}>
@@ -299,7 +301,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                   <View style={styles.taskGroup}>
                     <View style={styles.taskGroupTitleRow}>
                       <FontAwesome5 name="clipboard-list" size={16} color="#3B82F6" solid />
-                      <Text style={styles.taskGroupTitle}>المهام القادمة ({upcomingTasks.length})</Text>
+                      <Text style={styles.taskGroupTitle}>{t('workerHome.upcomingTasks')} ({upcomingTasks.length})</Text>
                     </View>
                     {upcomingTasks.map((schedule) => (
                       <View key={schedule.id} style={styles.scheduleCard}>
@@ -319,7 +321,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                   <View style={styles.taskGroup}>
                     <View style={styles.taskGroupTitleRow}>
                       <FontAwesome5 name="check-circle" size={16} color="#27AE60" solid />
-                      <Text style={styles.taskGroupTitle}>المهام المكتملة ({pastTasks.length})</Text>
+                      <Text style={styles.taskGroupTitle}>{t('workerHome.completedTasks')} ({pastTasks.length})</Text>
                     </View>
                     {pastTasks.map((schedule) => (
                       <View key={schedule.id} style={[styles.scheduleCard, styles.pastTaskCard]}>
@@ -337,7 +339,7 @@ const WorkerHomeScreen = ({ navigation }) => {
             ) : (
               <View style={styles.emptyState}>
                 <FontAwesome5 name="clipboard-list" size={48} color="#4A90E2" solid />
-                <Text style={styles.emptyText}>لا توجد مهام مجدولة لليوم</Text>
+                <Text style={styles.emptyText}>{t('workerHome.noTasksToday')}</Text>
               </View>
             )}
           </View>
@@ -349,7 +351,7 @@ const WorkerHomeScreen = ({ navigation }) => {
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
                 <FontAwesome5 name="book-open" size={22} color="#9B59B6" solid />
-                <Text style={styles.sectionTitle}>دروسي</Text>
+                <Text style={styles.sectionTitle}>{t('workerHome.myLessons')}</Text>
               </View>
             </View>
 
@@ -358,7 +360,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {/* Today's Lessons */}
                 {todayLessons.length > 0 && (
                   <View style={styles.lessonGroup}>
-                    <Text style={styles.lessonGroupTitle}>دروس اليوم</Text>
+                    <Text style={styles.lessonGroupTitle}>{t('workerHome.todayLessons')}</Text>
                     {todayLessons.map((lesson) => (
                       <View key={lesson.id} style={styles.lessonCard}>
                         <View style={styles.lessonHeader}>
@@ -369,25 +371,25 @@ const WorkerHomeScreen = ({ navigation }) => {
                           {lesson.confirmed && (
                             <View style={styles.confirmedBadge}>
                               <FontAwesome5 name="check" size={10} color="#fff" solid />
-                              <Text style={styles.confirmedBadgeText}>مكتمل</Text>
+                              <Text style={styles.confirmedBadgeText}>{t('clientHome.completed')}</Text>
                             </View>
                           )}
                           {lesson.status === 'cancelled' && (
                             <View style={styles.cancelledBadge}>
                               <FontAwesome5 name="times" size={10} color="#fff" solid />
-                              <Text style={styles.cancelledBadgeText}>ملغي</Text>
+                              <Text style={styles.cancelledBadgeText}>{t('clientHome.cancelled')}</Text>
                             </View>
                           )}
                         </View>
                         <View style={styles.lessonDetails}>
                           <View style={styles.lessonInfoRow}>
                             <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-                            <Text style={styles.lessonLabel}>العميل:</Text>
+                            <Text style={styles.lessonLabel}>{t('lessons.client')}</Text>
                             <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
                           </View>
                           <View style={styles.lessonInfoRow}>
                             <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-                            <Text style={styles.lessonLabel}>الحصان:</Text>
+                            <Text style={styles.lessonLabel}>{t('lessons.horse')}</Text>
                             <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
                           </View>
                         </View>
@@ -398,14 +400,14 @@ const WorkerHomeScreen = ({ navigation }) => {
                               onPress={() => handleConfirmLesson(lesson.id)}
                             >
                               <FontAwesome5 name="check" size={12} color="#fff" solid />
-                              <Text style={styles.confirmButtonText}>تأكيد الإتمام</Text>
+                              <Text style={styles.confirmButtonText}>{t('workerHome.confirmCompletion')}</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                               style={styles.cancelButton}
                               onPress={() => handleCancelLesson(lesson.id)}
                             >
                               <FontAwesome5 name="times" size={12} color="#fff" solid />
-                              <Text style={styles.cancelButtonText}>إلغاء</Text>
+                              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                             </TouchableOpacity>
                           </View>
                         )}
@@ -417,7 +419,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {/* Upcoming Lessons */}
                 {upcomingLessons.length > 0 && (
                   <View style={styles.lessonGroup}>
-                    <Text style={styles.lessonGroupTitle}>الدروس القادمة</Text>
+                    <Text style={styles.lessonGroupTitle}>{t('clientHome.upcomingLessons')}</Text>
                     {upcomingLessons.map((lesson) => (
                       <View key={lesson.id} style={styles.lessonCard}>
                         <View style={styles.lessonHeader}>
@@ -433,12 +435,12 @@ const WorkerHomeScreen = ({ navigation }) => {
                         <View style={styles.lessonDetails}>
                           <View style={styles.lessonInfoRow}>
                             <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-                            <Text style={styles.lessonLabel}>العميل:</Text>
+                            <Text style={styles.lessonLabel}>{t('lessons.client')}</Text>
                             <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
                           </View>
                           <View style={styles.lessonInfoRow}>
                             <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-                            <Text style={styles.lessonLabel}>الحصان:</Text>
+                            <Text style={styles.lessonLabel}>{t('lessons.horse')}</Text>
                             <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
                           </View>
                         </View>
@@ -450,7 +452,7 @@ const WorkerHomeScreen = ({ navigation }) => {
             ) : (
               <View style={styles.emptyState}>
                 <FontAwesome5 name="book-open" size={48} color="#9B59B6" solid />
-                <Text style={styles.emptyText}>لا توجد دروس مضافة</Text>
+                <Text style={styles.emptyText}>{t('workerHome.noLessonsAdded')}</Text>
               </View>
             )}
           </View>
@@ -462,18 +464,18 @@ const WorkerHomeScreen = ({ navigation }) => {
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleRow}>
                 <FontAwesome5 name="info-circle" size={24} color="#3B82F6" solid />
-                <Text style={styles.sectionTitle}>معلوماتي</Text>
+                <Text style={styles.sectionTitle}>{t('workerHome.myInfo')}</Text>
               </View>
             </View>
 
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>الوظيفة:</Text>
-                <Text style={styles.infoValue}>{currentWorker.role || 'عامل'}</Text>
+                <Text style={styles.infoLabel}>{t('workerHome.jobTitle')}</Text>
+                <Text style={styles.infoValue}>{currentWorker.role || t('roles.worker')}</Text>
               </View>
               {currentWorker.contact && (
                 <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>الاتصال:</Text>
+                  <Text style={styles.infoLabel}>{t('workerHome.contactLabel')}</Text>
                   <Text style={styles.infoValue}>{currentWorker.contact}</Text>
                 </View>
               )}
@@ -490,7 +492,7 @@ const WorkerHomeScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       {/* Compact Header */}
       <CompactHeader
-        userName={currentWorker?.name || user?.email || 'عامل'}
+        userName={currentWorker?.name || user?.email || t('roles.worker')}
         userRole="worker"
         onLogout={logOut}
         onProfilePress={handleProfilePress}

@@ -20,9 +20,11 @@ import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import { useFadeIn } from '../utils/animations';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const WeeklyScheduleScreen = () => {
   const { weeklySchedules, workerUsers, addWeeklySchedule, updateWeeklySchedule, removeWeeklySchedule } = useContext(DataContext);
+  const { t } = useTranslation();
 
   const [currentWeekStart, setCurrentWeekStart] = useState(null);
   const [currentWeekId, setCurrentWeekId] = useState('');
@@ -37,13 +39,13 @@ const WeeklyScheduleScreen = () => {
 
   // Days of the week (Saturday to Friday)
   const daysOfWeek = [
-    { key: 'saturday', label: 'السبت', shortLabel: 'سبت' },
-    { key: 'sunday', label: 'الأحد', shortLabel: 'أحد' },
-    { key: 'monday', label: 'الاثنين', shortLabel: 'اثنين' },
-    { key: 'tuesday', label: 'الثلاثاء', shortLabel: 'ثلاثاء' },
-    { key: 'wednesday', label: 'الأربعاء', shortLabel: 'أربعاء' },
-    { key: 'thursday', label: 'الخميس', shortLabel: 'خميس' },
-    { key: 'friday', label: 'الجمعة', shortLabel: 'جمعة' },
+    { key: 'saturday', label: t('weeklySchedule.saturday'), shortLabel: t('weeklySchedule.satShort') },
+    { key: 'sunday', label: t('weeklySchedule.sunday'), shortLabel: t('weeklySchedule.sunShort') },
+    { key: 'monday', label: t('weeklySchedule.monday'), shortLabel: t('weeklySchedule.monShort') },
+    { key: 'tuesday', label: t('weeklySchedule.tuesday'), shortLabel: t('weeklySchedule.tueShort') },
+    { key: 'wednesday', label: t('weeklySchedule.wednesday'), shortLabel: t('weeklySchedule.wedShort') },
+    { key: 'thursday', label: t('weeklySchedule.thursday'), shortLabel: t('weeklySchedule.thuShort') },
+    { key: 'friday', label: t('weeklySchedule.friday'), shortLabel: t('weeklySchedule.friShort') },
   ];
 
   // Time slots (8 AM to 11 PM)
@@ -139,8 +141,8 @@ const WeeklyScheduleScreen = () => {
     dayDate.setDate(weekStartDate.getDate() + dayOffset);
 
     const day = dayDate.getDate();
-    const monthNames = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-                        'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+    const monthNames = [t('weeklySchedule.january'), t('weeklySchedule.february'), t('weeklySchedule.march'), t('weeklySchedule.april'), t('weeklySchedule.may'), t('weeklySchedule.june'),
+                        t('weeklySchedule.july'), t('weeklySchedule.august'), t('weeklySchedule.september'), t('weeklySchedule.october'), t('weeklySchedule.november'), t('weeklySchedule.december')];
     const monthName = monthNames[dayDate.getMonth()];
 
     return `${day} ${monthName}`;
@@ -156,7 +158,7 @@ const WeeklyScheduleScreen = () => {
   // Get worker name by ID
   const getWorkerName = (workerId) => {
     const worker = workerUsers?.find((w) => w.id === workerId);
-    return worker?.name || 'غير معروف';
+    return worker?.name || t('common.unknown');
   };
 
   // Handle slot press
@@ -166,12 +168,12 @@ const WeeklyScheduleScreen = () => {
     if (existingSchedule) {
       // Edit existing schedule
       Alert.alert(
-        'تعديل المهمة',
-        'ماذا تريد أن تفعل؟',
+        t('weeklySchedule.editTask'),
+        t('weeklySchedule.whatToDo'),
         [
-          { text: 'إلغاء', style: 'cancel' },
+          { text: t('common.cancel'), style: 'cancel' },
           {
-            text: 'تعديل',
+            text: t('common.edit'),
             onPress: () => {
               setEditMode(true);
               setEditingScheduleId(existingSchedule.id);
@@ -182,7 +184,7 @@ const WeeklyScheduleScreen = () => {
             },
           },
           {
-            text: 'حذف',
+            text: t('weeklySchedule.deleteTask'),
             style: 'destructive',
             onPress: () => handleDeleteSchedule(existingSchedule.id),
           },
@@ -201,7 +203,7 @@ const WeeklyScheduleScreen = () => {
   // Open modal to assign work
   const openAssignModal = () => {
     if (selectedSlots.length === 0) {
-      Alert.alert('تنبيه', 'الرجاء اختيار وقت واحد على الأقل');
+      Alert.alert(t('common.alert'), t('weeklySchedule.selectAtLeastOneTime'));
       return;
     }
     setModalVisible(true);
@@ -210,12 +212,12 @@ const WeeklyScheduleScreen = () => {
   // Handle save schedule
   const handleSaveSchedule = async () => {
     if (!selectedWorker) {
-      Alert.alert('خطأ', 'الرجاء اختيار عامل');
+      Alert.alert(t('common.error'), t('weeklySchedule.selectWorker'));
       return;
     }
 
     if (!workDescription.trim()) {
-      Alert.alert('خطأ', 'الرجاء إدخال وصف العمل');
+      Alert.alert(t('common.error'), t('weeklySchedule.enterWorkDescription'));
       return;
     }
 
@@ -230,10 +232,10 @@ const WeeklyScheduleScreen = () => {
         });
 
         if (result.success) {
-          Alert.alert('نجح', 'تم تحديث المهمة بنجاح');
+          Alert.alert(t('common.success'), t('weeklySchedule.taskUpdated'));
           closeModal();
         } else {
-          Alert.alert('خطأ', result.error || 'فشل تحديث المهمة');
+          Alert.alert(t('common.error'), result.error || t('weeklySchedule.taskUpdateFailed'));
         }
       } else {
         // Add new schedules for all selected slots
@@ -248,17 +250,17 @@ const WeeklyScheduleScreen = () => {
           });
 
           if (!result.success) {
-            Alert.alert('خطأ', result.error || 'فشل إضافة المهمة');
+            Alert.alert(t('common.error'), result.error || t('weeklySchedule.taskAddFailed'));
             setLoading(false);
             return;
           }
         }
 
-        Alert.alert('نجح', `تم إضافة ${selectedSlots.length} مهمة بنجاح`);
+        Alert.alert(t('common.success'), t('weeklySchedule.tasksAdded', { count: selectedSlots.length }));
         closeModal();
       }
     } catch (error) {
-      Alert.alert('خطأ', 'حدث خطأ أثناء الحفظ');
+      Alert.alert(t('common.error'), t('weeklySchedule.saveError'));
     }
 
     setLoading(false);
@@ -267,19 +269,19 @@ const WeeklyScheduleScreen = () => {
   // Handle delete schedule
   const handleDeleteSchedule = async (scheduleId) => {
     Alert.alert(
-      'تأكيد الحذف',
-      'هل أنت متأكد من حذف هذه المهمة؟',
+      t('weeklySchedule.confirmDeleteTask'),
+      t('weeklySchedule.confirmDeleteTaskQuestion'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'حذف',
+          text: t('weeklySchedule.deleteTask'),
           style: 'destructive',
           onPress: async () => {
             const result = await removeWeeklySchedule(scheduleId);
             if (result.success) {
-              Alert.alert('نجح', 'تم حذف المهمة بنجاح');
+              Alert.alert(t('common.success'), t('weeklySchedule.taskDeleted'));
             } else {
-              Alert.alert('خطأ', result.error || 'فشل حذف المهمة');
+              Alert.alert(t('common.error'), result.error || t('weeklySchedule.taskDeleteFailed'));
             }
           },
         },
@@ -308,7 +310,7 @@ const WeeklyScheduleScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.weekInfo}>
-          <Text style={styles.weekSubtitle}>أسبوع {currentWeekId}</Text>
+          <Text style={styles.weekSubtitle}>{t('weeklySchedule.week')} {currentWeekId}</Text>
         </View>
 
         {/* Day Selector - Using FlatList instead of ScrollView */}
@@ -395,7 +397,7 @@ const WeeklyScheduleScreen = () => {
                   </Text>
                 </View>
               ) : (
-                <Text style={styles.emptySlotText}>غير محدد</Text>
+                <Text style={styles.emptySlotText}>{t('common.notSpecified')}</Text>
               )}
             </TouchableOpacity>
           );
@@ -406,14 +408,14 @@ const WeeklyScheduleScreen = () => {
       {selectedSlots.length > 0 && (
         <View style={styles.actionBar}>
           <Text style={styles.selectionCount}>
-            {selectedSlots.length} وقت محدد
+            {t('weeklySchedule.timeSelected', { count: selectedSlots.length })}
           </Text>
           <View style={styles.actionButtons}>
             <TouchableOpacity onPress={clearSelections} style={styles.clearButton}>
-              <Text style={styles.clearButtonText}>إلغاء</Text>
+              <Text style={styles.clearButtonText}>{t('common.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={openAssignModal} style={styles.assignButton}>
-              <Text style={styles.assignButtonText}>تعيين عمل</Text>
+              <Text style={styles.assignButtonText}>{t('weeklySchedule.assignWork')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -430,7 +432,7 @@ const WeeklyScheduleScreen = () => {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {editMode ? 'تعديل المهمة' : 'تعيين عمل'}
+                {editMode ? t('weeklySchedule.editTaskTitle') : t('weeklySchedule.assignWork')}
               </Text>
               <TouchableOpacity onPress={closeModal}>
                 <FontAwesome5 name="times" size={20} color={colors.text.secondary} solid />
@@ -446,7 +448,7 @@ const WeeklyScheduleScreen = () => {
                 <ScrollView contentContainerStyle={styles.modalBody}>
                   {/* Selected Time Info */}
                   <View style={styles.selectedTimeInfo}>
-                    <Text style={styles.selectedTimeLabel}>الوقت المحدد:</Text>
+                    <Text style={styles.selectedTimeLabel}>{t('weeklySchedule.selectedTime')}</Text>
                     <Text style={styles.selectedTimeText}>
                       {editMode
                         ? selectedSlots[0]
@@ -455,7 +457,7 @@ const WeeklyScheduleScreen = () => {
                   </View>
 
                   {/* Worker Selection - Using FlatList */}
-                  <Text style={styles.inputLabel}>اختر العامل</Text>
+                  <Text style={styles.inputLabel}>{t('weeklySchedule.chooseWorker')}</Text>
                   <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -490,10 +492,10 @@ const WeeklyScheduleScreen = () => {
                   />
 
                   {/* Work Description */}
-                  <Text style={styles.inputLabel}>وصف العمل</Text>
+                  <Text style={styles.inputLabel}>{t('weeklySchedule.workDescription')}</Text>
                   <TextInput
                     style={styles.textArea}
-                    placeholder="أدخل وصف العمل المطلوب"
+                    placeholder={t('weeklySchedule.enterWorkDesc')}
                     placeholderTextColor={colors.text.muted}
                     value={workDescription}
                     onChangeText={setWorkDescription}
@@ -512,7 +514,7 @@ const WeeklyScheduleScreen = () => {
                       <ActivityIndicator color="#fff" />
                     ) : (
                       <Text style={styles.saveButtonText}>
-                        {editMode ? 'تحديث' : 'حفظ'}
+                        {editMode ? t('common.update') : t('common.save')}
                       </Text>
                     )}
                   </TouchableOpacity>

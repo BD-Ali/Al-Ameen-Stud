@@ -17,12 +17,14 @@ import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * UsersScreen - Unified section for managing both Clients and Workers
  * Features: Tabs, Search/Filter, Collapsible items, Create/Edit/Delete for both types
  */
 const UsersScreen = () => {
+  const { t } = useTranslation();
   const {
     clients,
     workers,
@@ -84,7 +86,7 @@ const UsersScreen = () => {
   }, [activeTab, clients, workers, workerUsers, searchQuery]);
 
   // Helper Functions
-  const getHorseName = (id) => horses?.find((h) => h.id === id)?.name || 'غير معروف';
+  const getHorseName = (id) => horses?.find((h) => h.id === id)?.name || t('common.unknown');
 
   const formatDate = (dateStr) => {
     try {
@@ -159,12 +161,12 @@ const UsersScreen = () => {
         if (supported) {
           return Linking.openURL(phoneUrl);
         } else {
-          Alert.alert('خطأ', 'لا يمكن إجراء المكالمة على هذا الجهاز');
+          Alert.alert(t('common.error'), t('users.cannotCallOnDevice'));
         }
       })
       .catch((err) => {
         console.error('Error opening phone dialer:', err);
-        Alert.alert('خطأ', 'فشل فتح تطبيق الهاتف');
+        Alert.alert(t('common.error'), t('users.phoneDialFailed'));
       });
   };
 
@@ -210,7 +212,7 @@ const UsersScreen = () => {
 
   const saveUserDetails = async (userId) => {
     setIsLoading(true);
-    setLoadingMessage('جاري الحفظ...');
+    setLoadingMessage(t('users.saving'));
 
     if (activeTab === 'clients') {
       const paidNum = editFormData.amountPaid ? parseFloat(editFormData.amountPaid) : 0;
@@ -225,16 +227,16 @@ const UsersScreen = () => {
 
       setIsLoading(false);
       if (result.success) {
-        showToastNotification('✅ تم تحديث بيانات العميل بنجاح', 'success');
+        showToastNotification(t('users.clientUpdated'), 'success');
         setEditingUserId(null);
         setEditFormData({});
       } else {
-        showToastNotification(result.error || 'فشل تحديث البيانات', 'error');
+        showToastNotification(result.error || t('users.updateFailed'), 'error');
       }
     } else {
       // For workers, we can add update functionality if needed
       setIsLoading(false);
-      showToastNotification('✅ تم تحديث بيانات العامل بنجاح', 'success');
+      showToastNotification(t('users.workerUpdated'), 'success');
       setEditingUserId(null);
       setEditFormData({});
     }
@@ -242,18 +244,17 @@ const UsersScreen = () => {
 
   // Delete Functions
   const handleRemoveUser = (id, name) => {
-    const userType = activeTab === 'clients' ? 'العميل' : 'العامل';
     Alert.alert(
-      `حذف ${userType}`,
-      `هل أنت متأكد أنك تريد حذف ${name}؟`,
+      activeTab === 'clients' ? t('users.deleteClient') : t('users.deleteWorker'),
+      t('users.confirmDeleteUser', { name }),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'حذف',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             setIsLoading(true);
-            setLoadingMessage('جاري الحذف...');
+            setLoadingMessage(t('users.deleting'));
 
             const result = activeTab === 'clients'
               ? await removeClient(id)
@@ -261,10 +262,10 @@ const UsersScreen = () => {
 
             setIsLoading(false);
             if (result.success) {
-              showToastNotification(`✅ تم حذف ${userType} بنجاح`, 'success');
+              showToastNotification(activeTab === 'clients' ? t('users.clientDeleted') : t('users.workerDeleted'), 'success');
               setExpandedUserId(null);
             } else {
-              showToastNotification(result.error || `فشل حذف ${userType}`, 'error');
+              showToastNotification(result.error || t('users.deleteFailed'), 'error');
             }
           }
         }
@@ -276,15 +277,15 @@ const UsersScreen = () => {
   const handleAddNewUser = async () => {
     // Validation
     if (!newUserForm.name.trim()) {
-      Alert.alert('خطأ', 'يرجى إدخال الاسم');
+      Alert.alert(t('common.error'), t('users.enterNameRequired'));
       return;
     }
     if (!newUserForm.email.trim()) {
-      Alert.alert('خطأ', 'يرجى إدخال البريد الإلكتروني');
+      Alert.alert(t('common.error'), t('users.enterEmailRequired'));
       return;
     }
     if (!newUserForm.phone.trim()) {
-      Alert.alert('خطأ', 'يرجى إدخال رقم الهاتف');
+      Alert.alert(t('common.error'), t('users.enterPhoneRequired'));
       return;
     }
 
@@ -292,14 +293,14 @@ const UsersScreen = () => {
     if (activeTab === 'clients' && newUserForm.hasSubscription) {
       const subscriptionCount = parseInt(newUserForm.subscriptionLessons);
       if (isNaN(subscriptionCount) || subscriptionCount <= 0) {
-        Alert.alert('خطأ', 'يرجى إدخال عدد صحيح من الدروس للاشتراك');
+        Alert.alert(t('common.error'), t('users.invalidSubscriptionCount'));
         return;
       }
     }
 
     setIsAddingUser(true);
     setIsLoading(true);
-    setLoadingMessage('جاري الإضافة...');
+    setLoadingMessage(t('users.adding'));
 
     const result = await createUserAccount(
       newUserForm.name.trim(),
@@ -321,11 +322,10 @@ const UsersScreen = () => {
     setIsLoading(false);
 
     if (result.success) {
-      const userType = activeTab === 'clients' ? 'العميل' : 'العامل';
-      showToastNotification(`✅ تم إضافة ${userType} ${newUserForm.name} بنجاح`, 'success');
+      showToastNotification(activeTab === 'clients' ? t('users.clientAdded', { name: newUserForm.name }) : t('users.workerAdded', { name: newUserForm.name }), 'success');
       setNewUserForm({ name: '', email: '', phone: '', hasSubscription: false, subscriptionLessons: '' });
     } else {
-      showToastNotification(result.error || 'فشل الإضافة', 'error');
+      showToastNotification(result.error || t('users.addFailed'), 'error');
     }
   };
 
@@ -381,14 +381,14 @@ const UsersScreen = () => {
             <View style={styles.detailsCard}>
               <View style={styles.detailsTitleRow}>
                 <FontAwesome5 name="clipboard-list" size={16} color={colors.primary.main} solid />
-                <Text style={styles.detailsTitle}>المعلومات الأساسية</Text>
+                <Text style={styles.detailsTitle}>{t('users.basicInfo')}</Text>
               </View>
 
               {item.email && (
                 <View style={styles.detailRow}>
                   <View style={styles.labelRow}>
                     <FontAwesome5 name="envelope" size={14} color="#3B82F6" solid />
-                    <Text style={styles.detailLabel}>البريد الإلكتروني</Text>
+                    <Text style={styles.detailLabel}>{t('users.email')}</Text>
                   </View>
                   <Text style={styles.detailValue}>{item.email}</Text>
                 </View>
@@ -398,7 +398,7 @@ const UsersScreen = () => {
                 <View style={styles.detailRow}>
                   <View style={styles.labelRow}>
                     <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
-                    <Text style={styles.detailLabel}>رقم الهاتف</Text>
+                    <Text style={styles.detailLabel}>{t('users.phoneNumber')}</Text>
                   </View>
                   <TouchableOpacity onPress={() => handlePhoneCall(item.phoneNumber)}>
                     <Text style={[styles.detailValue, styles.phoneLink]}>{item.phoneNumber}</Text>
@@ -413,7 +413,7 @@ const UsersScreen = () => {
                       <View style={styles.detailRow}>
                         <View style={styles.labelRow}>
                           <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
-                          <Text style={styles.detailLabel}>المبلغ المدفوع (₪)</Text>
+                          <Text style={styles.detailLabel}>{t('users.amountPaidCurrency')}</Text>
                         </View>
                         <TextInput
                           value={editFormData.amountPaid}
@@ -428,7 +428,7 @@ const UsersScreen = () => {
                       <View style={styles.detailRow}>
                         <View style={styles.labelRow}>
                           <FontAwesome5 name="file-invoice-dollar" size={14} color="#F39C12" solid />
-                          <Text style={styles.detailLabel}>المبلغ المستحق (₪)</Text>
+                          <Text style={styles.detailLabel}>{t('users.amountDueCurrency')}</Text>
                         </View>
                         <TextInput
                           value={editFormData.amountDue}
@@ -443,7 +443,7 @@ const UsersScreen = () => {
                       <View style={styles.detailRow}>
                         <View style={styles.labelRow}>
                           <FontAwesome5 name="book-open" size={14} color="#9B59B6" solid />
-                          <Text style={styles.detailLabel}>عدد الدروس</Text>
+                          <Text style={styles.detailLabel}>{t('users.lessonCount')}</Text>
                         </View>
                         <TextInput
                           value={editFormData.lessonCount}
@@ -461,14 +461,14 @@ const UsersScreen = () => {
                           onPress={() => saveUserDetails(item.id)}
                         >
                           <FontAwesome5 name="save" size={14} color="#fff" solid />
-                          <Text style={styles.editButtonText}>حفظ</Text>
+                          <Text style={styles.editButtonText}>{t('common.save')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={[styles.editButton, styles.cancelButton]}
                           onPress={cancelEditing}
                         >
                           <FontAwesome5 name="times" size={14} color="#fff" solid />
-                          <Text style={styles.editButtonText}>إلغاء</Text>
+                          <Text style={styles.editButtonText}>{t('common.cancel')}</Text>
                         </TouchableOpacity>
                       </View>
                     </>
@@ -477,7 +477,7 @@ const UsersScreen = () => {
                       <View style={styles.detailRow}>
                         <View style={styles.labelRow}>
                           <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
-                          <Text style={styles.detailLabel}>المبلغ المدفوع</Text>
+                          <Text style={styles.detailLabel}>{t('users.amountPaid')}</Text>
                         </View>
                         <Text style={[styles.detailValue, styles.paidText]}>₪{item.amountPaid || 0}</Text>
                       </View>
@@ -485,7 +485,7 @@ const UsersScreen = () => {
                       <View style={styles.detailRow}>
                         <View style={styles.labelRow}>
                           <FontAwesome5 name="file-invoice-dollar" size={14} color="#F39C12" solid />
-                          <Text style={styles.detailLabel}>المبلغ المستحق</Text>
+                          <Text style={styles.detailLabel}>{t('users.amountDue')}</Text>
                         </View>
                         <Text style={[styles.detailValue, styles.dueText]}>₪{item.amountDue || 0}</Text>
                       </View>
@@ -493,7 +493,7 @@ const UsersScreen = () => {
                       <View style={styles.detailRow}>
                         <View style={styles.labelRow}>
                           <FontAwesome5 name="book-open" size={14} color="#9B59B6" solid />
-                          <Text style={styles.detailLabel}>عدد الدروس</Text>
+                          <Text style={styles.detailLabel}>{t('users.lessonCount')}</Text>
                         </View>
                         <Text style={styles.detailValue}>{item.lessonCount || 0}</Text>
                       </View>
@@ -504,33 +504,33 @@ const UsersScreen = () => {
                           <View style={styles.subscriptionInfoHeader}>
                             <View style={styles.labelRow}>
                               <FontAwesome5 name="ticket-alt" size={14} color="#9B59B6" solid />
-                              <Text style={styles.subscriptionInfoTitle}>اشتراك العيادة</Text>
+                              <Text style={styles.subscriptionInfoTitle}>{t('users.subscription')}</Text>
                             </View>
                             <View style={[styles.subscriptionStatusBadge, item.subscriptionActive && styles.subscriptionActiveBadge]}>
                               <Text style={styles.subscriptionStatusText}>
-                                {item.subscriptionActive ? '✓ نشط' : '✕ منتهي'}
+                                {item.subscriptionActive ? t('clientHome.active') : t('clientHome.expired')}
                               </Text>
                             </View>
                           </View>
                           <View style={styles.subscriptionStats}>
                             <View style={styles.subscriptionStatItem}>
-                              <Text style={styles.subscriptionStatLabel}>المتبقي</Text>
+                              <Text style={styles.subscriptionStatLabel}>{t('users.remaining')}</Text>
                               <Text style={styles.subscriptionStatValue}>{item.subscriptionLessons || 0}</Text>
                             </View>
                             <View style={styles.subscriptionStatDivider} />
                             <View style={styles.subscriptionStatItem}>
-                              <Text style={styles.subscriptionStatLabel}>المستخدم</Text>
+                              <Text style={styles.subscriptionStatLabel}>{t('users.used')}</Text>
                               <Text style={styles.subscriptionStatValue}>{item.subscriptionUsedLessons || 0}</Text>
                             </View>
                             <View style={styles.subscriptionStatDivider} />
                             <View style={styles.subscriptionStatItem}>
-                              <Text style={styles.subscriptionStatLabel}>الإجمالي</Text>
+                              <Text style={styles.subscriptionStatLabel}>{t('users.total')}</Text>
                               <Text style={styles.subscriptionStatValue}>{item.subscriptionTotalLessons || 0}</Text>
                             </View>
                           </View>
                           {item.subscriptionStartDate && (
                             <Text style={styles.subscriptionDate}>
-                              تاريخ البدء: {formatDate(item.subscriptionStartDate)}
+                              {t('users.startDate', { date: formatDate(item.subscriptionStartDate) })}
                             </Text>
                           )}
                         </View>
@@ -541,7 +541,7 @@ const UsersScreen = () => {
                         onPress={() => startEditing(item)}
                       >
                         <FontAwesome5 name="edit" size={14} color="#fff" solid />
-                        <Text style={styles.editDetailsButtonText}>تعديل البيانات</Text>
+                        <Text style={styles.editDetailsButtonText}>{t('users.editDetails')}</Text>
                       </TouchableOpacity>
                     </>
                   )}
@@ -551,9 +551,9 @@ const UsersScreen = () => {
                   <View style={styles.detailRow}>
                     <View style={styles.labelRow}>
                       <FontAwesome5 name="briefcase" size={14} color="#3B82F6" solid />
-                      <Text style={styles.detailLabel}>الوظيفة</Text>
+                      <Text style={styles.detailLabel}>{t('users.job')}</Text>
                     </View>
-                    <Text style={styles.detailValue}>{item.role || 'عامل'}</Text>
+                    <Text style={styles.detailValue}>{item.role || t('roles.worker')}</Text>
                   </View>
                 </>
               )}
@@ -564,7 +564,7 @@ const UsersScreen = () => {
               <View style={styles.nextLessonCard}>
                 <View style={styles.labelRow}>
                   <FontAwesome5 name="bullseye" size={16} color="#E74C3C" solid />
-                  <Text style={styles.sectionTitle}>الدرس القادم</Text>
+                  <Text style={styles.sectionTitle}>{t('users.nextLesson')}</Text>
                 </View>
                 <View style={styles.lessonInfoRow}>
                   <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
@@ -584,7 +584,7 @@ const UsersScreen = () => {
                     <View style={styles.lessonGroupHeader}>
                       <View style={styles.labelRow}>
                         <FontAwesome5 name="calendar-check" size={14} color="#3B82F6" solid />
-                        <Text style={styles.lessonGroupTitle}>الدروس القادمة</Text>
+                        <Text style={styles.lessonGroupTitle}>{t('users.upcomingLessons')}</Text>
                       </View>
                       <View style={styles.countBadgeSmall}>
                         <Text style={styles.countBadgeSmallText}>{upcomingLessons.length}</Text>
@@ -603,7 +603,7 @@ const UsersScreen = () => {
                       </View>
                     ))}
                     {upcomingLessons.length > 3 && (
-                      <Text style={styles.moreText}>و {upcomingLessons.length - 3} دروس أخرى...</Text>
+                      <Text style={styles.moreText}>{t('users.moreOtherLessons', { count: upcomingLessons.length - 3 })}</Text>
                     )}
                   </View>
                 )}
@@ -613,7 +613,7 @@ const UsersScreen = () => {
                     <View style={styles.lessonGroupHeader}>
                       <View style={styles.labelRow}>
                         <FontAwesome5 name="scroll" size={14} color="#7C3AED" solid />
-                        <Text style={styles.lessonGroupTitle}>سجل الدروس</Text>
+                        <Text style={styles.lessonGroupTitle}>{t('users.lessonHistory')}</Text>
                       </View>
                       <View style={[styles.countBadgeSmall, styles.countBadgePast]}>
                         <Text style={styles.countBadgeSmallText}>{pastLessons.length}</Text>
@@ -632,7 +632,7 @@ const UsersScreen = () => {
                       </View>
                     ))}
                     {pastLessons.length > 3 && (
-                      <Text style={styles.moreText}>و {pastLessons.length - 3} دروس أخرى...</Text>
+                      <Text style={styles.moreText}>{t('users.moreOtherLessons', { count: pastLessons.length - 3 })}</Text>
                     )}
                   </View>
                 )}
@@ -646,7 +646,7 @@ const UsersScreen = () => {
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <FontAwesome5 name="trash-alt" size={14} color="#E74C3C" solid />
-                <Text style={styles.removeButtonText}>حذف {isClient ? 'العميل' : 'العامل'}</Text>
+                <Text style={styles.removeButtonText}>{isClient ? t('users.deleteClient') : t('users.deleteWorker')}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -665,7 +665,7 @@ const UsersScreen = () => {
       <View style={styles.header}>
         <View style={styles.titleRow}>
           <FontAwesome5 name="users" size={24} color="#3B82F6" solid />
-          <Text style={styles.pageTitle}>المستخدمين</Text>
+          <Text style={styles.pageTitle}>{t('users.title')}</Text>
         </View>
 
         {/* Tab Selector */}
@@ -676,7 +676,7 @@ const UsersScreen = () => {
             activeOpacity={0.7}
           >
             <Text style={[styles.tabText, activeTab === 'clients' && styles.tabTextActive]}>
-              العملاء ({clients.length})
+              {t('users.clientsTab')} ({clients.length})
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -685,7 +685,7 @@ const UsersScreen = () => {
             activeOpacity={0.7}
           >
             <Text style={[styles.tabText, activeTab === 'workers' && styles.tabTextActive]}>
-              العمال ({(workerUsers || workers).length})
+              {t('users.workersTab')} ({(workerUsers || workers).length})
             </Text>
           </TouchableOpacity>
         </View>
@@ -695,7 +695,7 @@ const UsersScreen = () => {
           <FontAwesome5 name="search" size={16} color={colors.text.secondary} solid style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="ابحث بالاسم أو البريد أو الهاتف..."
+            placeholder={t('users.searchPlaceholder')}
             placeholderTextColor={colors.text.muted}
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -727,10 +727,10 @@ const UsersScreen = () => {
                 solid 
               />
               <Text style={styles.emptyText}>
-                {searchQuery ? 'لا توجد نتائج' : `لا يوجد ${activeTab === 'clients' ? 'عملاء' : 'عمال'} بعد`}
+                {searchQuery ? t('users.noResults') : (activeTab === 'clients' ? t('users.noClientsYet') : t('users.noWorkersYet'))}
               </Text>
               <Text style={styles.emptySubtext}>
-                {searchQuery ? 'جرب البحث بكلمات أخرى' : `أضف أول ${activeTab === 'clients' ? 'عميل' : 'عامل'} أدناه`}
+                {searchQuery ? t('users.tryOtherSearch') : (activeTab === 'clients' ? t('users.addFirstClient') : t('users.addFirstWorker'))}
               </Text>
             </View>
           }
@@ -741,20 +741,20 @@ const UsersScreen = () => {
                 <View style={styles.formTitleRow}>
                   <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
                   <Text style={styles.formTitle}>
-                    إضافة {activeTab === 'clients' ? 'عميل' : 'عامل'} جديد
+                    {activeTab === 'clients' ? t('users.addNewClient') : t('users.addNewWorker')}
                   </Text>
                 </View>
-                <Text style={styles.formSubtitle}>سيتم إنشاء حساب تلقائياً مع رقم الهاتف ككلمة مرور</Text>
+                <Text style={styles.formSubtitle}>{t('users.autoAccountNote')}</Text>
 
                 <View style={styles.inputGroup}>
                   <View style={styles.labelRow}>
                     <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
-                    <Text style={styles.label}>الاسم</Text>
+                    <Text style={styles.label}>{t('users.nameLabel')}</Text>
                   </View>
                   <TextInput
                     value={newUserForm.name}
                     onChangeText={(text) => setNewUserForm({...newUserForm, name: text})}
-                    placeholder={`أدخل اسم ${activeTab === 'clients' ? 'العميل' : 'العامل'}`}
+                    placeholder={activeTab === 'clients' ? t('users.enterClientName') : t('users.enterWorkerName')}
                     placeholderTextColor="#64748b"
                     style={styles.input}
                     returnKeyType="next"
@@ -765,12 +765,12 @@ const UsersScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelRow}>
                     <FontAwesome5 name="envelope" size={14} color="#3B82F6" solid />
-                    <Text style={styles.label}>البريد الإلكتروني</Text>
+                    <Text style={styles.label}>{t('users.email')}</Text>
                   </View>
                   <TextInput
                     value={newUserForm.email}
                     onChangeText={(text) => setNewUserForm({...newUserForm, email: text})}
-                    placeholder="أدخل البريد الإلكتروني"
+                    placeholder={t('users.enterEmail')}
                     keyboardType="email-address"
                     autoCapitalize="none"
                     placeholderTextColor="#64748b"
@@ -783,12 +783,12 @@ const UsersScreen = () => {
                 <View style={styles.inputGroup}>
                   <View style={styles.labelRow}>
                     <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
-                    <Text style={styles.label}>رقم الهاتف</Text>
+                    <Text style={styles.label}>{t('users.phoneNumber')}</Text>
                   </View>
                   <TextInput
                     value={newUserForm.phone}
                     onChangeText={(text) => setNewUserForm({...newUserForm, phone: text})}
-                    placeholder="أدخل رقم الهاتف"
+                    placeholder={t('users.enterPhone')}
                     keyboardType="phone-pad"
                     placeholderTextColor="#64748b"
                     style={styles.input}
@@ -802,7 +802,7 @@ const UsersScreen = () => {
                     <View style={styles.subscriptionHeader}>
                       <View style={styles.labelRow}>
                         <FontAwesome5 name="ticket-alt" size={16} color="#9B59B6" solid />
-                        <Text style={styles.subscriptionTitle}>اشتراك العيادة</Text>
+                        <Text style={styles.subscriptionTitle}>{t('users.subscription')}</Text>
                       </View>
                     </View>
 
@@ -821,7 +821,7 @@ const UsersScreen = () => {
                             <FontAwesome5 name="check" size={14} color="#27AE60" solid />
                           )}
                         </View>
-                        <Text style={styles.checkboxLabel}>لديه اشتراك من العيادة</Text>
+                        <Text style={styles.checkboxLabel}>{t('users.hasSubscription')}</Text>
                       </View>
                     </TouchableOpacity>
 
@@ -829,19 +829,19 @@ const UsersScreen = () => {
                       <View style={styles.inputGroup}>
                         <View style={styles.labelRow}>
                           <FontAwesome5 name="chart-bar" size={14} color="#E67E22" solid />
-                          <Text style={styles.label}>عدد الدروس في الاشتراك</Text>
+                          <Text style={styles.label}>{t('users.subscriptionLessonsCount')}</Text>
                         </View>
                         <TextInput
                           value={newUserForm.subscriptionLessons}
                           onChangeText={(text) => setNewUserForm({...newUserForm, subscriptionLessons: text})}
-                          placeholder="عدد الدروس"
+                          placeholder={t('users.subscriptionLessonsPlaceholder')}
                           keyboardType="number-pad"
                           placeholderTextColor="#64748b"
                           style={styles.input}
                           returnKeyType="done"
                         />
                         <Text style={styles.helpText}>
-                          سيتم خصم درس من الاشتراك عند تأكيد كل درس مكتمل
+                          {t('users.subscriptionDeductNote')}
                         </Text>
                       </View>
                     )}
@@ -855,7 +855,7 @@ const UsersScreen = () => {
                   activeOpacity={0.7}
                 >
                   <Text style={styles.addButtonText}>
-                    {isAddingUser ? 'جاری الإضافة...' : `➕ إضافة ${activeTab === 'clients' ? 'عميل' : 'عامل'}`}
+                    {isAddingUser ? t('users.adding') : `➕ ${activeTab === 'clients' ? t('users.addClient') : t('users.addWorker')}`}
                   </Text>
                 </TouchableOpacity>
               </View>

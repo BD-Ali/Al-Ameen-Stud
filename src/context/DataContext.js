@@ -18,6 +18,7 @@ import { auth } from '../config/firebaseConfig';
 import notificationService from '../services/notificationService';
 import lessonReminderService from '../services/lessonReminderService';
 import lessonCleanupService from '../services/lessonCleanupService';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * DataContext stores all of the core stable data and syncs with Firebase Firestore.
@@ -37,6 +38,8 @@ export const DataProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [weeklySchedules, setWeeklySchedules] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
+
+  const { t } = useTranslation();
 
   // Subscribe to horses collection
   useEffect(() => {
@@ -122,15 +125,14 @@ export const DataProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  // Start automatic lesson cleanup when data is loaded
+  // Start automatic lesson cleanup — runs daily at midnight (00:00)
   useEffect(() => {
     if (lessons.length > 0 && schedules.length >= 0 && missions.length >= 0) {
-      // Start auto-cleanup that runs every 12 hours
+      // Start auto-cleanup that runs daily at midnight to delete expired lessons
       lessonCleanupService.startAutoCleanup(
         () => lessons,
         () => schedules,
-        () => missions,
-        12 // Run every 12 hours
+        () => missions
       );
 
       return () => {
@@ -277,7 +279,7 @@ export const DataProvider = ({ children }) => {
           name,
           email,
           phoneNumber,
-          role: 'عامل', // Default role
+          role: 'worker', // Default role stored in English
           contact: phoneNumber,
           createdAt: serverTimestamp(),
         });
@@ -467,19 +469,19 @@ export const DataProvider = ({ children }) => {
     try {
       // Validate worker availability
       if (!isWorkerAvailable(lesson.instructorId, lesson.date, lesson.time)) {
-        const workerName = workerUsers.find(w => w.id === lesson.instructorId)?.name || 'المدرب';
+        const workerName = workerUsers.find(w => w.id === lesson.instructorId)?.name || t('notifications.theInstructor');
         return {
           success: false,
-          error: `${workerName} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.`
+          error: t('dataContext.instructorUnavailable', { name: workerName })
         };
       }
 
       // Validate horse availability
       if (!isHorseAvailable(lesson.horseId, lesson.date, lesson.time)) {
-        const horseName = horses.find(h => h.id === lesson.horseId)?.name || 'الحصان';
+        const horseName = horses.find(h => h.id === lesson.horseId)?.name || t('notifications.theHorse');
         return {
           success: false,
-          error: `${horseName} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.`
+          error: t('dataContext.horseUnavailable', { name: horseName })
         };
       }
 
@@ -499,7 +501,7 @@ export const DataProvider = ({ children }) => {
         date: lesson.date,
         timeSlot: lesson.time,
         workerId: lesson.instructorId,
-        description: `درس مع عميل`,
+        description: t('dataContext.lessonWithClient'),
         type: 'lesson',
         lessonId: lessonRef.id,
         createdAt: serverTimestamp()
@@ -508,8 +510,8 @@ export const DataProvider = ({ children }) => {
       // Automatically create a mission for the instructor
       await addDoc(collection(db, 'missions'), {
         workerId: lesson.instructorId,
-        title: `درس تدريب`,
-        description: `درس مجدول في ${lesson.time}`,
+        title: t('dataContext.trainingLesson'),
+        description: t('dataContext.lessonScheduledAt', { time: lesson.time }),
         dueDate: lesson.date,
         time: lesson.time,
         horseId: lesson.horseId,
@@ -565,10 +567,10 @@ export const DataProvider = ({ children }) => {
         const time = updates.time || currentLesson.time;
 
         if (!isWorkerAvailable(instructorId, date, time, id)) {
-          const workerName = workerUsers.find(w => w.id === instructorId)?.name || 'المدرب';
+          const workerName = workerUsers.find(w => w.id === instructorId)?.name || t('notifications.theInstructor');
           return {
             success: false,
-            error: `${workerName} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.`
+            error: t('dataContext.instructorUnavailable', { name: workerName })
           };
         }
       }
@@ -580,10 +582,10 @@ export const DataProvider = ({ children }) => {
         const time = updates.time || currentLesson.time;
 
         if (!isHorseAvailable(horseId, date, time, id)) {
-          const horseName = horses.find(h => h.id === horseId)?.name || 'الحصان';
+          const horseName = horses.find(h => h.id === horseId)?.name || t('notifications.theHorse');
           return {
             success: false,
-            error: `${horseName} غير متاح في هذا الوقت. لديه درس آخر خلال الساعة المحددة.`
+            error: t('dataContext.horseUnavailable', { name: horseName })
           };
         }
       }
@@ -603,10 +605,10 @@ export const DataProvider = ({ children }) => {
 
           // Send notification about lesson update
           const changeDescription = dateChanged && timeChanged
-            ? `تم تغيير الموعد إلى ${updates.date} في ${updates.time}`
+            ? t('dataContext.dateTimeChangedTo', { date: updates.date, time: updates.time })
             : dateChanged
-            ? `تم تغيير التاريخ إلى ${updates.date}`
-            : `تم تغيير الوقت إلى ${updates.time}`;
+            ? t('dataContext.dateChangedTo', { date: updates.date })
+            : t('dataContext.timeChangedTo', { time: updates.time });
 
           await notificationService.sendLessonUpdatedNotification(updatedLesson, client, changeDescription);
         }
@@ -627,11 +629,11 @@ export const DataProvider = ({ children }) => {
     try {
       const lesson = lessons.find(l => l.id === lessonId);
       if (!lesson) {
-        return { success: false, error: 'الدرس غير موجود' };
+        return { success: false, error: t('dataContext.lessonNotFound') };
       }
 
       if (lesson.confirmed) {
-        return { success: false, error: 'تم تأكيد هذا الدرس مسبقاً' };
+        return { success: false, error: t('dataContext.lessonAlreadyConfirmed') };
       }
 
       // Update lesson status
@@ -700,7 +702,7 @@ export const DataProvider = ({ children }) => {
     try {
       const lesson = lessons.find(l => l.id === lessonId);
       if (!lesson) {
-        return { success: false, error: 'الدرس غير موجود' };
+        return { success: false, error: t('dataContext.lessonNotFound') };
       }
 
       await updateDoc(doc(db, 'lessons', lessonId), {
@@ -780,8 +782,8 @@ export const DataProvider = ({ children }) => {
 
       // Get horse name for notifications
       const horse = horses.find(h => h.id === reminder.horseId);
-      const horseName = horse?.name || 'الحصان';
-      const description = reminder.description || 'تذكير';
+      const horseName = horse?.name || t('notifications.theHorse');
+      const description = reminder.description || t('notifications.reminder');
 
       // Schedule notification 2 days before at the same time as reminder
       const twoDaysBefore = new Date(reminderDate);
@@ -797,8 +799,8 @@ export const DataProvider = ({ children }) => {
       // Only schedule 2-day-before notification if it's in the future
       if (twoDaysBefore > now) {
         await notificationService.scheduleNotification(
-          '⏰ تذكير مسبق - قبل يومين',
-          `${horseName}: ${description} - متبقي يومان`,
+          t('dataContext.advanceReminder'),
+          t('dataContext.advanceReminderBody', { name: horseName, desc: description }),
           twoDaysBefore,
           {
             type: 'reminder_advance',
@@ -820,8 +822,8 @@ export const DataProvider = ({ children }) => {
       // Only schedule same-day notification if it's in the future
       if (reminderDay8AM > now) {
         await notificationService.scheduleNotification(
-          '🔔 تذكير - اليوم',
-          `${horseName}: ${description} - اليوم`,
+          t('dataContext.todayReminder'),
+          t('dataContext.todayReminderBody', { name: horseName, desc: description }),
           reminderDay8AM,
           {
             type: 'reminder_today',
@@ -867,8 +869,8 @@ export const DataProvider = ({ children }) => {
         const now = new Date();
 
         const horse = horses.find(h => h.id === updatedReminder.horseId);
-        const horseName = horse?.name || 'الحصان';
-        const description = updatedReminder.description || 'تذكير';
+        const horseName = horse?.name || t('notifications.theHorse');
+        const description = updatedReminder.description || t('notifications.reminder');
 
         // Schedule 2 days before
         const twoDaysBefore = new Date(reminderDate);
@@ -883,8 +885,8 @@ export const DataProvider = ({ children }) => {
 
         if (twoDaysBefore > now) {
           await notificationService.scheduleNotification(
-            '⏰ تذكير مسبق - قبل يومين',
-            `${horseName}: ${description} - متبقي يومان`,
+            t('dataContext.advanceReminder'),
+            t('dataContext.advanceReminderBody', { name: horseName, desc: description }),
             twoDaysBefore,
             {
               type: 'reminder_advance',
@@ -904,8 +906,8 @@ export const DataProvider = ({ children }) => {
 
         if (reminderDay8AM > now) {
           await notificationService.scheduleNotification(
-            '🔔 تذكير - اليوم',
-            `${horseName}: ${description} - اليوم`,
+            t('dataContext.todayReminder'),
+            t('dataContext.todayReminderBody', { name: horseName, desc: description }),
             reminderDay8AM,
             {
               type: 'reminder_today',
@@ -962,8 +964,8 @@ export const DataProvider = ({ children }) => {
       // Automatically create a mission for the worker
       const missionRef = await addDoc(collection(db, 'missions'), {
         workerId: schedule.workerId,
-        title: schedule.description || 'مهمة عمل',
-        description: `مجدول في ${schedule.timeSlot}`,
+        title: schedule.description || t('dataContext.workTask'),
+        description: t('dataContext.scheduledAt', { time: schedule.timeSlot }),
         dueDate: schedule.date,
         time: schedule.timeSlot,
         scheduleId: scheduleRef.id,
@@ -981,8 +983,8 @@ export const DataProvider = ({ children }) => {
           const missionData = {
             id: missionRef.id,
             workerId: schedule.workerId,
-            title: schedule.description || 'مهمة عمل',
-            description: `مجدول في ${schedule.timeSlot}`,
+            title: schedule.description || t('dataContext.workTask'),
+            description: t('dataContext.scheduledAt', { time: schedule.timeSlot }),
             dueDate: schedule.date,
             time: schedule.timeSlot,
           };
@@ -1052,7 +1054,7 @@ export const DataProvider = ({ children }) => {
       if (horseLessons.length > 0) {
         return {
           success: false,
-          error: `لا يمكن حذف الحصان. لديه ${horseLessons.length} درس مجدول أو قادم. يرجى إلغاء أو إزالة الدروس أولاً.`
+          error: t('dataContext.cannotDeleteHorse', { count: horseLessons.length })
         };
       }
 
@@ -1083,7 +1085,7 @@ export const DataProvider = ({ children }) => {
       if (clientLessons.length > 0) {
         return {
           success: false,
-          error: `لا يمكن حذف العميل. لديه ${clientLessons.length} درس مجدول أو قادم. يرجى إلغاء أو إزالة الدروس أولاً.`
+          error: t('dataContext.cannotDeleteClient', { count: clientLessons.length })
         };
       }
 
@@ -1123,7 +1125,7 @@ export const DataProvider = ({ children }) => {
       if (workerLessons.length > 0) {
         return {
           success: false,
-          error: `لا يمكن حذف العامل. لديه ${workerLessons.length} درس مجدول أو قادم. يرجى إلغاء أو إزالة الدروس أولاً.`
+          error: t('dataContext.cannotDeleteWorker', { count: workerLessons.length })
         };
       }
 
@@ -1137,7 +1139,7 @@ export const DataProvider = ({ children }) => {
       if (workerSchedules.length > 0) {
         return {
           success: false,
-          error: `لا يمكن حذف العامل. لديه ${workerSchedules.length} جدولة قادمة. يرجى إزالة الجدولات أولاً.`
+          error: t('dataContext.workerHasSchedules', { count: workerSchedules.length })
         };
       }
 
@@ -1406,7 +1408,7 @@ export const DataProvider = ({ children }) => {
     try {
       // Check if there are any workers
       if (!workerUsers || workerUsers.length === 0) {
-        return { success: false, error: 'لا يوجد عمال متاحون لإنشاء الجدول الافتراضي' };
+        return { success: false, error: t('dataContext.noWorkersForSchedule') };
       }
 
       // Define default schedule template
@@ -1429,7 +1431,7 @@ export const DataProvider = ({ children }) => {
               day,
               timeSlot,
               workerId: worker.id,
-              description: 'رعاية الخيول والإسطبلات - الفترة الصباحية',
+              description: t('dataContext.morningCare'),
               isDefault: true,
               createdAt: serverTimestamp()
             });
@@ -1447,7 +1449,7 @@ export const DataProvider = ({ children }) => {
               day,
               timeSlot,
               workerId: worker.id,
-              description: 'رعاية الخيول والإسطبلات - الفترة المسائية',
+              description: t('dataContext.eveningCare'),
               isDefault: true,
               createdAt: serverTimestamp()
             });
@@ -1471,7 +1473,7 @@ export const DataProvider = ({ children }) => {
       const dateSchedules = schedules.filter(s => s.date === date);
 
       if (dateSchedules.length === 0) {
-        return { success: false, error: 'لا توجد جداول لحفظها كافتراضية' };
+        return { success: false, error: t('dataContext.noSchedulesToSave') };
       }
 
       // Save to a default template collection
@@ -1500,7 +1502,7 @@ export const DataProvider = ({ children }) => {
       const snapshot = await getDocs(q);
 
       if (snapshot.empty) {
-        return { success: false, error: 'لا يوجد جدول افتراضي محفوظ' };
+        return { success: false, error: t('dataContext.noDefaultSchedule') };
       }
 
       const templates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -1519,8 +1521,8 @@ export const DataProvider = ({ children }) => {
         // Create mission for the worker
         await addDoc(collection(db, 'missions'), {
           workerId: template.workerId,
-          title: template.description || 'مهمة عمل',
-          description: `مجدول في ${template.timeSlot}`,
+          title: template.description || t('dataContext.workTask'),
+          description: t('dataContext.scheduledAt', { time: template.timeSlot }),
           dueDate: date,
           time: template.timeSlot,
           type: 'schedule',
@@ -1550,7 +1552,7 @@ export const DataProvider = ({ children }) => {
       const dateSchedules = schedules.filter(s => s.date === date);
 
       if (dateSchedules.length === 0) {
-        return { success: false, error: 'لا توجد جداول لحذفها' };
+        return { success: false, error: t('dataContext.noSchedulesToDelete') };
       }
 
       // Build a map of scheduleId -> missions for O(1) lookup instead of O(n²)
@@ -1639,7 +1641,7 @@ export const DataProvider = ({ children }) => {
       const dateSchedules = schedules.filter(s => s.date === date);
 
       if (dateSchedules.length === 0) {
-        return { success: false, error: 'لا توجد جداول لحذفها' };
+        return { success: false, error: t('dataContext.noSchedulesToDelete') };
       }
 
       // Build deletion map
@@ -1891,7 +1893,7 @@ export const DataProvider = ({ children }) => {
    * @returns {Object} Cleanup stats
    */
   const getCleanupStats = () => {
-    return lessonCleanupService.getCleanupStats(lessons, 90);
+    return lessonCleanupService.getCleanupStats(lessons);
   };
 
   /**

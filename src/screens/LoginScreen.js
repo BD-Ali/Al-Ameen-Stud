@@ -14,11 +14,14 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Animated,
+  SafeAreaView,
 } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { useFadeIn, useSlideInFromBottom, useScaleIn, createPressAnimation } from '../utils/animations';
+import { useTranslation } from '../i18n/LanguageContext';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 /**
  * LoginScreen provides authentication with sign in and sign up functionality.
@@ -33,6 +36,8 @@ const LoginScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const { t } = useTranslation();
+
   // Animation values
   const fadeAnim = useFadeIn(800);
   const slideAnim = useSlideInFromBottom(700, 100);
@@ -45,12 +50,12 @@ const LoginScreen = ({ navigation }) => {
 
   const handleAuth = async () => {
     if (!email || !password) {
-      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
+      Alert.alert(t('common.error'), t('common.fillAllFields'));
       return;
     }
 
     if (isSignUp && !name) {
-      Alert.alert('خطأ', 'يرجى إدخال اسمك');
+      Alert.alert(t('common.error'), t('auth.enterYourName'));
       return;
     }
 
@@ -61,18 +66,18 @@ const LoginScreen = ({ navigation }) => {
         // Only allow client signups - admins must be added via Firebase
         const result = await signUp(email, password, name, 'client');
         if (result.success) {
-          Alert.alert('نجح', 'تم إنشاء الحساب بنجاح!');
+          Alert.alert(t('common.success'), t('auth.accountCreated'));
         } else {
-          Alert.alert('خطأ', result.error);
+          Alert.alert(t('common.error'), result.error);
         }
       } else {
         const result = await signIn(email, password);
         if (!result.success) {
-          Alert.alert('خطأ', result.error);
+          Alert.alert(t('common.error'), result.error);
         }
       }
     } catch (error) {
-      Alert.alert('خطأ', error.message);
+      Alert.alert(t('common.error'), error.message);
     } finally {
       setLoading(false);
     }
@@ -84,9 +89,10 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}
+        style={styles.keyboardView}
       >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -101,10 +107,11 @@ const LoginScreen = ({ navigation }) => {
                 resizeMode="contain"
               />
             </View>
-            <Text style={styles.title}>مَرْبَطُ الأَمِين</Text>
+            <Text style={styles.title}>{t('auth.brandName')}</Text>
             <Text style={styles.subtitle}>
-              {isSignUp ? 'إنشاء حساب عميل' : 'مرحباً بعودتك'}
+              {isSignUp ? t('auth.createClientAccount') : t('auth.welcomeBack')}
             </Text>
+            <LanguageSwitcher style={styles.langSwitcher} />
           </View>
 
           {/* Form Card */}
@@ -112,12 +119,12 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.cardReflection} />
             {isSignUp && (
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>الاسم الكامل</Text>
+                <Text style={styles.label}>{t('auth.fullName')}</Text>
                 <View style={styles.inputWrapper}>
                   <FontAwesome5 name="user" size={18} color="#95A5A6" solid style={styles.inputIcon} />
                   <TextInput
                     style={styles.input}
-                    placeholder="أدخل اسمك"
+                    placeholder={t('auth.enterFullName')}
                     placeholderTextColor="#95a5a6"
                     value={name}
                     onChangeText={setName}
@@ -129,7 +136,7 @@ const LoginScreen = ({ navigation }) => {
             )}
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>البريد الإلكتروني</Text>
+              <Text style={styles.label}>{t('auth.email')}</Text>
               <View style={styles.inputWrapper}>
                 <FontAwesome5 name="envelope" size={16} color="#95A5A6" solid style={styles.inputIcon} />
                 <TextInput
@@ -146,7 +153,7 @@ const LoginScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>كلمة المرور</Text>
+              <Text style={styles.label}>{t('auth.password')}</Text>
               <View style={styles.inputWrapper}>
                 <FontAwesome5 name="lock" size={18} color="#95A5A6" solid style={styles.inputIcon} />
                 <TextInput
@@ -176,7 +183,7 @@ const LoginScreen = ({ navigation }) => {
                 ) : (
                   <>
                     <Text style={styles.primaryButtonText}>
-                      {isSignUp ? 'إنشاء حساب' : 'تسجيل الدخول'}
+                      {isSignUp ? t('auth.createAccount') : t('auth.signIn')}
                     </Text>
                     <Text style={styles.buttonArrow}>←</Text>
                   </>
@@ -196,8 +203,8 @@ const LoginScreen = ({ navigation }) => {
             >
               <Text style={styles.switchButtonText}>
                 {isSignUp
-                  ? 'هل لديك حساب؟ تسجيل الدخول'
-                  : 'ليس لديك حساب؟ إنشاء حساب'}
+                  ? `${t('auth.haveAccount')} ${t('auth.signInNow')}`
+                  : `${t('auth.noAccount')} ${t('auth.createNewAccount')}`}
               </Text>
             </TouchableOpacity>
 
@@ -205,14 +212,14 @@ const LoginScreen = ({ navigation }) => {
               <View style={styles.infoBox}>
                 <FontAwesome5 name="info-circle" size={16} color="#3498DB" solid style={styles.infoIcon} />
                 <Text style={styles.infoText}>
-                  التسجيل ينشئ حساب عميل. يجب منح صلاحية المسؤول من قبل إدارة المربط.
+                  {t('auth.signUpInfo')}
                 </Text>
               </View>
             )}
 
             <View style={styles.divider}>
               <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>أو</Text>
+              <Text style={styles.dividerText}>{t('common.or')}</Text>
               <View style={styles.dividerLine} />
             </View>
 
@@ -225,17 +232,18 @@ const LoginScreen = ({ navigation }) => {
               <Animated.View style={[styles.visitorButtonContent, { transform: [{ scale: visitorButtonScale }] }]}>
                 <View style={styles.buttonReflection} />
                 <FontAwesome5 name="eye" size={18} color="#7F8C8D" solid style={styles.visitorIcon} />
-                <Text style={styles.visitorButtonText}>متابعة كزائر</Text>
+                <Text style={styles.visitorButtonText}>{t('auth.continueAsVisitor')}</Text>
               </Animated.View>
             </TouchableOpacity>
           </Animated.View>
 
           {/* Footer */}
           <Text style={styles.footer}>
-            إدارة احترافية للمرابط
+            {t('auth.tagline')}
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 };
@@ -245,10 +253,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background.primary,
   },
+  keyboardView: {
+    flex: 1,
+  },
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xl,
+  },
+  langSwitcher: {
+    marginTop: spacing.md,
   },
   header: {
     alignItems: 'center',

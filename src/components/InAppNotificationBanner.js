@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * InAppNotificationBanner - Shows notification banner when user is active in app
@@ -21,6 +22,7 @@ const InAppNotificationBanner = ({
   duration = 5000,
   type = 'announcement'
 }) => {
+  const { t } = useTranslation();
   const slideAnim = useRef(new Animated.Value(-100)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const dismissTimer = useRef(null);
@@ -108,7 +110,7 @@ const InAppNotificationBanner = ({
           opacity: opacityAnim,
         },
       ]}
-      accessibilityLabel={`إشعار: ${title}. ${body}`}
+      accessibilityLabel={`${t('notifications.reminder')}: ${title}. ${body}`}
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
     >
@@ -133,7 +135,7 @@ const InAppNotificationBanner = ({
         <TouchableOpacity
           style={styles.dismissButton}
           onPress={handleDismiss}
-          accessibilityLabel="إغلاق الإشعار"
+          accessibilityLabel={t('common.close')}
           accessibilityRole="button"
         >
           <Text style={styles.dismissText}>✕</Text>

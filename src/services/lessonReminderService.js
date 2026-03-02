@@ -1,6 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { db } from '../config/firebaseConfig';
+import { translate as t } from '../i18n/LanguageContext';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 
 /**
@@ -10,9 +11,9 @@ import { doc, updateDoc, getDoc } from 'firebase/firestore';
 class LessonReminderService {
   constructor() {
     this.reminderIntervals = [
-      { hours: 24, label: '24h', name: 'قبل 24 ساعة' },
-      { hours: 2, label: '2h', name: 'قبل ساعتين' },
-      { minutes: 30, label: '30m', name: 'قبل 30 دقيقة' },
+      { hours: 24, label: '24h', name: () => t('notifications.before24Hours') },
+      { hours: 2, label: '2h', name: () => t('notifications.before2Hours') },
+      { minutes: 30, label: '30m', name: () => t('notifications.before30Minutes') },
     ];
   }
 
@@ -22,7 +23,7 @@ class LessonReminderService {
   async setupNotificationChannel() {
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('lesson_reminders', {
-        name: 'تذكيرات الدروس',
+        name: t('notifications.channelLessonReminders'),
         importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#10B981',
@@ -40,14 +41,14 @@ class LessonReminderService {
       await Notifications.setNotificationCategoryAsync('lesson_reminder', [
         {
           identifier: 'view',
-          buttonTitle: 'عرض',
+          buttonTitle: t('notifications.view'),
           options: {
             opensAppToForeground: true,
           },
         },
         {
           identifier: 'dismiss',
-          buttonTitle: 'تجاهل',
+          buttonTitle: t('notifications.dismiss'),
           options: {
             opensAppToForeground: false,
           },
@@ -163,8 +164,9 @@ class LessonReminderService {
    */
   async scheduleReminder(lesson, client, reminderTime, interval) {
     try {
-      const title = `تذكير بالدرس ${interval.name}`;
-      const body = `لديك درس مجدول في ${lesson.time} - ${client.name}`;
+      const intervalName = typeof interval.name === 'function' ? interval.name() : interval.name;
+      const title = t('notifications.lessonReminderTitle', { interval: intervalName });
+      const body = t('notifications.lessonReminderBody', { time: lesson.time, client: client.name });
 
       // Ensure reminderTime is a valid Date and in the future
       if (!(reminderTime instanceof Date) || isNaN(reminderTime.getTime())) {

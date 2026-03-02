@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Text, StyleSheet, Alert, View, Image } from 'react-native';
 import { Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { AuthContext } from '../context/AuthContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import HorsesScreen from '../screens/HorsesScreen';
 import FeedScreen from '../screens/FeedScreen';
@@ -18,15 +19,16 @@ const Tab = createBottomTabNavigator();
 const AdminTabs = () => {
   const { logOut } = useContext(AuthContext);
   const navigation = useNavigation();
+  const { t } = useTranslation();
 
   const handleLogout = async () => {
     Alert.alert(
-      'تسجيل الخروج',
-      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+      t('auth.logout'),
+      t('auth.logoutConfirm'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'تسجيل الخروج',
+          text: t('auth.logout'),
           onPress: async () => {
             await logOut();
           },
@@ -80,7 +82,7 @@ const AdminTabs = () => {
         headerRight: () => (
           <View style={styles.headerActions}>
             <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-              <Text style={styles.logoutText}>خروج</Text>
+              <Text style={styles.logoutText}>{t('auth.exit')}</Text>
             </TouchableOpacity>
           </View>
         ),
@@ -90,8 +92,8 @@ const AdminTabs = () => {
         name="Announcements"
         component={AnnouncementsScreen}
         options={{
-          title: 'الإعلانات',
-          tabBarLabel: 'الإعلانات',
+          title: t('nav.announcements'),
+          tabBarLabel: t('nav.announcements'),
           tabBarIcon: ({ focused }) => (
             <FontAwesome5 name="bullhorn" size={20} color={focused ? '#FF6B6B' : '#95A5A6'} solid />
           ),
@@ -101,8 +103,8 @@ const AdminTabs = () => {
         name="Missions"
         component={MissionsScreen}
         options={{
-          title: 'المهام',
-          tabBarLabel: 'المهام',
+          title: t('nav.missions'),
+          tabBarLabel: t('nav.missions'),
           tabBarIcon: ({ focused }) => (
             <FontAwesome5 name="tasks" size={20} color={focused ? '#4ECDC4' : '#95A5A6'} solid />
           ),
@@ -112,8 +114,8 @@ const AdminTabs = () => {
         name="Schedule"
         component={WeeklyScheduleScreen}
         options={{
-          title: 'جدول العمل الأسبوعي',
-          tabBarLabel: 'الجدول',
+          title: t('nav.schedule'),
+          tabBarLabel: t('nav.schedule'),
           tabBarIcon: ({ focused }) => (
             <FontAwesome5 name="calendar-alt" size={20} color={focused ? '#5DADE2' : '#95A5A6'} solid />
           ),
@@ -123,8 +125,8 @@ const AdminTabs = () => {
         name="Horses"
         component={HorsesScreen}
         options={{
-          title: 'الخيول',
-          tabBarLabel: 'الخيول',
+          title: t('nav.horses'),
+          tabBarLabel: t('nav.horses'),
           tabBarIcon: ({ focused }) => (
             <MaterialCommunityIcons name="horse-variant" size={24} color={focused ? '#F39C12' : '#95A5A6'} />
           ),
@@ -134,8 +136,8 @@ const AdminTabs = () => {
         name="Feeding"
         component={FeedScreen}
         options={{
-          title: 'التغذية',
-          tabBarLabel: 'التغذية',
+          title: t('nav.feed'),
+          tabBarLabel: t('nav.feed'),
           tabBarIcon: ({ focused }) => (
             <FontAwesome5 name="carrot" size={20} color={focused ? '#FF9800' : '#95A5A6'} solid />
           ),
@@ -145,8 +147,8 @@ const AdminTabs = () => {
         name="Lessons"
         component={LessonsScreen}
         options={{
-          title: 'الدروس',
-          tabBarLabel: 'الدروس',
+          title: t('nav.lessons'),
+          tabBarLabel: t('nav.lessons'),
           tabBarIcon: ({ focused }) => (
             <FontAwesome5 name="book-open" size={20} color={focused ? '#9B59B6' : '#95A5A6'} solid />
           ),
@@ -156,8 +158,8 @@ const AdminTabs = () => {
         name="Clients"
         component={UsersScreen}
         options={{
-          title: 'المستخدمين',
-          tabBarLabel: 'المستخدمين',
+          title: t('nav.users'),
+          tabBarLabel: t('nav.users'),
           tabBarIcon: ({ focused }) => (
             <FontAwesome5 name="users" size={20} color={focused ? '#1ABC9C' : '#95A5A6'} solid />
           ),

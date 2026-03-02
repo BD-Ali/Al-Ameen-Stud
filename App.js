@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthProvider, AuthContext } from './src/context/AuthContext';
 import { DataProvider } from './src/context/DataContext';
+import { LanguageProvider, useTranslation } from './src/i18n/LanguageContext';
 import LoginScreen from './src/screens/LoginScreen';
 import AdminTabs from './src/components/AdminTabs';
 import ClientHomeScreen from './src/screens/ClientHomeScreen';
@@ -27,6 +28,7 @@ const Stack = createNativeStackNavigator();
  */
 function AppNavigator() {
   const { user, userRole, loading } = useContext(AuthContext);
+  const { t } = useTranslation();
   const [bannerVisible, setBannerVisible] = useState(false);
   const [bannerData, setBannerData] = useState(null);
   const [deepLinkAnnouncementId, setDeepLinkAnnouncementId] = useState(null);
@@ -126,7 +128,7 @@ function AppNavigator() {
                 component={VisitorHomeScreen}
                 options={{
                   headerShown: true,
-                  title: 'منطقة الزوار',
+                  title: t('nav.visitorArea'),
                   headerStyle: { backgroundColor: '#1e293b' },
                   headerTintColor: '#fff',
                 }}
@@ -146,7 +148,7 @@ function AppNavigator() {
                 component={ProfileScreen}
                 options={{
                   headerShown: true,
-                  title: 'الملف الشخصي',
+                  title: t('nav.profile'),
                   headerStyle: { backgroundColor: '#141b2d' },
                   headerTintColor: '#fff',
                 }}
@@ -168,7 +170,7 @@ function AppNavigator() {
                 component={ProfileScreen}
                 options={{
                   headerShown: true,
-                  title: 'الملف الشخصي',
+                  title: t('nav.profile'),
                   headerStyle: { backgroundColor: '#141b2d' },
                   headerTintColor: '#fff',
                 }}
@@ -190,7 +192,7 @@ function AppNavigator() {
                 component={ProfileScreen}
                 options={{
                   headerShown: true,
-                  title: 'الملف الشخصي',
+                  title: t('nav.profile'),
                   headerStyle: { backgroundColor: '#141b2d' },
                   headerTintColor: '#fff',
                 }}
@@ -222,11 +224,13 @@ function AppNavigator() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <DataProvider>
-        <AppNavigator />
-      </DataProvider>
-    </AuthProvider>
+    <LanguageProvider>
+      <AuthProvider>
+        <DataProvider>
+          <AppNavigator />
+        </DataProvider>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }
 

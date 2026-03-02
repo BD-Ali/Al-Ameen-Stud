@@ -4,8 +4,10 @@ import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 const MissionsScreen = () => {
+  const { t } = useTranslation();
   const { reminders, updateReminder } = useContext(DataContext);
   const [todayMissions, setTodayMissions] = useState([]);
   const [completedMissions, setCompletedMissions] = useState([]);
@@ -52,12 +54,12 @@ const MissionsScreen = () => {
 
   const handleMarkAsDone = async (mission) => {
     Alert.alert(
-      'تأكيد',
-      'هل تريد تحديد هذه المهمة كمنجزة؟',
+      t('common.confirm'),
+      t('missions.confirmCompletion'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'نعم',
+          text: t('common.yes'),
           onPress: async () => {
             const result = await updateReminder(mission.id, {
               completed: true,
@@ -65,9 +67,9 @@ const MissionsScreen = () => {
             });
 
             if (result.success) {
-              Alert.alert('نجح', 'تم تحديد المهمة كمنجزة');
+              Alert.alert(t('common.success'), t('missions.missionCompleted'));
             } else {
-              Alert.alert('خطأ', result.error || 'فشل تحديث المهمة');
+              Alert.alert(t('common.error'), result.error || t('missions.missionUpdateFailed'));
             }
           }
         }
@@ -82,9 +84,9 @@ const MissionsScreen = () => {
     });
 
     if (result.success) {
-      Alert.alert('نجح', 'تم إلغاء تحديد المهمة');
+      Alert.alert(t('common.success'), t('missions.missionUncompleted'));
     } else {
-      Alert.alert('خطأ', result.error || 'فشل تحديث المهمة');
+      Alert.alert(t('common.error'), result.error || t('missions.missionUpdateFailed'));
     }
   };
 
@@ -111,7 +113,7 @@ const MissionsScreen = () => {
           onPress={() => handleMarkAsDone(item)}
         >
           <FontAwesome5 name="check" size={14} color="#fff" solid />
-          <Text style={styles.doneButtonText}>تحديد كمنجز</Text>
+          <Text style={styles.doneButtonText}>{t('missions.markAsDone')}</Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
@@ -119,7 +121,7 @@ const MissionsScreen = () => {
           onPress={() => handleMarkAsUndone(item)}
         >
           <FontAwesome5 name="undo" size={14} color="#fff" solid />
-          <Text style={styles.undoneButtonText}>إلغاء الإنجاز</Text>
+          <Text style={styles.undoneButtonText}>{t('missions.undoCompletion')}</Text>
         </TouchableOpacity>
       )}
     </AnimatedCard>
@@ -153,7 +155,7 @@ const MissionsScreen = () => {
         <View style={styles.sectionHeader}>
           <View style={styles.sectionTitleRow}>
             <FontAwesome5 name="clipboard-list" size={20} color="#9B59B6" solid />
-            <Text style={styles.sectionTitle}>مهام اليوم</Text>
+            <Text style={styles.sectionTitle}>{t('missions.todayMissions')}</Text>
           </View>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{todayMissions.length}</Text>
@@ -163,7 +165,7 @@ const MissionsScreen = () => {
         {todayMissions.length === 0 ? (
           <View style={styles.emptyState}>
             <FontAwesome5 name="check-circle" size={48} color="#27AE60" solid />
-            <Text style={styles.emptyText}>لا توجد مهام متبقية لليوم!</Text>
+            <Text style={styles.emptyText}>{t('missions.noTasksRemaining')}</Text>
           </View>
         ) : (
           <FlatList
@@ -181,7 +183,7 @@ const MissionsScreen = () => {
           <View style={styles.sectionHeader}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <FontAwesome5 name="check-double" size={20} color="#27AE60" solid />
-              <Text style={styles.sectionTitle}>المهام المنجزة اليوم</Text>
+              <Text style={styles.sectionTitle}>{t('missions.completedToday')}</Text>
             </View>
             <View style={[styles.badge, styles.completedBadge]}>
               <Text style={styles.badgeText}>{completedMissions.length}</Text>
@@ -203,7 +205,7 @@ const MissionsScreen = () => {
           <View style={styles.sectionHeader}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <FontAwesome5 name="calendar-alt" size={20} color="#5DADE2" solid />
-              <Text style={styles.sectionTitle}>المهام القادمة</Text>
+              <Text style={styles.sectionTitle}>{t('missions.upcomingMissions')}</Text>
             </View>
             <View style={[styles.badge, styles.upcomingBadge]}>
               <Text style={styles.badgeText}>{upcomingMissions.length}</Text>

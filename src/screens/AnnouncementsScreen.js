@@ -27,6 +27,7 @@ import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudin
 import AnimatedCard from '../components/AnimatedCard';
 import AnimatedButton from '../components/AnimatedButton';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * Toast Notification Component
@@ -85,6 +86,7 @@ const Toast = ({ visible, message, type, onHide }) => {
 const AnnouncementsScreen = () => {
   const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useContext(DataContext);
   const { user } = useContext(AuthContext);
+  const { t } = useTranslation();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -111,17 +113,17 @@ const AnnouncementsScreen = () => {
 
   const tags = ['Update', 'Promo', 'Alert', 'Event', 'Info'];
   const audiences = [
-    { value: 'all', label: 'الجميع' },
-    { value: 'clients', label: 'العملاء فقط' },
-    { value: 'visitors', label: 'الزوار فقط' },
-    { value: 'workers', label: 'العاملين فقط' },
+    { value: 'all', label: t('announcements.everyone') },
+    { value: 'clients', label: t('announcements.clientsOnly') },
+    { value: 'visitors', label: t('announcements.visitorsOnly') },
+    { value: 'workers', label: t('announcements.workersOnly') },
   ];
 
   const statusOptions = [
-    { value: 'draft', label: 'مسودة', color: colors.text.tertiary },
-    { value: 'scheduled', label: 'مجدول', color: colors.accent.amber },
-    { value: 'published', label: 'منشور', color: colors.status.success },
-    { value: 'expired', label: 'منتهي', color: colors.text.muted },
+    { value: 'draft', label: t('announcements.draft'), color: colors.text.tertiary },
+    { value: 'scheduled', label: t('announcements.scheduled'), color: colors.accent.amber },
+    { value: 'published', label: t('announcements.published'), color: colors.status.success },
+    { value: 'expired', label: t('announcements.expired'), color: colors.text.muted },
   ];
 
   const showToast = (message, type = 'success') => {
@@ -184,13 +186,13 @@ const AnnouncementsScreen = () => {
       if (useCamera) {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== 'granted') {
-          showToast('نحتاج إلى إذن الوصول للكاميرا', 'error');
+          showToast(t('announcements.cameraPermissionNeeded'), 'error');
           return;
         }
       } else {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          showToast('نحتاج إلى إذن الوصول للمعرض', 'error');
+          showToast(t('announcements.galleryPermissionNeeded'), 'error');
           return;
         }
       }
@@ -214,7 +216,7 @@ const AnnouncementsScreen = () => {
         setFormData({ ...formData, imageUri: result.assets[0].uri });
       }
     } catch (error) {
-      showToast('حدث خطأ أثناء اختيار الصورة', 'error');
+      showToast(t('announcements.imagePickError'), 'error');
       console.error('Image picker error:', error);
     } finally {
       setUploadingImage(false);
@@ -223,12 +225,12 @@ const AnnouncementsScreen = () => {
 
   const removeImage = () => {
     Alert.alert(
-      'إزالة الصورة',
-      'هل أنت متأكد من إزالة الصورة؟',
+      t('announcements.removeImage'),
+      t('announcements.confirmRemoveImage'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'إزالة',
+          text: t('common.remove'),
           style: 'destructive',
           onPress: () => setFormData({ ...formData, imageUri: '' }),
         },
@@ -238,12 +240,12 @@ const AnnouncementsScreen = () => {
 
   const showImagePickerOptions = () => {
     Alert.alert(
-      'اختر صورة',
-      'من أين تريد اختيار الصورة؟',
+      t('announcements.imageSource'),
+      t('announcements.imageSourceQuestion'),
       [
-        { text: 'إلغاء', style: 'cancel' },
-        { text: 'الكاميرا', onPress: () => pickImage(true) },
-        { text: 'المعرض', onPress: () => pickImage(false) },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('announcements.camera'), onPress: () => pickImage(true) },
+        { text: t('announcements.gallery'), onPress: () => pickImage(false) },
       ]
     );
   };
@@ -254,7 +256,7 @@ const AnnouncementsScreen = () => {
 
     // Validation
     if (!formData.title.trim() || !formData.content.trim()) {
-      showToast('الرجاء إدخال العنوان والمحتوى', 'error');
+      showToast(t('announcements.fillTitleContent'), 'error');
       return;
     }
 
@@ -275,7 +277,7 @@ const AnnouncementsScreen = () => {
         if (uploadResult.success) {
           cloudinaryImageUrl = uploadResult.url;
         } else {
-          showToast('فشل رفع الصورة: ' + uploadResult.error, 'error');
+          showToast(t('announcements.uploadFailed') + uploadResult.error, 'error');
           setIsSubmitting(false);
           setUploadingImage(false);
           return;
@@ -298,10 +300,10 @@ const AnnouncementsScreen = () => {
         if (result.success) {
           setModalVisible(false);
           setTimeout(() => {
-            showToast('تم تحديث الإعلان بنجاح', 'success');
+            showToast(t('announcements.updateSuccess'), 'success');
           }, 300);
         } else {
-          showToast(result.error || 'فشل تحديث الإعلان', 'error');
+          showToast(result.error || t('announcements.updateFailed'), 'error');
         }
       } else {
         announcementData.createdBy = user?.email || user?.uid;
@@ -309,15 +311,15 @@ const AnnouncementsScreen = () => {
         if (result.success) {
           setModalVisible(false);
           setTimeout(() => {
-            showToast('تم نشر الإعلان بنجاح', 'success');
+            showToast(t('announcements.publishSuccess'), 'success');
           }, 300);
         } else {
-          showToast(result.error || 'فشل نشر الإعلان', 'error');
+          showToast(result.error || t('announcements.publishFailed'), 'error');
         }
       }
     } catch (error) {
       console.error('Save error:', error);
-      showToast('حدث خطأ غير متوقع', 'error');
+      showToast(t('common.unexpectedError'), 'error');
     } finally {
       setIsSubmitting(false);
       setUploadingImage(false);
@@ -326,19 +328,19 @@ const AnnouncementsScreen = () => {
 
   const handleDelete = (id) => {
     Alert.alert(
-      'تأكيد الحذف',
-      'هل أنت متأكد من حذف هذا الإعلان؟',
+      t('announcements.confirmDelete'),
+      t('announcements.confirmDeleteQuestion'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'حذف',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             const result = await deleteAnnouncement(id);
             if (result.success) {
-              showToast('تم حذف الإعلان', 'success');
+              showToast(t('announcements.deleteSuccess'), 'success');
             } else {
-              showToast(result.error || 'فشل حذف الإعلان', 'error');
+              showToast(result.error || t('announcements.deleteFailed'), 'error');
             }
           },
         },
@@ -367,7 +369,7 @@ const AnnouncementsScreen = () => {
       'Update': { name: 'bullhorn', color: '#3498DB' },
       'Promo': { name: 'gift', color: '#E91E63' },
       'Alert': { name: 'exclamation-triangle', color: '#E74C3C' },
-      'Event': { name: 'calendar-star', color: '#9C27B0' },
+      'Event': { name: 'calendar-check', color: '#9C27B0' },
       'Info': { name: 'info-circle', color: '#2196F3' },
     };
     return icons[tag] || { name: 'thumbtack', color: '#F39C12' };
@@ -376,14 +378,14 @@ const AnnouncementsScreen = () => {
 
   const renderAnnouncementCard = ({ item, index }) => {
     const statusInfo = getStatusInfo(item.status);
-    const audienceLabel = audiences.find(a => a.value === item.targetAudience)?.label || 'الجميع';
+    const audienceLabel = audiences.find(a => a.value === item.targetAudience)?.label || t('announcements.everyone');
 
     return (
       <AnimatedCard index={index} delay={80} style={styles.card}>
         {item.isPinned && (
           <View style={styles.pinnedBadge}>
             <FontAwesome5 name="thumbtack" size={12} color="#F39C12" solid />
-            <Text style={styles.pinnedText}>مثبت</Text>
+            <Text style={styles.pinnedText}>{t('common.pinned')}</Text>
           </View>
         )}
 
@@ -416,13 +418,13 @@ const AnnouncementsScreen = () => {
 
         {item.scheduledDate && (
           <Text style={styles.scheduledText}>
-            🕐 مجدول: {formatDate(item.scheduledDate)}
+            {t('announcements.scheduledAt', { date: formatDate(item.scheduledDate) })}
           </Text>
         )}
 
         {item.expiryDate && (
           <Text style={styles.expiryText}>
-            ⏰ ينتهي: {formatDate(item.expiryDate)}
+            {t('announcements.expiresAt', { date: formatDate(item.expiryDate) })}
           </Text>
         )}
 
@@ -430,7 +432,7 @@ const AnnouncementsScreen = () => {
         {item.notificationSentAt && (
           <View style={styles.notificationStatus}>
             <Text style={styles.notificationText}>
-              ✅ تم إرسال الإشعار • {item.notificationSentCount || 0} مستلم
+              {t('announcements.notificationSent', { count: item.notificationSentCount || 0 })}
             </Text>
           </View>
         )}
@@ -439,24 +441,24 @@ const AnnouncementsScreen = () => {
           <TouchableOpacity
             style={[styles.actionButton, styles.editButton]}
             onPress={() => openEditModal(item)}
-            accessibilityLabel="تعديل الإعلان"
+            accessibilityLabel={t('announcements.editAnnouncementAccessibility')}
             accessibilityRole="button"
           >
-            <Text style={styles.actionButtonText}>✏️ تعديل</Text>
+            <Text style={styles.actionButtonText}>{t('announcements.editAction')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, styles.deleteButton]}
             onPress={() => handleDelete(item.id)}
-            accessibilityLabel="حذف الإعلان"
+            accessibilityLabel={t('announcements.deleteAnnouncementAccessibility')}
             accessibilityRole="button"
           >
-            <Text style={styles.actionButtonText}>🗑️ حذف</Text>
+            <Text style={styles.actionButtonText}>{t('announcements.deleteAction')}</Text>
           </TouchableOpacity>
         </View>
 
         {item.lastEditedBy && (
           <Text style={styles.editInfo}>
-            آخر تعديل بواسطة: {item.lastEditedBy}
+            {t('announcements.lastEditedBy', { name: item.lastEditedBy })}
           </Text>
         )}
       </AnimatedCard>
@@ -477,15 +479,15 @@ const AnnouncementsScreen = () => {
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>{announcements?.filter(a => a.status === 'published').length || 0}</Text>
-          <Text style={styles.statLabel}>منشور</Text>
+          <Text style={styles.statLabel}>{t('announcements.published')}</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>{announcements?.filter(a => a.status === 'draft').length || 0}</Text>
-          <Text style={styles.statLabel}>مسودة</Text>
+          <Text style={styles.statLabel}>{t('announcements.draft')}</Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statNumber}>{announcements?.filter(a => a.isPinned).length || 0}</Text>
-          <Text style={styles.statLabel}>مثبت</Text>
+          <Text style={styles.statLabel}>{t('common.pinned')}</Text>
         </View>
       </View>
 
@@ -496,8 +498,8 @@ const AnnouncementsScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <FontAwesome5 name="bullhorn" size={64} color="#95A5A6" solid />
-            <Text style={styles.emptyText}>لا توجد إعلانات بعد</Text>
-            <Text style={styles.emptySubtext}>ابدأ بإنشاء إعلان جديد</Text>
+            <Text style={styles.emptyText}>{t('announcements.noAnnouncementsYet')}</Text>
+            <Text style={styles.emptySubtext}>{t('announcements.startCreating')}</Text>
           </View>
         }
         contentContainerStyle={sortedAnnouncements.length === 0 && styles.emptyContainer}
@@ -507,7 +509,7 @@ const AnnouncementsScreen = () => {
       <TouchableOpacity
         style={styles.fab}
         onPress={openCreateModal}
-        accessibilityLabel="إنشاء إعلان جديد"
+        accessibilityLabel={t('announcements.createNew')}
         accessibilityRole="button"
       >
         <FontAwesome5 name="plus" size={20} color="#fff" solid />
@@ -535,7 +537,7 @@ const AnnouncementsScreen = () => {
               <TouchableOpacity
                 onPress={() => !isSubmitting && setModalVisible(false)}
                 style={styles.closeButtonContainer}
-                accessibilityLabel="إغلاق"
+                accessibilityLabel={t('common.close')}
                 accessibilityRole="button"
                 disabled={isSubmitting}
               >
@@ -547,11 +549,11 @@ const AnnouncementsScreen = () => {
                 />
               </TouchableOpacity>
               <Text style={styles.modalTitle}>
-                {previewMode ? 'معاينة' : editingId ? 'تعديل إعلان' : 'إعلان جديد'}
+                {previewMode ? t('announcements.preview') : editingId ? t('announcements.editAnnouncement') : t('announcements.newAnnouncement')}
               </Text>
               <TouchableOpacity
                 onPress={() => setPreviewMode(!previewMode)}
-                accessibilityLabel={previewMode ? 'تعديل' : 'معاينة'}
+                accessibilityLabel={previewMode ? t('common.edit') : t('announcements.preview')}
                 accessibilityRole="button"
               >
                 <Text style={styles.previewButton}>{previewMode ? '✏️' : '👁️'}</Text>
@@ -570,7 +572,7 @@ const AnnouncementsScreen = () => {
                     {formData.isPinned && (
                       <View style={styles.pinnedBadge}>
                         <FontAwesome5 name="thumbtack" size={12} color="#F39C12" solid />
-                        <Text style={styles.pinnedText}>مثبت</Text>
+                        <Text style={styles.pinnedText}>{t('common.pinned')}</Text>
                       </View>
                     )}
                     <View style={styles.previewHeader}>
@@ -581,7 +583,7 @@ const AnnouncementsScreen = () => {
                         solid
                         style={styles.previewTagIcon}
                       />
-                      <Text style={styles.previewTitle}>{formData.title || 'عنوان الإعلان'}</Text>
+                      <Text style={styles.previewTitle}>{formData.title || t('announcements.announcementTitle')}</Text>
                     </View>
                     {formData.imageUri && (
                       <Image
@@ -590,11 +592,11 @@ const AnnouncementsScreen = () => {
                         resizeMode="cover"
                       />
                     )}
-                    <Text style={styles.previewContent}>{formData.content || 'محتوى الإعلان'}</Text>
+                    <Text style={styles.previewContent}>{formData.content || t('announcements.announcementContent')}</Text>
                     {formData.linkUrl && (
                       <TouchableOpacity style={styles.previewLink}>
                         <Text style={styles.previewLinkText}>
-                          {formData.linkText || 'اضغط هنا'} →
+                          {formData.linkText || t('announcements.linkTextPlaceholder')} →
                         </Text>
                       </TouchableOpacity>
                     )}
@@ -603,35 +605,35 @@ const AnnouncementsScreen = () => {
               ) : (
                 <>
                   {/* Title */}
-                  <Text style={styles.label}>العنوان *</Text>
+                  <Text style={styles.label}>{t('announcements.titleLabel')}</Text>
                   <TextInput
                     style={styles.input}
                     value={formData.title}
                     onChangeText={(text) => setFormData({ ...formData, title: text })}
-                    placeholder="اكتب عنوان الإعلان"
+                    placeholder={t('announcements.titlePlaceholder')}
                     placeholderTextColor={colors.text.muted}
                     maxLength={100}
                     editable={!isSubmitting}
-                    accessibilityLabel="عنوان الإعلان"
+                    accessibilityLabel={t('announcements.announcementTitle')}
                   />
 
                   {/* Content */}
-                  <Text style={styles.label}>المحتوى *</Text>
+                  <Text style={styles.label}>{t('announcements.contentLabel')}</Text>
                   <TextInput
                     style={[styles.input, styles.textArea]}
                     value={formData.content}
                     onChangeText={(text) => setFormData({ ...formData, content: text })}
-                    placeholder="اكتب محتوى الإعلان"
+                    placeholder={t('announcements.contentPlaceholder')}
                     placeholderTextColor={colors.text.muted}
                     multiline
                     numberOfLines={4}
                     maxLength={500}
                     editable={!isSubmitting}
-                    accessibilityLabel="محتوى الإعلان"
+                    accessibilityLabel={t('announcements.announcementContent')}
                   />
 
                   {/* Image Upload */}
-                  <Text style={styles.label}>رفع صورة (اختياري)</Text>
+                  <Text style={styles.label}>{t('announcements.uploadImage')}</Text>
                   {formData.imageUri ? (
                     <View style={styles.imagePreviewContainer}>
                       <Image
@@ -645,7 +647,7 @@ const AnnouncementsScreen = () => {
                         disabled={isSubmitting}
                       >
                         <FontAwesome5 name="trash-alt" size={12} color="#E74C3C" solid />
-                        <Text style={styles.removeImageText}> إزالة الصورة</Text>
+                        <Text style={styles.removeImageText}> {t('announcements.removeImage')}</Text>
                       </TouchableOpacity>
                     </View>
                   ) : (
@@ -657,30 +659,30 @@ const AnnouncementsScreen = () => {
                       {uploadingImage ? (
                         <ActivityIndicator size="small" color={colors.primary.main} />
                       ) : (
-                        <Text style={styles.imageUploadText}>📷 اختر صورة</Text>
+                        <Text style={styles.imageUploadText}>{t('announcements.chooseImage')}</Text>
                       )}
                     </TouchableOpacity>
                   )}
 
                   {/* Link */}
-                  <Text style={styles.label}>رابط الإجراء (اختياري)</Text>
+                  <Text style={styles.label}>{t('announcements.linkLabel')}</Text>
                   <TextInput
                     style={styles.input}
                     value={formData.linkUrl}
                     onChangeText={(text) => setFormData({ ...formData, linkUrl: text })}
-                    placeholder="أدخل رابط الموقع"
+                    placeholder={t('announcements.linkPlaceholder')}
                     placeholderTextColor={colors.text.muted}
                     editable={!isSubmitting}
                   />
 
                   {formData.linkUrl && (
                     <>
-                      <Text style={styles.label}>نص الزر</Text>
+                      <Text style={styles.label}>{t('announcements.linkTextLabel')}</Text>
                       <TextInput
                         style={styles.input}
                         value={formData.linkText}
                         onChangeText={(text) => setFormData({ ...formData, linkText: text })}
-                        placeholder="اضغط هنا"
+                        placeholder={t('announcements.linkTextPlaceholder')}
                         placeholderTextColor={colors.text.muted}
                         editable={!isSubmitting}
                       />
@@ -688,7 +690,7 @@ const AnnouncementsScreen = () => {
                   )}
 
                   {/* Tag */}
-                  <Text style={styles.label}>التصنيف</Text>
+                  <Text style={styles.label}>{t('announcements.tagLabel')}</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagScroll}>
                     {tags.map((tag) => (
                       <TouchableOpacity
@@ -719,7 +721,7 @@ const AnnouncementsScreen = () => {
                   </ScrollView>
 
                   {/* Target Audience */}
-                  <Text style={styles.label}>الجمهور المستهدف</Text>
+                  <Text style={styles.label}>{t('announcements.targetAudience')}</Text>
                   <View style={styles.audienceGrid}>
                     {audiences.map((aud) => (
                       <TouchableOpacity
@@ -742,7 +744,7 @@ const AnnouncementsScreen = () => {
                   </View>
 
                   {/* Status */}
-                  <Text style={styles.label}>الحالة</Text>
+                  <Text style={styles.label}>{t('announcements.statusLabel')}</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagScroll}>
                     {statusOptions.map((status) => (
                       <TouchableOpacity
@@ -773,18 +775,18 @@ const AnnouncementsScreen = () => {
                       thumbColor={formData.isPinned ? colors.primary.main : colors.text.muted}
                       disabled={isSubmitting}
                     />
-                    <Text style={styles.switchLabel}>📌 تثبيت الإعلان (يظهر في الأعلى)</Text>
+                    <Text style={styles.switchLabel}>{t('announcements.pinAnnouncement')}</Text>
                   </View>
 
                   {/* Scheduled Date */}
-                  <Text style={styles.label}>تاريخ النشر (اختياري)</Text>
+                  <Text style={styles.label}>{t('announcements.scheduleDateLabel')}</Text>
                   <TouchableOpacity
                     style={styles.dateButton}
                     onPress={() => setShowStartPicker(true)}
                     disabled={isSubmitting}
                   >
                     <Text style={styles.dateButtonText}>
-                      {formData.scheduledDate ? formatDate(formData.scheduledDate) : 'نشر الآن'}
+                      {formData.scheduledDate ? formatDate(formData.scheduledDate) : t('announcements.publishNow')}
                     </Text>
                   </TouchableOpacity>
                   {formData.scheduledDate && (
@@ -792,7 +794,7 @@ const AnnouncementsScreen = () => {
                       onPress={() => setFormData({ ...formData, scheduledDate: null })}
                       disabled={isSubmitting}
                     >
-                      <Text style={styles.clearDate}>مسح التاريخ</Text>
+                      <Text style={styles.clearDate}>{t('announcements.clearDate')}</Text>
                     </TouchableOpacity>
                   )}
 
@@ -811,14 +813,14 @@ const AnnouncementsScreen = () => {
                   )}
 
                   {/* Expiry Date */}
-                  <Text style={styles.label}>تاريخ الانتهاء (اختياري)</Text>
+                  <Text style={styles.label}>{t('announcements.expiryDateLabel')}</Text>
                   <TouchableOpacity
                     style={styles.dateButton}
                     onPress={() => setShowEndPicker(true)}
                     disabled={isSubmitting}
                   >
                     <Text style={styles.dateButtonText}>
-                      {formData.expiryDate ? formatDate(formData.expiryDate) : 'بدون تاريخ انتهاء'}
+                      {formData.expiryDate ? formatDate(formData.expiryDate) : t('announcements.noExpiryDate')}
                     </Text>
                   </TouchableOpacity>
                   {formData.expiryDate && (
@@ -826,7 +828,7 @@ const AnnouncementsScreen = () => {
                       onPress={() => setFormData({ ...formData, expiryDate: null })}
                       disabled={isSubmitting}
                     >
-                      <Text style={styles.clearDate}>مسح التاريخ</Text>
+                      <Text style={styles.clearDate}>{t('announcements.clearDate')}</Text>
                     </TouchableOpacity>
                   )}
 
@@ -854,7 +856,7 @@ const AnnouncementsScreen = () => {
                       thumbColor={formData.sendNotification ? colors.primary.main : colors.text.muted}
                       disabled={isSubmitting}
                     />
-                    <Text style={styles.switchLabel}>🔔 إرسال إشعار عند النشر</Text>
+                    <Text style={styles.switchLabel}>{t('announcements.sendNotification')}</Text>
                   </View>
 
                   {/* Extra padding for keyboard */}
@@ -870,7 +872,7 @@ const AnnouncementsScreen = () => {
                   style={[styles.saveButton, isSubmitting && styles.disabledButton]}
                   onPress={handleSave}
                   disabled={isSubmitting}
-                  accessibilityLabel={editingId ? 'تحديث' : 'حفظ'}
+                  accessibilityLabel={editingId ? t('common.update') : t('common.save')}
                   accessibilityRole="button"
                 >
                   {isSubmitting ? (
@@ -884,7 +886,7 @@ const AnnouncementsScreen = () => {
                         solid
                       />
                       <Text style={styles.saveButtonText}>
-                        {editingId ? 'تحديث' : 'نشر'}
+                        {editingId ? t('common.update') : t('common.publish')}
                       </Text>
                     </View>
                   )}

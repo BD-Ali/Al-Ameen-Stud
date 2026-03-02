@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import notificationService from '../services/notificationService';
 import { getOptimizedImageUrl } from '../config/cloudinaryConfig';
@@ -24,6 +25,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
   const { announcements, loading } = useContext(DataContext);
   const { user } = useContext(AuthContext);
+  const { t } = useTranslation();
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [displayCount, setDisplayCount] = useState(10);
@@ -70,7 +72,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
       'Update': { name: 'bullhorn', color: '#3498DB' },
       'Promo': { name: 'gift', color: '#E91E63' },
       'Alert': { name: 'exclamation-triangle', color: '#E74C3C' },
-      'Event': { name: 'calendar-star', color: '#9C27B0' },
+      'Event': { name: 'calendar-check', color: '#9C27B0' },
       'Info': { name: 'info-circle', color: '#2196F3' },
     };
     return icons[tag] || { name: 'thumbtack', color: '#F39C12' };
@@ -172,7 +174,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary.main} />
-        <Text style={styles.loadingText}>جاري التحميل...</Text>
+        <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
     );
   }
@@ -183,7 +185,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
       {visibleAnnouncements.length > 0 && (
         <View style={styles.header}>
           <FontAwesome5 name="bullhorn" size={20} color="#3498DB" solid />
-          <Text style={styles.headerTitle}>الإعلانات والتحديثات</Text>
+          <Text style={styles.headerTitle}>{t('announcements.headerTitle')}</Text>
         </View>
       )}
 
@@ -204,7 +206,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                   {item.isPinned && (
                     <View style={styles.pinnedBadge}>
                       <FontAwesome5 name="thumbtack" size={10} color="#F39C12" solid />
-                      <Text style={styles.pinnedText}>مثبت</Text>
+                      <Text style={styles.pinnedText}>{t('common.pinned')}</Text>
                     </View>
                   )}
 
@@ -233,7 +235,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
                   <View style={styles.cardFooter}>
                     <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
-                    <Text style={styles.readMore}>اقرأ المزيد ←</Text>
+                    <Text style={styles.readMore}>{t('announcements.readMore')} ←</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -246,15 +248,15 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
               style={styles.loadMoreButton}
               onPress={loadMore}
             >
-              <Text style={styles.loadMoreText}>عرض المزيد ↓</Text>
+              <Text style={styles.loadMoreText}>{t('announcements.loadMore')} ↓</Text>
             </TouchableOpacity>
           )}
         </>
       ) : (
         <View style={styles.emptyState}>
           <FontAwesome5 name="bullhorn" size={64} color="#95A5A6" solid />
-          <Text style={styles.emptyText}>لا توجد إعلانات حالياً</Text>
-          <Text style={styles.emptySubtext}>سنقوم بإعلامك عند وجود تحديثات جديدة</Text>
+          <Text style={styles.emptyText}>{t('announcements.noAnnouncementsNow')}</Text>
+          <Text style={styles.emptySubtext}>{t('announcements.willNotifyUpdates')}</Text>
         </View>
       )}
 
@@ -282,7 +284,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                   {selectedAnnouncement.isPinned && (
                     <View style={[styles.pinnedBadge, { marginBottom: spacing.md }]}>
                       <FontAwesome5 name="thumbtack" size={10} color="#F39C12" solid />
-                      <Text style={styles.pinnedText}>إعلان مثبت</Text>
+                      <Text style={styles.pinnedText}>{t('common.pinned')}</Text>
                     </View>
                   )}
 
@@ -314,7 +316,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                       onPress={() => handleLinkPress(selectedAnnouncement.linkUrl)}
                     >
                       <Text style={styles.actionButtonText}>
-                        {selectedAnnouncement.linkText || 'اضغط هنا'} →
+                        {selectedAnnouncement.linkText || t('announcements.clickHere')} →
                       </Text>
                     </TouchableOpacity>
                   )}

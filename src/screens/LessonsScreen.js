@@ -5,12 +5,14 @@ import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * LessonsScreen lists all scheduled lessons and allows the administrator to add
  * new lessons.
  */
 const LessonsScreen = () => {
+  const { t } = useTranslation();
   const { lessons, addLesson, removeLesson, horses, clients, workers, workerUsers } = useContext(DataContext);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
@@ -51,19 +53,19 @@ const LessonsScreen = () => {
 
   const handleRemoveLesson = async (id) => {
     Alert.alert(
-      'حذف الدرس',
-      'هل أنت متأكد أنك تريد حذف هذا الدرس؟',
+      t('lessons.deleteLesson'),
+      t('lessons.confirmDeleteLesson'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'حذف',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             const result = await removeLesson(id);
             if (result.success) {
-              Alert.alert('نجح', 'تم حذف الدرس بنجاح');
+              Alert.alert(t('common.success'), t('lessons.lessonDeleted'));
             } else {
-              Alert.alert('خطأ', result.error || 'فشل حذف الدرس');
+              Alert.alert(t('common.error'), result.error || t('lessons.lessonDeleteFailed'));
             }
           }
         }
@@ -86,7 +88,7 @@ const LessonsScreen = () => {
 
   const handleAddLesson = async () => {
     if (!horseId || !clientId || !instructorId) {
-      Alert.alert('خطأ', 'يرجى ملء جميع الحقول');
+      Alert.alert(t('common.error'), t('common.fillAllFields'));
       return;
     }
     const formattedDate = formatDate(date);
@@ -101,14 +103,14 @@ const LessonsScreen = () => {
     });
 
     if (result.success) {
-      Alert.alert('نجح', 'تم جدولة الدرس بنجاح');
+      Alert.alert(t('common.success'), t('lessons.lessonScheduled'));
       setDate(new Date());
       setTime(new Date());
       setHorseId('');
       setClientId('');
       setInstructorId('');
     } else {
-      Alert.alert('خطأ', result.error || 'فشل جدولة الدرس');
+      Alert.alert(t('common.error'), result.error || t('lessons.lessonScheduleFailed'));
     }
   };
 
@@ -124,17 +126,17 @@ const LessonsScreen = () => {
 
   const getSelectedHorseName = () => {
     const horse = horses?.find(h => h.id === horseId);
-    return horse ? horse.name : 'اختر حصاناً';
+    return horse ? horse.name : t('lessons.chooseHorse');
   };
 
   const getSelectedClientName = () => {
     const client = clients?.find(c => c.id === clientId);
-    return client ? client.name : 'اختر عميلاً';
+    return client ? client.name : t('lessons.chooseClient');
   };
 
   const getSelectedInstructorName = () => {
     const instructor = workerUsers?.find(w => w.id === instructorId);
-    return instructor ? instructor.name : 'اختر مدرباً';
+    return instructor ? instructor.name : t('lessons.chooseInstructor');
   };
 
   return (
@@ -146,7 +148,7 @@ const LessonsScreen = () => {
           <View style={styles.headerSection}>
             <View style={styles.titleRow}>
               <FontAwesome5 name="book-open" size={24} color="#9B59B6" solid />
-              <Text style={styles.pageTitle}>الدروس</Text>
+              <Text style={styles.pageTitle}>{t('lessons.title')}</Text>
             </View>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{lessons.length}</Text>
@@ -169,40 +171,40 @@ const LessonsScreen = () => {
               {item.confirmed && (
                 <View style={styles.confirmedBadge}>
                   <FontAwesome5 name="check-circle" size={14} color="#27AE60" solid />
-                  <Text style={styles.confirmedBadgeText}>مكتمل</Text>
+                  <Text style={styles.confirmedBadgeText}>{t('lessons.completed')}</Text>
                 </View>
               )}
               {item.status === 'cancelled' && (
                 <View style={styles.cancelledBadge}>
                   <FontAwesome5 name="times-circle" size={14} color="#E74C3C" solid />
-                  <Text style={styles.cancelledBadgeText}>ملغي</Text>
+                  <Text style={styles.cancelledBadgeText}>{t('lessons.cancelled')}</Text>
                 </View>
               )}
               {item.status === 'scheduled' && !item.confirmed && (
                 <View style={styles.scheduledBadge}>
                   <FontAwesome5 name="hourglass-half" size={14} color="#F39C12" solid />
-                  <Text style={styles.scheduledBadgeText}>مجدول</Text>
+                  <Text style={styles.scheduledBadgeText}>{t('lessons.scheduledStatus')}</Text>
                 </View>
               )}
             </View>
             <View style={styles.cardRow}>
               <View style={styles.labelRow}>
                 <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-                <Text style={styles.cardLabel}>الحصان:</Text>
+                <Text style={styles.cardLabel}>{t('lessons.horse')}</Text>
               </View>
               <Text style={styles.cardValue}>{getHorseName(item.horseId)}</Text>
             </View>
             <View style={styles.cardRow}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
-                <Text style={styles.cardLabel}>العميل:</Text>
+                <Text style={styles.cardLabel}>{t('lessons.client')}</Text>
               </View>
               <Text style={styles.cardValue}>{getClientName(item.clientId)}</Text>
             </View>
             <View style={styles.cardRow}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
-                <Text style={styles.cardLabel}>المدرب:</Text>
+                <Text style={styles.cardLabel}>{t('lessons.instructor')}</Text>
               </View>
               <Text style={styles.cardValue}>{getWorkerName(item.instructorId)}</Text>
             </View>
@@ -211,7 +213,7 @@ const LessonsScreen = () => {
               onPress={() => handleRemoveLesson(item.id)}
             >
               <FontAwesome5 name="trash-alt" size={14} color="#E74C3C" solid />
-              <Text style={styles.removeButtonText}>حذف الدرس</Text>
+              <Text style={styles.removeButtonText}>{t('lessons.deleteLesson')}</Text>
             </TouchableOpacity>
           </AnimatedCard>
         )}
@@ -219,13 +221,13 @@ const LessonsScreen = () => {
           <View style={styles.formSection}>
             <View style={styles.formTitleRow}>
               <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
-              <Text style={styles.formTitle}>جدولة درس جديد</Text>
+              <Text style={styles.formTitle}>{t('lessons.scheduleNewLesson')}</Text>
             </View>
 
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                <Text style={styles.label}>اختر التاريخ</Text>
+                <Text style={styles.label}>{t('lessons.selectDate')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.pickerButton}
@@ -251,7 +253,7 @@ const LessonsScreen = () => {
                       style={styles.confirmButton}
                       onPress={() => setShowDatePicker(false)}
                     >
-                      <Text style={styles.confirmButtonText}>موافق</Text>
+                      <Text style={styles.confirmButtonText}>{t('common.ok')}</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -261,7 +263,7 @@ const LessonsScreen = () => {
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-                  <Text style={styles.label}>اختر الوقت</Text>
+                  <Text style={styles.label}>{t('lessons.selectTime')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.pickerButton}
@@ -287,7 +289,7 @@ const LessonsScreen = () => {
                       style={styles.confirmButton}
                       onPress={() => setShowTimePicker(false)}
                     >
-                      <Text style={styles.confirmButtonText}>موافق</Text>
+                      <Text style={styles.confirmButtonText}>{t('common.ok')}</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -297,7 +299,7 @@ const LessonsScreen = () => {
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-                <Text style={styles.label}>اختر الحصان</Text>
+                <Text style={styles.label}>{t('lessons.selectHorse')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.pickerButton}
@@ -339,14 +341,14 @@ const LessonsScreen = () => {
               )}
 
               {horses.length === 0 && (
-                <Text style={styles.helpText}>أضف خيولاً أولاً</Text>
+                <Text style={styles.helpText}>{t('lessons.addHorsesFirst')}</Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
-                <Text style={styles.label}>اختر العميل</Text>
+                <Text style={styles.label}>{t('lessons.selectClient')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.pickerButton}
@@ -388,14 +390,14 @@ const LessonsScreen = () => {
               )}
 
               {clients.length === 0 && (
-                <Text style={styles.helpText}>أضف عملاء أولاً</Text>
+                <Text style={styles.helpText}>{t('lessons.addClientsFirst')}</Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
               <View style={styles.labelRow}>
                 <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
-                <Text style={styles.label}>اختر المدرب</Text>
+                <Text style={styles.label}>{t('lessons.selectInstructor')}</Text>
               </View>
               <TouchableOpacity
                 style={styles.pickerButton}
@@ -436,20 +438,20 @@ const LessonsScreen = () => {
                     ))
                   ) : (
                     <View style={styles.emptyPickerState}>
-                      <Text style={styles.emptyPickerText}>لا يوجد مدربين مضافين</Text>
-                      <Text style={styles.emptyPickerSubtext}>أضف مستخدمين بدور "worker" أولاً</Text>
+                      <Text style={styles.emptyPickerText}>{t('lessons.noInstructorsAvailable')}</Text>
+                      <Text style={styles.emptyPickerSubtext}>{t('lessons.addWorkersFirst')}</Text>
                     </View>
                   )}
                 </ScrollView>
               )}
 
               {!workerUsers || workerUsers.length === 0 ? (
-                <Text style={styles.helpText}>لا يوجد مستخدمين بدور worker - أضف مستخدمين أولاً</Text>
+                <Text style={styles.helpText}>{t('lessons.noWorkersHint')}</Text>
               ) : null}
             </View>
 
             <TouchableOpacity style={styles.addButton} onPress={handleAddLesson}>
-              <Text style={styles.addButtonText}>جدولة درس</Text>
+              <Text style={styles.addButtonText}>{t('lessons.scheduleLesson')}</Text>
             </TouchableOpacity>
           </View>
         }
@@ -457,8 +459,8 @@ const LessonsScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <FontAwesome5 name="book-open" size={64} color="#9B59B6" solid />
-            <Text style={styles.emptyText}>لا توجد دروس مجدولة</Text>
-            <Text style={styles.emptySubtext}>جدول أول درس أدناه</Text>
+            <Text style={styles.emptyText}>{t('lessons.noScheduledLessons')}</Text>
+            <Text style={styles.emptySubtext}>{t('lessons.scheduleFirstLesson')}</Text>
           </View>
         }
       />

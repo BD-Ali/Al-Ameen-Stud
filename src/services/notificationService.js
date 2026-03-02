@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { translate as t } from '../i18n/LanguageContext';
 
 /**
  * NotificationService - Handles all notification functionality
@@ -41,7 +42,7 @@ class NotificationService {
       // Setup notification channel for Android
       if (Platform.OS === 'android') {
         await Notifications.setNotificationChannelAsync('default', {
-          name: 'افتراضي',
+          name: t('notifications.channelDefault'),
           importance: Notifications.AndroidImportance.MAX,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: '#FF231F7C',
@@ -50,7 +51,7 @@ class NotificationService {
 
         // Create announcement channel
         await Notifications.setNotificationChannelAsync('announcements', {
-          name: 'الإعلانات',
+          name: t('notifications.channelAnnouncements'),
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: '#3B82F6',
@@ -59,7 +60,7 @@ class NotificationService {
 
         // Create lesson reminder channel
         await Notifications.setNotificationChannelAsync('lesson_reminders', {
-          name: 'تذكيرات الدروس',
+          name: t('notifications.channelLessonReminders'),
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: '#10B981',
@@ -243,7 +244,7 @@ class NotificationService {
    */
   async sendAnnouncementNotification(announcement, immediate = true) {
     try {
-      const title = announcement.title || 'إعلان جديد';
+      const title = announcement.title || t('notifications.newAnnouncement');
       const message = announcement.content || announcement.message || '';
 
       await this.sendNotification(
@@ -272,7 +273,7 @@ class NotificationService {
    */
   async scheduleAnnouncementNotification(announcement, scheduledDate) {
     try {
-      const title = announcement.title || 'إعلان جديد';
+      const title = announcement.title || t('notifications.newAnnouncement');
       const message = announcement.content || announcement.message || '';
       const triggerDate = typeof scheduledDate === 'string' ? new Date(scheduledDate) : scheduledDate;
 
@@ -332,8 +333,8 @@ class NotificationService {
    */
   async sendLessonCreatedNotification(lesson, client, instructor, horse) {
     try {
-      const title = '✅ تم جدولة درس جديد';
-      const body = `درس مع ${client.name} في ${lesson.time} - ${lesson.date}`;
+      const title = t('notifications.lessonScheduled');
+      const body = t('notifications.lessonScheduledBody', { client: client.name, time: lesson.time, date: lesson.date });
 
       await this.sendNotification(
         title,
@@ -365,8 +366,8 @@ class NotificationService {
    */
   async sendLessonUpdatedNotification(lesson, client, changeDescription) {
     try {
-      const title = '🔄 تم تحديث موعد الدرس';
-      const body = `درس ${client.name} - ${changeDescription}`;
+      const title = t('notifications.lessonUpdated');
+      const body = t('notifications.lessonUpdatedBody', { client: client.name, change: changeDescription });
 
       await this.sendNotification(
         title,
@@ -396,10 +397,10 @@ class NotificationService {
    */
   async sendLessonCancelledNotification(lesson, client, reason = '') {
     try {
-      const title = '❌ تم إلغاء الدرس';
+      const title = t('notifications.lessonCancelled');
       const body = reason
-        ? `تم إلغاء درس ${client.name} في ${lesson.time} - ${reason}`
-        : `تم إلغاء درس ${client.name} في ${lesson.time}`;
+        ? t('notifications.lessonCancelledReasonBody', { client: client.name, time: lesson.time, reason })
+        : t('notifications.lessonCancelledBody', { client: client.name, time: lesson.time });
 
       await this.sendNotification(
         title,
@@ -429,8 +430,8 @@ class NotificationService {
    */
   async sendLessonConfirmedNotification(lesson, client) {
     try {
-      const title = '✅ تم تأكيد إكمال الدرس';
-      const body = `تم تأكيد درس ${client.name} بنجاح`;
+      const title = t('notifications.lessonConfirmed');
+      const body = t('notifications.lessonConfirmedBody', { client: client.name });
 
       await this.sendNotification(
         title,
@@ -459,8 +460,8 @@ class NotificationService {
    */
   async sendMissionAssignedNotification(mission, worker) {
     try {
-      const title = '📋 مهمة جديدة';
-      const body = `${mission.title} - ${mission.description || 'مهمة عمل جديدة'}`;
+      const title = t('notifications.newMission');
+      const body = `${mission.title} - ${mission.description || t('notifications.newMissionDefault')}`;
 
       await this.sendNotification(
         title,
@@ -489,8 +490,8 @@ class NotificationService {
    */
   async sendMissionCompletedNotification(mission, worker) {
     try {
-      const title = '✅ تم إكمال المهمة';
-      const body = `أكمل ${worker.name} المهمة: ${mission.title}`;
+      const title = t('notifications.missionCompleted');
+      const body = t('notifications.missionCompletedBody', { worker: worker.name, title: mission.title });
 
       await this.sendNotification(
         title,
@@ -518,8 +519,8 @@ class NotificationService {
    */
   async sendReminderNotification(reminder) {
     try {
-      const title = '🔔 تذكير';
-      const body = reminder.description || 'لديك تذكير';
+      const title = t('notifications.reminderTitle');
+      const body = reminder.description || t('notifications.reminderDefault');
 
       await this.sendNotification(
         title,
@@ -547,8 +548,8 @@ class NotificationService {
    */
   async sendClientRegisteredNotification(client) {
     try {
-      const title = '👤 عميل جديد';
-      const body = `تم تسجيل عميل جديد: ${client.name}`;
+      const title = t('notifications.newClient');
+      const body = t('notifications.newClientBody', { name: client.name });
 
       await this.sendNotification(
         title,
@@ -576,8 +577,8 @@ class NotificationService {
    */
   async sendSubscriptionExpiringNotification(client, remainingLessons) {
     try {
-      const title = '⚠️ تنبيه: الاشتراك على وشك الانتهاء';
-      const body = `لدى ${client.name} ${remainingLessons} دروس متبقية فقط`;
+      const title = t('notifications.subscriptionWarning');
+      const body = t('notifications.subscriptionWarningBody', { name: client.name, count: remainingLessons });
 
       await this.sendNotification(
         title,
@@ -606,8 +607,8 @@ class NotificationService {
    */
   async sendPaymentReceivedNotification(client, amount) {
     try {
-      const title = '💰 تم استلام دفعة';
-      const body = `تم استلام ${amount} من ${client.name}`;
+      const title = t('notifications.paymentReceived');
+      const body = t('notifications.paymentReceivedBody', { amount, name: client.name });
 
       await this.sendNotification(
         title,

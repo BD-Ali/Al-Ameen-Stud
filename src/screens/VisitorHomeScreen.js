@@ -6,6 +6,7 @@ import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import AnimatedCard from '../components/AnimatedCard';
 import { useFadeIn, useScaleIn, usePulse } from '../utils/animations';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * VisitorHomeScreen is the public‑facing section of the app.  It shows a
@@ -15,6 +16,7 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
  */
 const VisitorHomeScreen = () => {
   const { horses } = useContext(DataContext);
+  const { t } = useTranslation();
 
   // Animations
   const fadeAnim = useFadeIn(700);
@@ -23,27 +25,27 @@ const VisitorHomeScreen = () => {
 
   const handleContactUs = () => {
     Alert.alert(
-      'تواصل معنا',
-      'اختر طريقة التواصل مع الإدارة:',
+      t('visitorHome.contactUs'),
+      t('visitorHome.contactChooseMethod'),
       [
         {
-          text: 'إرسال بريد إلكتروني',
+          text: t('visitorHome.sendEmail'),
           onPress: () => {
             Linking.openURL('mailto:badarne3li@gmail.com').catch(() => {
-              Alert.alert('خطأ', 'لا يمكن فتح تطبيق البريد الإلكتروني');
+              Alert.alert(t('common.error'), t('visitorHome.cannotOpenEmail'));
             });
           }
         },
         {
-          text: 'اتصال هاتفي',
+          text: t('visitorHome.phoneCall'),
           onPress: () => {
             Linking.openURL('tel:0503653429').catch(() => {
-              Alert.alert('خطأ', 'لا يمكن إجراء المكالمة');
+              Alert.alert(t('common.error'), t('visitorHome.cannotMakeCall'));
             });
           }
         },
         {
-          text: 'إلغاء',
+          text: t('common.cancel'),
           style: 'cancel'
         }
       ]
@@ -66,9 +68,9 @@ const VisitorHomeScreen = () => {
             />
             <View style={styles.logoReflection} />
           </View>
-          <Text style={styles.heading}>مرحباً بك في مَرْبَط الأَمِين!</Text>
+          <Text style={styles.heading}>{t('visitorHome.welcomeMessage')}</Text>
           <Text style={styles.paragraph}>
-            نحن فخورون برعاية مجموعة متنوعة من الخيول الرائعة. لا تتردد في الاطلاع والتعرف عليها.
+            {t('visitorHome.description')}
           </Text>
         </Animated.View>
 
@@ -77,7 +79,7 @@ const VisitorHomeScreen = () => {
 
         <View style={styles.subheadingRow}>
           <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
-          <Text style={styles.subheading}>خيولنا</Text>
+          <Text style={styles.subheading}>{t('visitorHome.ourHorses')}</Text>
         </View>
 
         {/* Render horses directly instead of using FlatList */}
@@ -98,7 +100,7 @@ const VisitorHomeScreen = () => {
                 </View>
                 <View style={styles.breedRow}>
                   <MaterialCommunityIcons name="horse" size={14} color="#E67E22" />
-                  <Text style={styles.breedLabel}>السلالة:</Text>
+                  <Text style={styles.breedLabel}>{t('horses.breed')}</Text>
                   <Text style={styles.breedValue}>{item.breed}</Text>
                 </View>
               </View>
@@ -107,7 +109,7 @@ const VisitorHomeScreen = () => {
         ) : (
           <View style={styles.emptyState}>
             <MaterialCommunityIcons name="horse-variant" size={64} color="#F39C12" />
-            <Text style={styles.emptyText}>لا توجد خيول لعرضها بعد</Text>
+            <Text style={styles.emptyText}>{t('visitorHome.noHorses')}</Text>
           </View>
         )}
       </ScrollView>

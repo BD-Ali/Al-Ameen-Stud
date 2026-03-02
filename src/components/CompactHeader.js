@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { useTranslation } from '../i18n/LanguageContext';
 
 /**
  * CompactHeader - A compact, modern header for user home screens
@@ -17,10 +18,11 @@ const CompactHeader = ({
   onProfilePress = null
 }) => {
   const [pressAnim] = useState(new Animated.Value(1));
+  const { t } = useTranslation();
 
-  // Get greeting - now just returns "Welcome"
+  // Get greeting
   const getGreeting = () => {
-    return 'أهلاً';
+    return t('header.hello');
   };
 
   // Get initials from name
@@ -34,9 +36,9 @@ const CompactHeader = ({
   // Get role display info
   const getRoleInfo = (role) => {
     const roleMap = {
-      'client': { label: 'عميل', color: colors.accent.teal, icon: 'user', iconFamily: 'FontAwesome5', iconColor: '#1ABC9C' },
-      'worker': { label: 'عامل', color: colors.accent.pink, icon: 'hard-hat', iconFamily: 'FontAwesome5', iconColor: '#E91E63' },
-      'admin': { label: 'مدير', color: colors.accent.purple, icon: 'user-shield', iconFamily: 'FontAwesome5', iconColor: '#9B59B6' },
+      'client': { label: t('roles.client'), color: colors.accent.teal, icon: 'user', iconFamily: 'FontAwesome5', iconColor: '#1ABC9C' },
+      'worker': { label: t('roles.worker'), color: colors.accent.pink, icon: 'hard-hat', iconFamily: 'FontAwesome5', iconColor: '#E91E63' },
+      'admin': { label: t('roles.admin'), color: colors.accent.purple, icon: 'user-shield', iconFamily: 'FontAwesome5', iconColor: '#9B59B6' },
     };
     return roleMap[role.toLowerCase()] || roleMap['client'];
   };
@@ -45,12 +47,12 @@ const CompactHeader = ({
 
   const handleLogoutPress = () => {
     Alert.alert(
-      'تسجيل الخروج',
-      'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+      t('auth.logout'),
+      t('auth.logoutConfirm'),
       [
-        { text: 'إلغاء', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'خروج',
+          text: t('auth.exit'),
           style: 'destructive',
           onPress: onLogout,
         },
@@ -107,7 +109,7 @@ const CompactHeader = ({
 
           <View style={styles.userInfo}>
             <Text style={styles.welcomeText} numberOfLines={1}>
-              {loading ? 'جاري التحميل...' : `${getGreeting()} ${userName || 'مستخدم'}`}
+              {loading ? t('common.loading') : `${getGreeting()} ${userName || t('profile.defaultUser')}`}
             </Text>
           </View>
         </TouchableOpacity>
@@ -119,9 +121,9 @@ const CompactHeader = ({
             onPress={handleLogoutPress}
             activeOpacity={0.6}
             disabled={loading}
-            accessibilityLabel="تسجيل الخروج"
+            accessibilityLabel={t('auth.logout')}
             accessibilityRole="button"
-            accessibilityHint="اضغط لتسجيل الخروج من حسابك"
+            accessibilityHint={t('auth.logoutHint')}
           >
             <FontAwesome5 name="sign-out-alt" size={20} color="#EF4444" solid />
           </TouchableOpacity>
