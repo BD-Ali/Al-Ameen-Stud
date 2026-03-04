@@ -18,9 +18,8 @@ import lessonReminderService from './src/services/lessonReminderService';
 import { ActivityIndicator, View, StyleSheet, I18nManager, Animated } from 'react-native';
 import { useFadeIn } from './src/utils/animations';
 
-// Enable RTL for Arabic
+// Allow RTL — actual direction is set dynamically by LanguageContext per language
 I18nManager.allowRTL(true);
-I18nManager.forceRTL(true);
 
 const Stack = createNativeStackNavigator();
 

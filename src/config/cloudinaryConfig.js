@@ -5,7 +5,6 @@
 
 const CLOUDINARY_CLOUD_NAME = 'dtbynupyx';
 const CLOUDINARY_API_KEY = '696232838498944';
-const CLOUDINARY_API_SECRET = 'K-4f9U5kLBu0UOLP_VlRKW23brU';
 const CLOUDINARY_UPLOAD_PRESET = 'al-ameen-stable'; // You'll need to create this in Cloudinary dashboard
 
 /**
@@ -171,7 +170,6 @@ export const getOptimizedImageUrl = (url, options = {}) => {
 export const cloudinaryConfig = {
   cloudName: CLOUDINARY_CLOUD_NAME,
   apiKey: CLOUDINARY_API_KEY,
-  apiSecret: CLOUDINARY_API_SECRET,
 };
 
 export default {
