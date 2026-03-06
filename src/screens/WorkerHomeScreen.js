@@ -391,13 +391,11 @@ const WorkerHomeScreen = ({ navigation }) => {
                         <View style={styles.lessonDetails}>
                           <View style={styles.lessonInfoRow}>
                             <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-                            <Text style={styles.lessonLabel}>{t('lessons.client')}</Text>
-                            <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
+                            <Text style={styles.lessonLabel}>{t('lessons.client')} <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text></Text>
                           </View>
                           <View style={styles.lessonInfoRow}>
                             <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-                            <Text style={styles.lessonLabel}>{t('lessons.horse')}</Text>
-                            <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
+                            <Text style={styles.lessonLabel}>{t('lessons.horse')} <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text></Text>
                           </View>
                         </View>
                         {!lesson.confirmed && lesson.status !== 'cancelled' && (
@@ -442,13 +440,11 @@ const WorkerHomeScreen = ({ navigation }) => {
                         <View style={styles.lessonDetails}>
                           <View style={styles.lessonInfoRow}>
                             <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-                            <Text style={styles.lessonLabel}>{t('lessons.client')}</Text>
-                            <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text>
+                            <Text style={styles.lessonLabel}>{t('lessons.client')} <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text></Text>
                           </View>
                           <View style={styles.lessonInfoRow}>
                             <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-                            <Text style={styles.lessonLabel}>{t('lessons.horse')}</Text>
-                            <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text>
+                            <Text style={styles.lessonLabel}>{t('lessons.horse')} <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text></Text>
                           </View>
                         </View>
                       </View>

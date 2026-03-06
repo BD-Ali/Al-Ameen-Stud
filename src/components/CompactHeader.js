@@ -27,7 +27,7 @@ const CompactHeader = ({
 
   // Get initials from name
   const getInitials = (name) => {
-    if (!name) return '👤';
+    if (!name) return null;
     const parts = name.trim().split(' ');
     if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -91,7 +91,7 @@ const CompactHeader = ({
         >
           {loading ? (
             <View style={[styles.avatar, styles.avatarLoading]}>
-              <Text style={styles.avatarText}>⏳</Text>
+              <FontAwesome5 name="hourglass-half" size={18} color={colors.text.secondary} />
             </View>
           ) : (
             <Animated.View
@@ -101,9 +101,13 @@ const CompactHeader = ({
                 { backgroundColor: roleInfo.color + '30' }
               ]}
             >
-              <Text style={[styles.avatarText, { color: roleInfo.color }]}>
-                {getInitials(userName)}
-              </Text>
+              {getInitials(userName) ? (
+                <Text style={[styles.avatarText, { color: roleInfo.color }]}>
+                  {getInitials(userName)}
+                </Text>
+              ) : (
+                <FontAwesome5 name="user" size={18} color={roleInfo.color} solid />
+              )}
             </Animated.View>
           )}
 
@@ -125,7 +129,7 @@ const CompactHeader = ({
             accessibilityRole="button"
             accessibilityHint={t('auth.logoutHint')}
           >
-            <FontAwesome5 name="sign-out-alt" size={20} color="#EF4444" solid />
+            <Text style={styles.logoutText}>{t('auth.exit')}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -187,19 +191,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutButton: {
-    width: 46,
-    height: 46,
-    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.sm,
     backgroundColor: colors.background.tertiary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: colors.border.medium,
-    ...shadows.sm,
   },
-  logoutIcon: {
-    fontSize: 20,
-    color: colors.text.secondary,
+  logoutText: {
+    color: colors.text.primary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
   },
 });
 

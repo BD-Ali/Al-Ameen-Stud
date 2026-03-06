@@ -410,7 +410,10 @@ const AnnouncementsScreen = () => {
         <Text style={styles.cardContent} numberOfLines={3}>{item.content}</Text>
 
         <View style={styles.cardMeta}>
-          <Text style={styles.metaText}>👥 {audienceLabel}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <FontAwesome5 name="users" size={12} color={colors.text.tertiary} solid />
+            <Text style={styles.metaText}>{audienceLabel}</Text>
+          </View>
           <Text style={styles.metaText}>
             {item.createdAt ? formatDate(item.createdAt.toDate?.() || item.createdAt) : ''}
           </Text>
@@ -556,7 +559,9 @@ const AnnouncementsScreen = () => {
                 accessibilityLabel={previewMode ? t('common.edit') : t('announcements.preview')}
                 accessibilityRole="button"
               >
-                <Text style={styles.previewButton}>{previewMode ? '✏️' : '👁️'}</Text>
+                <Text style={styles.previewButton}>
+                  <FontAwesome5 name={previewMode ? 'edit' : 'eye'} size={18} color={colors.primary.main} solid />
+                </Text>
               </TouchableOpacity>
             </View>
 

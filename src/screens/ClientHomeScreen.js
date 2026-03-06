@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, SafeAreaView, Linking, Image, ScrollView, Animated } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, SafeAreaView, Linking, Image, ScrollView, Animated, I18nManager } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -74,11 +74,11 @@ const ClientHomeScreen = ({ navigation }) => {
 
   const handleContactUs = () => {
     Alert.alert(
-      `📞 ${t('clientHome.contactUs')}`,
+      t('clientHome.contactUs'),
       t('visitorHome.contactChooseMethod'),
       [
         {
-          text: `📧 ${t('visitorHome.sendEmail')}`,
+          text: t('visitorHome.sendEmail'),
           onPress: () => {
             Linking.openURL('mailto:Lina.b.96@hotmail.com').catch(err => {
               Alert.alert(t('common.error'), t('visitorHome.cannotOpenEmail'));
@@ -86,7 +86,7 @@ const ClientHomeScreen = ({ navigation }) => {
           }
         },
         {
-          text: `📱 ${t('visitorHome.phoneCall')}`,
+          text: t('visitorHome.phoneCall'),
           onPress: () => {
             Linking.openURL('tel:0526913008').catch(err => {
               Alert.alert(t('common.error'), t('visitorHome.cannotMakeCall'));
@@ -325,7 +325,7 @@ const ClientHomeScreen = ({ navigation }) => {
         onPress={handleContactUs}
         activeOpacity={0.8}
       >
-        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }, { scaleX: I18nManager.isRTL ? -1 : 1 }] }}>
           <FontAwesome5 name="phone" size={20} color="#fff" solid />
         </Animated.View>
       </TouchableOpacity>

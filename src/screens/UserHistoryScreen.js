@@ -243,7 +243,7 @@ const UserHistoryScreen = ({ route }) => {
         {item.partnerName ? (
           <View style={styles.cardRow}>
             <FontAwesome5 name="user" size={13} color={colors.primary.light} solid />
-            <Text style={styles.cardRowText}>{item.partnerRole}: {item.partnerName}</Text>
+            <Text style={styles.cardRowText}>{item.partnerRole} <Text style={{ fontWeight: typography.weight.bold, color: colors.text.primary }}>{item.partnerName}</Text></Text>
           </View>
         ) : null}
       </AnimatedCard>
@@ -300,7 +300,7 @@ const UserHistoryScreen = ({ route }) => {
         {item.totalAfter != null && (
           <View style={styles.cardRow}>
             <FontAwesome5 name="wallet" size={14} color={colors.primary.light} solid />
-            <Text style={styles.cardRowText}>{t('userHistory.totalAfterPayment')}: {item.totalAfter} ₪</Text>
+            <Text style={styles.cardRowText}>{t('userHistory.totalAfterPayment')} <Text style={{ fontWeight: typography.weight.bold }}>{item.totalAfter} ₪</Text></Text>
           </View>
         )}
 
@@ -308,7 +308,7 @@ const UserHistoryScreen = ({ route }) => {
         {item.amountDue != null && (
           <View style={styles.cardRow}>
             <FontAwesome5 name="file-invoice-dollar" size={14} color={colors.status.warning} solid />
-            <Text style={styles.cardRowText}>{t('userHistory.amountDue')}: {item.amountDue} ₪</Text>
+            <Text style={styles.cardRowText}>{t('userHistory.amountDue')} <Text style={{ fontWeight: typography.weight.bold }}>{item.amountDue} ₪</Text></Text>
           </View>
         )}
 

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated, SafeAreaView, I18nManager } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
@@ -100,8 +100,7 @@ const VisitorHomeScreen = () => {
                 </View>
                 <View style={styles.breedRow}>
                   <MaterialCommunityIcons name="horse" size={14} color="#E67E22" />
-                  <Text style={styles.breedLabel}>{t('horses.breed')}</Text>
-                  <Text style={styles.breedValue}>{item.breed}</Text>
+                  <Text style={styles.breedLabel}>{t('horses.breed')} <Text style={styles.breedValue}>{item.breed}</Text></Text>
                 </View>
               </View>
             </AnimatedCard>
@@ -120,7 +119,7 @@ const VisitorHomeScreen = () => {
         onPress={handleContactUs}
         activeOpacity={0.8}
       >
-        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }, { scaleX: I18nManager.isRTL ? -1 : 1 }] }}>
           <FontAwesome5 name="phone" size={20} color="#fff" solid />
         </Animated.View>
       </TouchableOpacity>

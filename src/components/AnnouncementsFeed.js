@@ -9,6 +9,7 @@ import {
   Linking,
   ActivityIndicator,
   Image,
+  I18nManager,
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
@@ -235,7 +236,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
                   <View style={styles.cardFooter}>
                     <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
-                    <Text style={styles.readMore}>{t('announcements.readMore')} <FontAwesome5 name="arrow-left" size={12} color={colors.primary.main} /></Text>
+                    <Text style={styles.readMore}>{t('announcements.readMore')} <FontAwesome5 name={I18nManager.isRTL ? 'arrow-right' : 'arrow-left'} size={12} color={colors.primary.main} /></Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -248,7 +249,10 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
               style={styles.loadMoreButton}
               onPress={loadMore}
             >
-              <Text style={styles.loadMoreText}>{t('announcements.loadMore')} ↓</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={styles.loadMoreText}>{t('announcements.loadMore')}</Text>
+                <FontAwesome5 name="chevron-down" size={12} color={colors.primary.main} />
+              </View>
             </TouchableOpacity>
           )}
         </>
@@ -274,7 +278,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                 onPress={() => setDetailModalVisible(false)}
                 style={styles.closeButton}
               >
-                <Text style={styles.closeButtonText}>✕</Text>
+                <FontAwesome5 name="times" size={18} color={colors.text.secondary} />
               </TouchableOpacity>
             </View>
 

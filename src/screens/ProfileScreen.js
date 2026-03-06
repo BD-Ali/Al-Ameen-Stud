@@ -307,7 +307,7 @@ const ProfileScreen = ({ navigation }) => {
 
     // Double confirmation
     Alert.alert(
-      '⚠️ ' + t('common.warning'),
+      t('common.warning'),
       t('profile.deleteConfirmQuestion'),
       [
         {
@@ -523,20 +523,17 @@ const ProfileScreen = ({ navigation }) => {
             <View style={styles.infoContainer}>
               {/* Name Frame */}
               <View style={styles.infoItemFrame}>
-                <Text style={styles.infoItemLabel}>{t('profile.name')}</Text>
-                <Text style={styles.infoItemValue}>{displayName}</Text>
+                <Text style={styles.infoItemLabel}>{t('profile.name')} <Text style={styles.infoItemValue}>{displayName}</Text></Text>
               </View>
 
               {/* Email Frame */}
               <View style={styles.infoItemFrame}>
-                <Text style={styles.infoItemLabel}>{t('profile.emailLabel')}</Text>
-                <Text style={styles.infoItemValue}>{displayEmail}</Text>
+                <Text style={styles.infoItemLabel}>{t('profile.emailLabel')} <Text style={styles.infoItemValue}>{displayEmail}</Text></Text>
               </View>
 
               {/* Role Frame */}
               <View style={[styles.infoItemFrame, { borderColor: roleInfo.color }]}>
-                <Text style={styles.infoItemLabel}>{t('profile.roleLabel')}</Text>
-                <Text style={[styles.infoItemValue, { color: roleInfo.color }]}>{roleInfo.label}</Text>
+                <Text style={styles.infoItemLabel}>{t('profile.roleLabel')} <Text style={[styles.infoItemValue, { color: roleInfo.color }]}>{roleInfo.label}</Text></Text>
               </View>
             </View>
             <View style={styles.infoNote}>

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -87,15 +88,15 @@ const InAppNotificationBanner = ({
   const getIcon = () => {
     switch (type) {
       case 'announcement':
-        return '📢';
+        return { name: 'bullhorn', color: '#3498DB' };
       case 'alert':
-        return '⚠️';
+        return { name: 'exclamation-triangle', color: '#F39C12' };
       case 'success':
-        return '✅';
+        return { name: 'check-circle', color: '#27AE60' };
       case 'info':
-        return 'ℹ️';
+        return { name: 'info-circle', color: '#3498DB' };
       default:
-        return '🔔';
+        return { name: 'bell', color: '#F39C12' };
     }
   };
 
@@ -120,7 +121,7 @@ const InAppNotificationBanner = ({
         activeOpacity={0.9}
       >
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>{getIcon()}</Text>
+          <FontAwesome5 name={getIcon().name} size={20} color={getIcon().color} solid />
         </View>
 
         <View style={styles.content}>
@@ -138,7 +139,7 @@ const InAppNotificationBanner = ({
           accessibilityLabel={t('common.close')}
           accessibilityRole="button"
         >
-          <Text style={styles.dismissText}>✕</Text>
+          <FontAwesome5 name="times" size={14} color={colors.text.secondary} />
         </TouchableOpacity>
       </TouchableOpacity>
     </Animated.View>

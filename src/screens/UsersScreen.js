@@ -926,9 +926,12 @@ const UsersScreen = () => {
                   disabled={isAddingUser}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.addButtonText}>
-                    {isAddingUser ? t('users.adding') : `âž• ${activeTab === 'clients' ? t('users.addClient') : t('users.addWorker')}`}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                    <FontAwesome5 name="plus" size={14} color="#fff" solid />
+                    <Text style={styles.addButtonText}>
+                      {isAddingUser ? t('users.adding') : (activeTab === 'clients' ? t('users.addClient') : t('users.addWorker'))}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               </View>
             </View>
