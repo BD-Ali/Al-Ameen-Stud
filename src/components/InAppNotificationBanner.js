@@ -179,9 +179,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginEnd: spacing.sm,
   },
-  icon: {
-    fontSize: 24,
-  },
+
   content: {
     flex: 1,
     marginEnd: spacing.sm,
@@ -203,10 +201,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.text.muted + '20',
   },
-  dismissText: {
-    fontSize: 18,
-    color: colors.text.tertiary,
-  },
+
 });
 
 export default InAppNotificationBanner;

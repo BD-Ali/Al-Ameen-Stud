@@ -249,10 +249,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: spacing.xxxl,
   },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: spacing.md,
-  },
+
   emptyText: {
     fontSize: typography.size.base,
     color: colors.text.tertiary,
@@ -270,9 +267,7 @@ const styles = StyleSheet.create({
     ...shadows.lg,
     elevation: 5,
   },
-  contactButtonIcon: {
-    fontSize: 24,
-  },
+
 });
 
 export default VisitorHomeScreen;

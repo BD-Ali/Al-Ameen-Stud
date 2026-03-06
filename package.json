@@ -1,6 +1,6 @@
 {
   "name": "horse-stable-app",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "private": true,
   "description": "A React Native app for managing a horse stable with admin and public sections.",
   "main": "expo/AppEntry.js",
@@ -42,11 +42,11 @@
     "react-native-reanimated": "~4.1.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
-    "react-native-vector-icons": "^10.3.0",
     "react-native-web": "^0.21.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "babel-preset-expo": "~54.0.0",
     "baseline-browser-mapping": "^2.10.0"
   }

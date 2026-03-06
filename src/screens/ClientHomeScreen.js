@@ -535,10 +535,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: spacing.xxxl,
   },
-  emptyEmoji: {
-    fontSize: 48,
-    marginBottom: spacing.md,
-  },
+
   emptyText: {
     fontSize: typography.size.md,
     color: colors.text.secondary,
@@ -718,9 +715,7 @@ const styles = StyleSheet.create({
     ...shadows.lg,
     elevation: 5,
   },
-  contactButtonIcon: {
-    fontSize: 24,
-  },
+
 });
 
 export default ClientHomeScreen;

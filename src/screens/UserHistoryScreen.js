@@ -5,8 +5,8 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -23,7 +23,7 @@ import { useTranslation } from '../i18n/LanguageContext';
  *   userType – 'client' | 'worker'
  */
 const UserHistoryScreen = ({ route }) => {
-  const { userId, userName, userType } = route.params;
+  const { userId, userName, userType } = route.params || {};
   const { lessons, missions, schedules, weeklySchedules, horses, clients, workerUsers, paymentHistory } = useContext(DataContext);
   const { t } = useTranslation();
   const fadeStyle = useFadeIn(0);
