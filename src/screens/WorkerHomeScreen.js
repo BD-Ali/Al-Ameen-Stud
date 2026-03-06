@@ -105,8 +105,8 @@ const WorkerHomeScreen = ({ navigation }) => {
     return taskHour < currentHour;
   }).sort((a, b) => b.timeSlot.localeCompare(a.timeSlot));
 
-  // Filter lessons for this worker
-  const myLessons = lessons?.filter((l) => l.instructorId === user?.uid) || [];
+  // Filter lessons for this worker (exclude cancelled)
+  const myLessons = lessons?.filter((l) => l.instructorId === user?.uid && l.status !== 'cancelled') || [];
   const todayLessons = myLessons.filter((l) => l.date === today);
   const upcomingLessons = myLessons.filter((l) => l.date > today).slice(0, 5);
 

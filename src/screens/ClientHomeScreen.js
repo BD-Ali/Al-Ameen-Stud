@@ -16,7 +16,7 @@ import { useTranslation } from '../i18n/LanguageContext';
  * their authenticated account.
  */
 const ClientHomeScreen = ({ navigation }) => {
-  const { clients, lessons, horses, workers, getConfirmedLessons, getScheduledLessons } = useContext(DataContext);
+  const { clients, lessons, horses, workers, getConfirmedLessons, getScheduledLessons, getCancelledLessons } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
 
@@ -30,9 +30,10 @@ const ClientHomeScreen = ({ navigation }) => {
   // Get confirmed lessons (completed) and scheduled lessons separately
   const confirmedLessons = getConfirmedLessons ? getConfirmedLessons(user?.uid) : [];
   const scheduledLessons = getScheduledLessons ? getScheduledLessons(user?.uid) : [];
+  const cancelledLessons = getCancelledLessons ? getCancelledLessons(user?.uid) : [];
 
-  // Combine for display: show both confirmed and scheduled, but only confirmed count toward totals
-  const clientLessons = [...confirmedLessons, ...scheduledLessons].sort((a, b) => {
+  // Combine for display: show confirmed, scheduled, and cancelled lessons
+  const clientLessons = [...confirmedLessons, ...scheduledLessons, ...cancelledLessons].sort((a, b) => {
     // Sort by date descending (newest first)
     const dateCompare = new Date(b.date) - new Date(a.date);
     if (dateCompare !== 0) return dateCompare;

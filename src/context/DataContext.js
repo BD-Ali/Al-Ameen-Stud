@@ -7,6 +7,7 @@ import {
   doc,
   onSnapshot,
   query,
+  where,
   serverTimestamp,
   setDoc,
   getDocs,
@@ -919,42 +920,72 @@ export const DataProvider = ({ children }) => {
         return { success: false, error: t('dataContext.lessonNotFound') };
       }
 
+      // 1. Update the lesson status to cancelled
       await updateDoc(doc(db, 'lessons', lessonId), {
         status: 'cancelled',
+        confirmed: false,
         cancelReason: reason,
         cancelledAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       });
 
-      // Mark associated mission as completed (cancelled)
-      const associatedMissions = missions.filter(m => m.lessonId === lessonId);
-      for (const mission of associatedMissions) {
-        await updateDoc(doc(db, 'missions', mission.id), {
-          completed: true,
-          completedAt: serverTimestamp()
-        });
-      }
-
-      // Remove associated schedule entries (no longer needed)
-      const associatedSchedules = schedules.filter(s => s.lessonId === lessonId);
-      for (const schedule of associatedSchedules) {
-        await deleteDoc(doc(db, 'schedules', schedule.id));
-      }
-
-      // Remove associated weeklySchedules entries
+      // 2. Remove associated missions using Firestore query (more reliable than in-memory)
       try {
-        const associatedWeekly = weeklySchedules.filter(s => s.lessonId === lessonId);
-        for (const ws of associatedWeekly) {
-          await deleteDoc(doc(db, 'weeklySchedules', ws.id));
+        const missionsQuery = query(collection(db, 'missions'), where('lessonId', '==', lessonId));
+        const missionsSnap = await getDocs(missionsQuery);
+        for (const missionDoc of missionsSnap.docs) {
+          await deleteDoc(doc(db, 'missions', missionDoc.id));
+        }
+      } catch (missionErr) {
+        console.warn('Could not clean missions on cancel:', missionErr);
+      }
+
+      // 3. Remove associated schedule entries using Firestore query
+      try {
+        const schedulesQuery = query(collection(db, 'schedules'), where('lessonId', '==', lessonId));
+        const schedulesSnap = await getDocs(schedulesQuery);
+        for (const schedDoc of schedulesSnap.docs) {
+          await deleteDoc(doc(db, 'schedules', schedDoc.id));
+        }
+      } catch (schedErr) {
+        console.warn('Could not clean schedules on cancel:', schedErr);
+      }
+
+      // 4. Remove associated weeklySchedules entries using Firestore query
+      try {
+        const weeklyQuery = query(collection(db, 'weeklySchedules'), where('lessonId', '==', lessonId));
+        const weeklySnap = await getDocs(weeklyQuery);
+        for (const wsDoc of weeklySnap.docs) {
+          await deleteDoc(doc(db, 'weeklySchedules', wsDoc.id));
         }
       } catch (weeklyErr) {
         console.warn('Could not clean weeklySchedules on cancel:', weeklyErr);
       }
 
-      // Cancel lesson reminder notifications
+      // 5. If lesson was already confirmed, restore the subscription credit
+      if (lesson.confirmed || lesson.status === 'completed') {
+        const client = clients.find(c => c.id === lesson.clientId);
+        if (client) {
+          const updateData = {
+            lessonCount: Math.max((client.lessonCount || 1) - 1, 0),
+            updatedAt: serverTimestamp()
+          };
+          // Restore subscription lesson if client has a subscription
+          if (client.hasSubscription) {
+            updateData.subscriptionLessons = (client.subscriptionLessons || 0) + 1;
+            updateData.subscriptionUsedLessons = Math.max((client.subscriptionUsedLessons || 1) - 1, 0);
+            if (!client.subscriptionActive && updateData.subscriptionLessons > 0) {
+              updateData.subscriptionActive = true;
+            }
+          }
+          await updateDoc(doc(db, 'clients', lesson.clientId), updateData);
+        }
+      }
+
+      // 6. Cancel lesson reminder notifications
       await lessonReminderService.cancelLessonReminders(lessonId);
 
-      // Send cancellation notification
+      // 7. Send cancellation notification to the client
       const client = clients.find(c => c.id === lesson.clientId);
       if (client) {
         await notificationService.sendLessonCancelledNotification(lesson, client, reason);
@@ -979,23 +1010,34 @@ export const DataProvider = ({ children }) => {
       // Remove the lesson
       await deleteDoc(doc(db, 'lessons', id));
 
-      // Remove associated schedules
-      const associatedSchedules = schedules.filter(s => s.lessonId === id);
-      for (const schedule of associatedSchedules) {
-        await deleteDoc(doc(db, 'schedules', schedule.id));
-      }
-
-      // Remove associated missions
-      const associatedMissions = missions.filter(m => m.lessonId === id);
-      for (const mission of associatedMissions) {
-        await deleteDoc(doc(db, 'missions', mission.id));
-      }
-
-      // Remove associated weeklySchedules entries
+      // Remove associated schedules using Firestore query
       try {
-        const associatedWeekly = weeklySchedules.filter(s => s.lessonId === id);
-        for (const ws of associatedWeekly) {
-          await deleteDoc(doc(db, 'weeklySchedules', ws.id));
+        const schedulesQuery = query(collection(db, 'schedules'), where('lessonId', '==', id));
+        const schedulesSnap = await getDocs(schedulesQuery);
+        for (const schedDoc of schedulesSnap.docs) {
+          await deleteDoc(doc(db, 'schedules', schedDoc.id));
+        }
+      } catch (schedErr) {
+        console.warn('Could not clean schedules on remove:', schedErr);
+      }
+
+      // Remove associated missions using Firestore query
+      try {
+        const missionsQuery = query(collection(db, 'missions'), where('lessonId', '==', id));
+        const missionsSnap = await getDocs(missionsQuery);
+        for (const missionDoc of missionsSnap.docs) {
+          await deleteDoc(doc(db, 'missions', missionDoc.id));
+        }
+      } catch (missionErr) {
+        console.warn('Could not clean missions on remove:', missionErr);
+      }
+
+      // Remove associated weeklySchedules using Firestore query
+      try {
+        const weeklyQuery = query(collection(db, 'weeklySchedules'), where('lessonId', '==', id));
+        const weeklySnap = await getDocs(weeklyQuery);
+        for (const wsDoc of weeklySnap.docs) {
+          await deleteDoc(doc(db, 'weeklySchedules', wsDoc.id));
         }
       } catch (weeklyErr) {
         console.warn('Could not clean weeklySchedules on remove:', weeklyErr);
@@ -2148,6 +2190,7 @@ export const DataProvider = ({ children }) => {
   const getConfirmedLessons = (clientId) => {
     return lessons.filter(l =>
       l.clientId === clientId &&
+      l.status !== 'cancelled' &&
       (l.confirmed === true || l.status === 'completed')
     );
   };
@@ -2172,6 +2215,18 @@ export const DataProvider = ({ children }) => {
       l.clientId === clientId &&
       l.status === 'scheduled' &&
       !l.confirmed
+    );
+  };
+
+  /**
+   * Get all cancelled lessons for a client
+   * @param {string} clientId - Client ID
+   * @returns {Array} Cancelled lessons
+   */
+  const getCancelledLessons = (clientId) => {
+    return lessons.filter(l =>
+      l.clientId === clientId &&
+      l.status === 'cancelled'
     );
   };
 
@@ -2232,6 +2287,7 @@ export const DataProvider = ({ children }) => {
         getConfirmedLessons,
         getConfirmedLessonCount,
         getScheduledLessons,
+        getCancelledLessons,
         // Availability checks
         isWorkerAvailable,
         isHorseAvailable,
