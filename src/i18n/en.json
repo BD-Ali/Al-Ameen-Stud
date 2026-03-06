@@ -137,7 +137,9 @@
     "noLessonsAdded": "No lessons added",
     "myInfo": "My Info",
     "jobTitle": "Job Title:",
-    "contactLabel": "Contact:"
+    "contactLabel": "Contact:",
+    "am": "AM",
+    "pm": "PM"
   },
   "visitorHome": {
     "welcomeMessage": "Welcome to Al-Ameen Farm",
@@ -329,6 +331,8 @@
     "phoneNumber": "Phone Number",
     "amountPaid": "Amount Paid",
     "amountPaidCurrency": "Amount Paid (₪)",
+    "addPayment": "Add Payment",
+    "addPaymentPlaceholder": "Enter amount paid now...",
     "amountDue": "Amount Due",
     "amountDueCurrency": "Amount Due (₪)",
     "lessonCount": "Lesson Count",
@@ -404,7 +408,12 @@
     "tuesday": "Tuesday",
     "wednesday": "Wednesday",
     "thursday": "Thursday",
-    "friday": "Friday"
+    "friday": "Friday",
+    "payment": "Payment",
+    "payments": "Payments",
+    "paymentAmount": "Amount",
+    "totalAfterPayment": "Total After Payment",
+    "amountDue": "Amount Due"
   },
   "announcements": {
     "title": "Announcements",

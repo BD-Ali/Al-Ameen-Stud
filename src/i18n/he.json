@@ -137,7 +137,9 @@
     "noLessonsAdded": "אין שיעורים שנוספו",
     "myInfo": "המידע שלי",
     "jobTitle": "תפקיד:",
-    "contactLabel": "יצירת קשר:"
+    "contactLabel": "יצירת קשר:",
+    "am": "לפנה\"צ",
+    "pm": "אחה\"צ"
   },
   "visitorHome": {
     "welcomeMessage": "ברוכים הבאים לחוות אל-אמין",
@@ -329,6 +331,8 @@
     "phoneNumber": "מספר טלפון",
     "amountPaid": "סכום ששולם",
     "amountPaidCurrency": "סכום ששולם (₪)",
+    "addPayment": "הוסף תשלום",
+    "addPaymentPlaceholder": "הזן סכום ששולם עכשיו...",
     "amountDue": "סכום לתשלום",
     "amountDueCurrency": "סכום לתשלום (₪)",
     "lessonCount": "מספר שיעורים",
@@ -404,7 +408,12 @@
     "tuesday": "שלישי",
     "wednesday": "רביעי",
     "thursday": "חמישי",
-    "friday": "שישי"
+    "friday": "שישי",
+    "payment": "תשלום",
+    "payments": "תשלומים",
+    "paymentAmount": "סכום",
+    "totalAfterPayment": "סה\"כ לאחר תשלום",
+    "amountDue": "סכום לתשלום"
   },
   "announcements": {
     "title": "הודעות",

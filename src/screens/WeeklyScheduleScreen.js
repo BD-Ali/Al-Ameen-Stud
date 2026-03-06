@@ -604,7 +604,7 @@ const styles = StyleSheet.create({
   dayButton: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
     borderRadius: borderRadius.sm,
     backgroundColor: colors.background.tertiary,
   },
@@ -635,16 +635,16 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.border.medium,
+    borderStartWidth: 3,
+    borderStartColor: colors.border.medium,
     ...shadows.sm,
   },
   timeSlotCardAssigned: {
-    borderLeftColor: colors.status.success,
+    borderStartColor: colors.status.success,
     backgroundColor: colors.surface.elevated,
   },
   timeSlotCardSelected: {
-    borderLeftColor: colors.primary.main,
+    borderStartColor: colors.primary.main,
     backgroundColor: colors.primary.subtle,
   },
   timeSlotHeader: {
@@ -800,7 +800,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     borderRadius: borderRadius.md,
     padding: spacing.md,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
     alignItems: 'center',
     minWidth: 80,
     borderWidth: 2,

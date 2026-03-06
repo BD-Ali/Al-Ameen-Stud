@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   },
   paymentEmoji: {
     fontSize: 20,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   paymentTitle: {
     fontSize: typography.size.md,
@@ -441,16 +441,16 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
     ...shadows.sm,
   },
   lessonCardConfirmed: {
-    borderLeftColor: colors.status.success,
+    borderStartColor: colors.status.success,
     opacity: 0.9,
   },
   lessonCardCancelled: {
-    borderLeftColor: colors.status.error,
+    borderStartColor: colors.status.error,
     opacity: 0.7,
   },
   lessonHeader: {
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
   lessonDetailIcon: {
     fontSize: 16,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   lessonDetailText: {
     fontSize: typography.size.sm,
@@ -580,7 +580,7 @@ const styles = StyleSheet.create({
   },
   subscriptionEmoji: {
     fontSize: 24,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   subscriptionTitle: {
     fontSize: typography.size.lg,
@@ -671,7 +671,7 @@ const styles = StyleSheet.create({
   },
   horseCardCompact: {
     width: 160,
-    marginRight: spacing.md,
+    marginEnd: spacing.md,
     backgroundColor: colors.background.secondary,
     borderRadius: borderRadius.md,
     overflow: 'hidden',
@@ -708,10 +708,10 @@ const styles = StyleSheet.create({
   contactButton: {
     position: 'absolute',
     bottom: spacing.xl,
-    right: spacing.xl,
+    end: spacing.xl,
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: borderRadius.xxxl,
     backgroundColor: colors.primary.main,
     justifyContent: 'center',
     alignItems: 'center',

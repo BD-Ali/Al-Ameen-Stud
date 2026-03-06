@@ -562,7 +562,7 @@ const ProfileScreen = ({ navigation }) => {
                     <FontAwesome5 name="user-edit" size={20} color={colors.accent.teal} solid />
                     <Text style={styles.cardTitle}>{t('profile.changeName')}</Text>
                   </View>
-                  <Ionicons name={showNameSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
+                  <Ionicons name={showNameSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
                 </TouchableOpacity>
               </View>
 
@@ -612,7 +612,7 @@ const ProfileScreen = ({ navigation }) => {
                   <FontAwesome5 name="lock" size={22} color={colors.accent.amber} solid />
                   <Text style={styles.cardTitle}>{t('profile.changePassword')}</Text>
                 </View>
-                <Ionicons name={showPasswordSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
+                <Ionicons name={showPasswordSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
 
@@ -690,7 +690,7 @@ const ProfileScreen = ({ navigation }) => {
                   <FontAwesome5 name="envelope" size={20} color={colors.status.error} solid />
                   <Text style={styles.cardTitle}>{t('profile.changeEmail')}</Text>
                 </View>
-                <Ionicons name={showEmailSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
+                <Ionicons name={showEmailSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
 
@@ -754,7 +754,7 @@ const ProfileScreen = ({ navigation }) => {
                   <FontAwesome5 name="trash-alt" size={20} color={colors.status.error} solid />
                   <Text style={[styles.cardTitle, { color: colors.status.error }]}>{t('profile.deleteAccount')}</Text>
                 </View>
-                <Ionicons name={showDeleteSection ? "chevron-down" : "chevron-back"} size={22} color={colors.text.tertiary} />
+                <Ionicons name={showDeleteSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
 
@@ -856,7 +856,7 @@ const styles = StyleSheet.create({
   avatarLarge: {
     width: 100,
     height: 100,
-    borderRadius: 50,
+    borderRadius: borderRadius.full,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.lg,
@@ -965,7 +965,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.md,
     color: colors.text.tertiary,
     fontWeight: typography.weight.bold,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
     letterSpacing: 0.3,
   },
   infoItemValue: {
@@ -1005,8 +1005,8 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     backgroundColor: colors.primary.subtle,
     borderRadius: borderRadius.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 4,
+    borderStartColor: colors.primary.main,
     ...shadows.sm,
     gap: spacing.sm,
   },
@@ -1092,8 +1092,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.status.error + '15',
     padding: spacing.lg,
     borderRadius: borderRadius.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.status.error,
+    borderStartWidth: 4,
+    borderStartColor: colors.status.error,
     marginBottom: spacing.lg,
     gap: spacing.sm,
   },

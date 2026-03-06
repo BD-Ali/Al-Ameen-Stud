@@ -59,6 +59,24 @@ export const colors = {
     hover: '#222d3f',        // Hover states
     pressed: '#1a2433',      // Pressed states
   },
+
+  // Icon colors for semantic differentiation across the app
+  icon: {
+    horse: '#F39C12',        // Horse-related icons
+    calendar: '#5DADE2',     // Calendar / schedule icons
+    user: '#1ABC9C',         // User / people icons
+    lesson: '#9B59B6',       // Lesson / book icons
+    money: '#27AE60',        // Payment / success icons
+    alert: '#E74C3C',        // Alert / danger icons
+    info: '#3498DB',         // Information icons
+    promo: '#E91E63',        // Promotional icons
+    event: '#9C27B0',        // Event icons
+    feed: '#FF9800',         // Feed / carrot icons
+    breed: '#E67E22',        // Breed / chart icons
+    task: '#3B82F6',         // Task / clipboard icons
+    muted: '#95A5A6',        // Empty state icons
+    onWhite: '#ffffff',      // Icons on colored backgrounds
+  },
 };
 
 export const typography = {
@@ -72,6 +90,9 @@ export const typography = {
     xl: 20,
     xxl: 24,
     xxxl: 28,
+    display: 36,
+    hero: 48,
+    jumbo: 64,
   },
 
   weight: {
@@ -83,6 +104,7 @@ export const typography = {
 };
 
 export const spacing = {
+  xxs: 2,
   xs: 4,
   sm: 8,
   md: 12,
@@ -99,6 +121,7 @@ export const borderRadius = {
   lg: 16,
   xl: 20,
   xxl: 24,
+  xxxl: 28,
   full: 9999,
 };
 

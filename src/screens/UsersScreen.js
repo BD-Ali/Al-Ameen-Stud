@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo } from 'react';
+﻿import React, { useContext, useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -36,7 +36,8 @@ const UsersScreen = () => {
     createUserAccount,
     lessons,
     horses,
-    workerUsers
+    workerUsers,
+    addPaymentRecord
   } = useContext(DataContext);
 
   // Tab Management
@@ -196,8 +197,10 @@ const UsersScreen = () => {
     setEditingUserId(user.id);
     if (activeTab === 'clients') {
       setEditFormData({
+        quickPayment: '',
         amountPaid: String(user.amountPaid || 0),
         amountDue: String(user.amountDue || 0),
+        amountDueEdited: false,
         lessonCount: String(user.lessonCount || 0),
       });
     } else {
@@ -205,6 +208,22 @@ const UsersScreen = () => {
         role: user.role || '',
       });
     }
+  };
+
+  const handleQuickPayment = (text) => {
+    const quickAmount = parseFloat(text) || 0;
+    const basePaid = parseFloat(editFormData._basePaid ?? editFormData.amountPaid) || 0;
+    const newTotal = basePaid + quickAmount;
+    const updates = {
+      ...editFormData,
+      quickPayment: text,
+      amountPaid: String(newTotal),
+      _basePaid: String(basePaid),
+    };
+    if (!editFormData.amountDueEdited) {
+      updates.amountDue = String(newTotal);
+    }
+    setEditFormData(updates);
   };
 
   const cancelEditing = () => {
@@ -217,15 +236,35 @@ const UsersScreen = () => {
     setLoadingMessage(t('users.saving'));
 
     if (activeTab === 'clients') {
+      const currentClient = clients.find(c => c.id === userId);
+      const previousPaid = currentClient?.amountPaid || 0;
       const paidNum = editFormData.amountPaid ? parseFloat(editFormData.amountPaid) : 0;
-      const dueNum = editFormData.amountDue ? parseFloat(editFormData.amountDue) : 0;
+      let dueNum = editFormData.amountDue ? parseFloat(editFormData.amountDue) : 0;
       const lessonCountNum = editFormData.lessonCount ? parseInt(editFormData.lessonCount) : 0;
+      // Ensure amount due is never less than amount paid
+      if (dueNum < paidNum) dueNum = paidNum;
+      const paymentDiff = paidNum - previousPaid;
 
       const result = await updateClient(userId, {
         amountPaid: paidNum,
         amountDue: dueNum,
         lessonCount: lessonCountNum
       });
+
+      // Save payment receipt if amount paid increased
+      if (result.success && paymentDiff > 0) {
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const timeStr = `${String(today.getHours()).padStart(2, '0')}:${String(today.getMinutes()).padStart(2, '0')}`;
+        await addPaymentRecord(userId, {
+          amount: paymentDiff,
+          totalAfter: paidNum,
+          amountDue: dueNum,
+          date: dateStr,
+          time: timeStr,
+          clientName: currentClient?.name || '',
+        });
+      }
 
       setIsLoading(false);
       if (result.success) {
@@ -372,7 +411,7 @@ const UsersScreen = () => {
                 </View>
               </View>
             </View>
-            <Text style={styles.expandIcon}>{isExpanded ? '▼' : '◀'}</Text>
+            <FontAwesome5 name={isExpanded ? 'chevron-down' : 'chevron-left'} size={14} color={colors.text.tertiary} solid />
           </View>
         </TouchableOpacity>
 
@@ -412,6 +451,21 @@ const UsersScreen = () => {
                 <>
                   {isEditing ? (
                     <>
+                      <View style={styles.quickPaymentSection}>
+                        <View style={styles.labelRow}>
+                          <FontAwesome5 name="plus-circle" size={14} color="#27AE60" solid />
+                          <Text style={styles.detailLabel}>{t('users.addPayment')}</Text>
+                        </View>
+                        <TextInput
+                          value={editFormData.quickPayment}
+                          onChangeText={handleQuickPayment}
+                          keyboardType="numeric"
+                          style={[styles.editInput, styles.quickPaymentInput]}
+                          placeholder={t('users.addPaymentPlaceholder')}
+                          placeholderTextColor={colors.text.muted}
+                        />
+                      </View>
+
                       <View style={styles.detailRow}>
                         <View style={styles.labelRow}>
                           <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
@@ -419,11 +473,11 @@ const UsersScreen = () => {
                         </View>
                         <TextInput
                           value={editFormData.amountPaid}
-                          onChangeText={(text) => setEditFormData({...editFormData, amountPaid: text})}
+                          onChangeText={(text) => setEditFormData({...editFormData, amountPaid: text, quickPayment: '', _basePaid: undefined})}
                           keyboardType="numeric"
                           style={styles.editInput}
                           placeholder="0"
-                          placeholderTextColor="#64748b"
+                          placeholderTextColor={colors.text.muted}
                         />
                       </View>
 
@@ -434,11 +488,11 @@ const UsersScreen = () => {
                         </View>
                         <TextInput
                           value={editFormData.amountDue}
-                          onChangeText={(text) => setEditFormData({...editFormData, amountDue: text})}
+                          onChangeText={(text) => setEditFormData({...editFormData, amountDue: text, amountDueEdited: true})}
                           keyboardType="numeric"
                           style={styles.editInput}
                           placeholder="0"
-                          placeholderTextColor="#64748b"
+                          placeholderTextColor={colors.text.muted}
                         />
                       </View>
 
@@ -453,7 +507,7 @@ const UsersScreen = () => {
                           keyboardType="numeric"
                           style={styles.editInput}
                           placeholder="0"
-                          placeholderTextColor="#64748b"
+                          placeholderTextColor={colors.text.muted}
                         />
                       </View>
 
@@ -719,7 +773,7 @@ const UsersScreen = () => {
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
               <FontAwesome5 name="times" size={14} color={colors.text.secondary} solid />
             </TouchableOpacity>
           )}
@@ -773,7 +827,7 @@ const UsersScreen = () => {
                     value={newUserForm.name}
                     onChangeText={(text) => setNewUserForm({...newUserForm, name: text})}
                     placeholder={activeTab === 'clients' ? t('users.enterClientName') : t('users.enterWorkerName')}
-                    placeholderTextColor="#64748b"
+                    placeholderTextColor={colors.text.muted}
                     style={styles.input}
                     returnKeyType="next"
                     blurOnSubmit={false}
@@ -791,7 +845,7 @@ const UsersScreen = () => {
                     placeholder={t('users.enterEmail')}
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    placeholderTextColor="#64748b"
+                    placeholderTextColor={colors.text.muted}
                     style={styles.input}
                     returnKeyType="next"
                     blurOnSubmit={false}
@@ -808,7 +862,7 @@ const UsersScreen = () => {
                     onChangeText={(text) => setNewUserForm({...newUserForm, phone: text})}
                     placeholder={t('users.enterPhone')}
                     keyboardType="phone-pad"
-                    placeholderTextColor="#64748b"
+                    placeholderTextColor={colors.text.muted}
                     style={styles.input}
                     returnKeyType="done"
                   />
@@ -854,7 +908,7 @@ const UsersScreen = () => {
                           onChangeText={(text) => setNewUserForm({...newUserForm, subscriptionLessons: text})}
                           placeholder={t('users.subscriptionLessonsPlaceholder')}
                           keyboardType="number-pad"
-                          placeholderTextColor="#64748b"
+                          placeholderTextColor={colors.text.muted}
                           style={styles.input}
                           returnKeyType="done"
                         />
@@ -873,7 +927,7 @@ const UsersScreen = () => {
                   activeOpacity={0.7}
                 >
                   <Text style={styles.addButtonText}>
-                    {isAddingUser ? t('users.adding') : `➕ ${activeTab === 'clients' ? t('users.addClient') : t('users.addWorker')}`}
+                    {isAddingUser ? t('users.adding') : `âž• ${activeTab === 'clients' ? t('users.addClient') : t('users.addWorker')}`}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -967,7 +1021,7 @@ const styles = StyleSheet.create({
   },
   searchIcon: {
     fontSize: 18,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   searchInput: {
     flex: 1,
@@ -993,8 +1047,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     padding: spacing.base,
     marginBottom: spacing.md,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.status.info,
+    borderStartWidth: 4,
+    borderStartColor: colors.status.info,
     ...shadows.md,
   },
   cardHeader: {
@@ -1014,7 +1068,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent.pink,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
+    marginEnd: spacing.md,
   },
   avatarClient: {
     backgroundColor: colors.status.info,
@@ -1115,7 +1169,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.sm,
     color: colors.text.primary,
     fontWeight: typography.weight.bold,
-    marginLeft: spacing.md,
+    marginStart: spacing.md,
   },
   paidText: {
     color: colors.status.success,
@@ -1136,6 +1190,20 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     minWidth: 100,
     textAlign: 'right',
+  },
+  quickPaymentSection: {
+    backgroundColor: colors.status.success + '10',
+    borderWidth: 1.5,
+    borderColor: colors.status.success + '40',
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  quickPaymentInput: {
+    marginTop: spacing.sm,
+    borderColor: colors.status.success + '60',
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
   },
   editButtonsRow: {
     flexDirection: 'row',
@@ -1233,11 +1301,11 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
     padding: spacing.sm,
     marginBottom: spacing.xs,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
   },
   lessonItemPast: {
-    borderLeftColor: colors.text.muted,
+    borderStartColor: colors.text.muted,
     opacity: 0.8,
   },
   lessonItemRow: {
@@ -1399,13 +1467,13 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     ...shadows.lg,
     zIndex: 1001,
-    borderLeftWidth: 4,
+    borderStartWidth: 4,
   },
   toastSuccess: {
-    borderLeftColor: colors.status.success,
+    borderStartColor: colors.status.success,
   },
   toastError: {
-    borderLeftColor: colors.status.error,
+    borderStartColor: colors.status.error,
   },
   toastText: {
     fontSize: typography.size.md,
@@ -1445,7 +1513,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.border.light,
     backgroundColor: colors.background.primary,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -171,11 +171,11 @@ const AdminTabs = () => {
 
 const styles = StyleSheet.create({
   logoHeader: {
-    marginLeft: spacing.base,
-    marginRight: spacing.base,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    marginStart: spacing.base,
+    marginEnd: spacing.base,
+    width: 44,
+    height: 44,
+    borderRadius: borderRadius.full,
     overflow: 'hidden',
     backgroundColor: colors.surface.elevated,
     justifyContent: 'center',
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: spacing.base,
+    marginEnd: spacing.base,
   },
   logoutButton: {
     paddingHorizontal: spacing.md,

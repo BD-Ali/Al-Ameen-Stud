@@ -235,7 +235,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
                   <View style={styles.cardFooter}>
                     <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
-                    <Text style={styles.readMore}>{t('announcements.readMore')} ←</Text>
+                    <Text style={styles.readMore}>{t('announcements.readMore')} <FontAwesome5 name="arrow-left" size={12} color={colors.primary.main} /></Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -316,7 +316,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                       onPress={() => handleLinkPress(selectedAnnouncement.linkUrl)}
                     >
                       <Text style={styles.actionButtonText}>
-                        {selectedAnnouncement.linkText || t('announcements.clickHere')} →
+                        {selectedAnnouncement.linkText || t('announcements.clickHere')} <FontAwesome5 name="external-link-alt" size={12} color={colors.text.primary} />
                       </Text>
                     </TouchableOpacity>
                   )}
@@ -374,8 +374,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     padding: spacing.base,
     borderRadius: borderRadius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
     ...shadows.sm,
   },
   pinnedBadge: {
@@ -501,11 +501,11 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border.light,
   },
   closeButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 20,
+    borderRadius: borderRadius.full,
     backgroundColor: colors.background.secondary,
   },
   closeButtonText: {

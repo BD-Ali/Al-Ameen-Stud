@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity, Linking, Image, ScrollView, Animated } from 'react-native';
+import { View, Text, StyleSheet, Alert, FlatList, SafeAreaView, TouchableOpacity, Linking, Image, ScrollView, Animated, I18nManager } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -78,11 +78,16 @@ const WorkerHomeScreen = ({ navigation }) => {
     s.date === today
   ) || [];
 
-  // Combine both schedule types
-  const allTodaySchedules = [
-    ...myTodayWeeklySchedules.map(s => ({ ...s, source: 'weekly' })),
-    ...myTodayDailySchedules.map(s => ({ ...s, source: 'daily' }))
-  ];
+  // Combine both schedule types, deduplicating lesson entries that exist in both
+  const allTodaySchedules = (() => {
+    const weekly = myTodayWeeklySchedules.map(s => ({ ...s, source: 'weekly' }));
+    const daily = myTodayDailySchedules.map(s => ({ ...s, source: 'daily' }));
+    // Collect lessonIds already present from weekly schedules
+    const weeklyLessonIds = new Set(weekly.filter(s => s.lessonId).map(s => s.lessonId));
+    // Keep daily entries only if they don't duplicate a weekly lesson entry
+    const dedupedDaily = daily.filter(s => !s.lessonId || !weeklyLessonIds.has(s.lessonId));
+    return [...weekly, ...dedupedDaily];
+  })();
 
   // Separate current, upcoming and past tasks
   const currentTasks = allTodaySchedules.filter((s) => {
@@ -156,10 +161,12 @@ const WorkerHomeScreen = ({ navigation }) => {
   const formatTime = (time) => {
     const [hour] = time.split(':');
     const h = parseInt(hour);
-    if (h === 0) return '12 AM';
-    if (h < 12) return `${h} AM`;
-    if (h === 12) return '12 PM';
-    return `${h - 12} PM`;
+    const am = t('workerHome.am');
+    const pm = t('workerHome.pm');
+    if (h === 0) return `12 ${am}`;
+    if (h < 12) return `${h} ${am}`;
+    if (h === 12) return `12 ${pm}`;
+    return `${h - 12} ${pm}`;
   };
 
   const handleConfirmLesson = async (lessonId) => {
@@ -512,7 +519,7 @@ const WorkerHomeScreen = ({ navigation }) => {
         onPress={handleContactUs}
         activeOpacity={0.8}
       >
-        <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+        <Animated.View style={{ transform: [{ scale: pulseAnim }, { scaleX: I18nManager.isRTL ? -1 : 1 }] }}>
           <FontAwesome5 name="phone" size={20} color="#fff" solid />
         </Animated.View>
       </TouchableOpacity>
@@ -555,15 +562,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     borderRadius: borderRadius.lg,
     padding: spacing.base,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
     ...shadows.md,
   },
   currentTaskCard: {
-    borderLeftColor: colors.status.success,
+    borderStartColor: colors.status.success,
   },
   pastTaskCard: {
-    borderLeftColor: colors.status.error,
+    borderStartColor: colors.status.error,
   },
   scheduleHeader: {
     marginBottom: spacing.sm,
@@ -776,7 +783,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: spacing.xs,
-    marginLeft: spacing.sm,
+    marginStart: spacing.sm,
   },
   horsesBadgeText: {
     color: '#fff',
@@ -787,11 +794,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   horsesScrollContent: {
-    paddingRight: spacing.base,
+    paddingEnd: spacing.base,
   },
   horseCardCompact: {
     width: 160,
-    marginRight: spacing.md,
+    marginEnd: spacing.md,
     backgroundColor: colors.background.secondary,
     borderRadius: borderRadius.md,
     overflow: 'hidden',
@@ -828,10 +835,10 @@ const styles = StyleSheet.create({
   contactButton: {
     position: 'absolute',
     bottom: spacing.xl,
-    right: spacing.xl,
+    end: spacing.xl,
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: borderRadius.xxxl,
     backgroundColor: colors.primary.main,
     justifyContent: 'center',
     alignItems: 'center',

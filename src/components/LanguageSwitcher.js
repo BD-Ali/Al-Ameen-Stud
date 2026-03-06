@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   optionBorder: {
-    borderRightWidth: 1,
-    borderRightColor: colors.primary.main,
+    borderEndWidth: 1,
+    borderEndColor: colors.primary.main,
   },
   activeOption: {
     backgroundColor: colors.primary.main,

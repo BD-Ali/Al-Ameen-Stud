@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated, SafeAreaView } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
@@ -53,7 +53,7 @@ const VisitorHomeScreen = () => {
   };
 
   return (
-    <View style={styles.wrapper}>
+    <SafeAreaView style={styles.wrapper}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
@@ -124,7 +124,7 @@ const VisitorHomeScreen = () => {
           <FontAwesome5 name="phone" size={20} color="#fff" solid />
         </Animated.View>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.md,
-    borderRadius: 40,
+    borderRadius: borderRadius.full,
     overflow: 'hidden',
     backgroundColor: '#fff',
     alignSelf: 'center',
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: '40%',
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 40,
+    borderRadius: borderRadius.full,
   },
   logo: {
     width: '100%',
@@ -208,8 +208,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     marginBottom: spacing.md,
     borderRadius: borderRadius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
     overflow: 'hidden',
     ...shadows.sm,
   },
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   breedLabel: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   breedValue: {
     fontSize: typography.size.sm,
@@ -261,10 +261,10 @@ const styles = StyleSheet.create({
   contactButton: {
     position: 'absolute',
     bottom: spacing.xl,
-    right: spacing.xl,
+    end: spacing.xl,
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: borderRadius.xxxl,
     backgroundColor: colors.primary.main,
     justifyContent: 'center',
     alignItems: 'center',

@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent.amber,
+    borderStartWidth: 3,
+    borderStartColor: colors.accent.amber,
     ...shadows.md,
   },
   cardHeader: {

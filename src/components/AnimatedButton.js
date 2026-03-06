@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 20,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   text: {
     color: colors.text.primary,

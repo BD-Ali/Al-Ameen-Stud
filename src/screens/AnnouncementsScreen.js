@@ -596,7 +596,7 @@ const AnnouncementsScreen = () => {
                     {formData.linkUrl && (
                       <TouchableOpacity style={styles.previewLink}>
                         <Text style={styles.previewLinkText}>
-                          {formData.linkText || t('announcements.linkTextPlaceholder')} →
+                          {formData.linkText || t('announcements.linkTextPlaceholder')} <FontAwesome5 name="external-link-alt" size={12} color={colors.primary.main} />
                         </Text>
                       </TouchableOpacity>
                     )}
@@ -934,14 +934,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     padding: spacing.base,
     borderRadius: borderRadius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
     ...shadows.sm,
   },
   pinnedBadge: {
     position: 'absolute',
     top: spacing.sm,
-    left: spacing.sm,
+    start: spacing.sm,
     backgroundColor: colors.accent.amber + '30',
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
@@ -966,10 +966,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   cardTagIcon: {
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   cardTitle: {
     fontSize: typography.size.md,
@@ -1083,10 +1083,10 @@ const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
     bottom: spacing.xl,
-    right: spacing.xl,
+    end: spacing.xl,
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: borderRadius.xxxl,
     backgroundColor: colors.primary.main,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1123,7 +1123,7 @@ const styles = StyleSheet.create({
     minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: -spacing.sm,
+    marginStart: -spacing.sm,
   },
   closeButton: {
     fontSize: typography.size.xxl,
@@ -1182,7 +1182,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     borderWidth: 1,
     borderColor: colors.border.light,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
     minHeight: 44,
     justifyContent: 'center',
   },
@@ -1237,7 +1237,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     borderWidth: 1,
     borderColor: colors.border.light,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
     minHeight: 44,
     justifyContent: 'center',
   },
@@ -1255,7 +1255,7 @@ const styles = StyleSheet.create({
   switchLabel: {
     fontSize: typography.size.base,
     color: colors.text.primary,
-    marginLeft: spacing.md,
+    marginStart: spacing.md,
     flex: 1,
   },
   dateButton: {
@@ -1327,8 +1327,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     padding: spacing.base,
     borderRadius: borderRadius.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
   },
   previewHeader: {
     flexDirection: 'row',
@@ -1399,7 +1399,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'absolute',
     top: 8,
-    right: 8,
+    end: 8,
     backgroundColor: colors.status.error,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,

@@ -24,7 +24,7 @@ import { useTranslation } from '../i18n/LanguageContext';
  */
 const UserHistoryScreen = ({ route }) => {
   const { userId, userName, userType } = route.params;
-  const { lessons, missions, schedules, weeklySchedules, horses, clients, workerUsers } = useContext(DataContext);
+  const { lessons, missions, schedules, weeklySchedules, horses, clients, workerUsers, paymentHistory } = useContext(DataContext);
   const { t } = useTranslation();
   const fadeStyle = useFadeIn(0);
 
@@ -111,6 +111,23 @@ const UserHistoryScreen = ({ route }) => {
       });
     }
 
+    // --- Payments (clients) ---
+    if (userType === 'client') {
+      const userPayments = (paymentHistory || []).filter(p => p.clientId === userId);
+      userPayments.forEach(p => {
+        items.push({
+          id: `payment-${p.id}`,
+          type: 'payment',
+          date: p.date || '',
+          time: p.time || '',
+          amount: p.amount,
+          totalAfter: p.totalAfter,
+          amountDue: p.amountDue,
+          raw: p,
+        });
+      });
+    }
+
     // Sort by date descending, then time descending
     items.sort((a, b) => {
       const dc = (b.date || '').localeCompare(a.date || '');
@@ -119,7 +136,7 @@ const UserHistoryScreen = ({ route }) => {
     });
 
     return items;
-  }, [userId, userType, lessons, missions, weeklySchedules, horses, clients, workerUsers]);
+  }, [userId, userType, lessons, missions, weeklySchedules, horses, clients, workerUsers, paymentHistory]);
 
   // ── filter ──────────────────────────────────────────────────────────
   const filteredTimeline = useMemo(() => {
@@ -136,6 +153,8 @@ const UserHistoryScreen = ({ route }) => {
     const missionItems = timeline.filter(i => i.type === 'mission');
     const completedMissions = missionItems.filter(i => i.completed).length;
     const scheduleItems = timeline.filter(i => i.type === 'schedule');
+    const paymentItems = timeline.filter(i => i.type === 'payment');
+    const totalPaymentAmount = paymentItems.reduce((sum, i) => sum + (i.amount || 0), 0);
 
     return {
       totalLessons: lessonItems.length,
@@ -145,6 +164,8 @@ const UserHistoryScreen = ({ route }) => {
       totalMissions: missionItems.length,
       completedMissions,
       totalSchedules: scheduleItems.length,
+      totalPayments: paymentItems.length,
+      totalPaymentAmount,
       totalItems: timeline.length,
     };
   }, [timeline]);
@@ -158,6 +179,9 @@ const UserHistoryScreen = ({ route }) => {
     if (userType === 'worker') {
       base.push({ key: 'mission', label: t('userHistory.missions'), count: stats.totalMissions, icon: 'tasks' });
       base.push({ key: 'schedule', label: t('userHistory.schedules'), count: stats.totalSchedules, icon: 'calendar-alt' });
+    }
+    if (userType === 'client') {
+      base.push({ key: 'payment', label: t('userHistory.payments'), count: stats.totalPayments, icon: 'money-bill-wave' });
     }
     return base;
   }, [userType, stats]);
@@ -181,13 +205,14 @@ const UserHistoryScreen = ({ route }) => {
     if (item.type === 'lesson') return renderLessonCard(item, index);
     if (item.type === 'mission') return renderMissionCard(item, index);
     if (item.type === 'schedule') return renderScheduleCard(item, index);
+    if (item.type === 'payment') return renderPaymentCard(item, index);
     return null;
   };
 
   const renderLessonCard = (item, index) => {
     const meta = lessonStatusMeta(item.status, item.confirmed);
     return (
-      <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderLeftColor: meta.color }]}>
+      <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderStartColor: meta.color }]}>
         {/* Type badge */}
         <View style={styles.typeBadgeRow}>
           <View style={[styles.typeBadge, { backgroundColor: colors.accent.purple }]}>
@@ -229,7 +254,7 @@ const UserHistoryScreen = ({ route }) => {
     const done = item.completed;
     const priorityColor = item.priority === 'high' ? colors.status.error : item.priority === 'medium' ? colors.status.warning : colors.status.info;
     return (
-      <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderLeftColor: done ? colors.status.success : priorityColor }]}>
+      <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderStartColor: done ? colors.status.success : priorityColor }]}>
         <View style={styles.typeBadgeRow}>
           <View style={[styles.typeBadge, { backgroundColor: colors.accent.amber }]}>
             <FontAwesome5 name="tasks" size={10} color={colors.text.primary} solid />
@@ -252,9 +277,53 @@ const UserHistoryScreen = ({ route }) => {
     );
   };
 
+  const renderPaymentCard = (item, index) => {
+    return (
+      <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderStartColor: colors.status.success }]}>
+        {/* Type badge */}
+        <View style={styles.typeBadgeRow}>
+          <View style={[styles.typeBadge, { backgroundColor: colors.status.success }]}>
+            <FontAwesome5 name="money-bill-wave" size={10} color={colors.text.primary} solid />
+            <Text style={styles.typeBadgeText}>{t('userHistory.payment')}</Text>
+          </View>
+        </View>
+
+        {/* Amount */}
+        <View style={styles.cardRow}>
+          <FontAwesome5 name="shekel-sign" size={14} color={colors.status.success} solid />
+          <Text style={[styles.cardRowText, { fontWeight: 'bold', fontSize: typography.size.lg, color: colors.status.success }]}>
+            {item.amount} ₪
+          </Text>
+        </View>
+
+        {/* Total after payment */}
+        {item.totalAfter != null && (
+          <View style={styles.cardRow}>
+            <FontAwesome5 name="wallet" size={14} color={colors.primary.light} solid />
+            <Text style={styles.cardRowText}>{t('userHistory.totalAfterPayment')}: {item.totalAfter} ₪</Text>
+          </View>
+        )}
+
+        {/* Amount due */}
+        {item.amountDue != null && (
+          <View style={styles.cardRow}>
+            <FontAwesome5 name="file-invoice-dollar" size={14} color={colors.status.warning} solid />
+            <Text style={styles.cardRowText}>{t('userHistory.amountDue')}: {item.amountDue} ₪</Text>
+          </View>
+        )}
+
+        {/* Date + time */}
+        <View style={styles.cardRow}>
+          <FontAwesome5 name="calendar-alt" size={14} color={colors.accent.teal} solid />
+          <Text style={styles.cardRowText}>{fmtDate(item.date)}{item.time ? `  •  ${item.time}` : ''}</Text>
+        </View>
+      </AnimatedCard>
+    );
+  };
+
   const renderScheduleCard = (item, index) => {
     return (
-      <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderLeftColor: colors.accent.teal }]}>
+      <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderStartColor: colors.accent.teal }]}>
         <View style={styles.typeBadgeRow}>
           <View style={[styles.typeBadge, { backgroundColor: colors.accent.teal }]}>
             <FontAwesome5 name="calendar-alt" size={10} color={colors.text.primary} solid />
@@ -312,9 +381,9 @@ const UserHistoryScreen = ({ route }) => {
             </View>
           ) : (
             <View style={styles.statCard}>
-              <FontAwesome5 name="times-circle" size={16} color={colors.status.error} solid />
-              <Text style={styles.statValue}>{stats.cancelledLessons}</Text>
-              <Text style={styles.statLabel}>{t('userHistory.cancelled')}</Text>
+              <FontAwesome5 name="money-bill-wave" size={16} color={colors.status.success} solid />
+              <Text style={styles.statValue}>{stats.totalPayments}</Text>
+              <Text style={styles.statLabel}>{t('userHistory.payments')}</Text>
             </View>
           )}
         </View>
@@ -380,7 +449,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 56,
     height: 56,
-    borderRadius: 28,
+    borderRadius: borderRadius.xxxl,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -473,7 +542,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
     padding: spacing.base,
     marginBottom: spacing.md,
-    borderLeftWidth: 4,
+    borderStartWidth: 4,
     ...shadows.md,
   },
   typeBadgeRow: {

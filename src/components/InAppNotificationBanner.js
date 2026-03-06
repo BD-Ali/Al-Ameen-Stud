@@ -166,8 +166,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 4,
+    borderStartColor: colors.primary.main,
   },
   iconContainer: {
     width: 40,
@@ -176,14 +176,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary.main + '20',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   icon: {
     fontSize: 24,
   },
   content: {
     flex: 1,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   title: {
     ...typography.h4,
@@ -195,8 +195,8 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
   },
   dismissButton: {
-    width: 32,
-    height: 32,
+    width: 44,
+    height: 44,
     borderRadius: borderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',

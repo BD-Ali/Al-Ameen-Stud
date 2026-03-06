@@ -185,7 +185,7 @@ const LoginScreen = ({ navigation }) => {
                     <Text style={styles.primaryButtonText}>
                       {isSignUp ? t('auth.createAccount') : t('auth.signIn')}
                     </Text>
-                    <Text style={styles.buttonArrow}>←</Text>
+                    <FontAwesome5 name="arrow-left" size={16} color={colors.text.primary} solid />
                   </>
                 )}
               </Animated.View>
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: spacing.base,
-    borderRadius: 50,
+    borderRadius: borderRadius.full,
     overflow: 'hidden',
     backgroundColor: colors.surface.elevated,
     justifyContent: 'center',
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     right: 0,
     height: '40%',
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 50,
+    borderRadius: borderRadius.full,
   },
   logo: {
     width: '100%',
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
     height: 48,
   },
   inputIcon: {
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   input: {
     flex: 1,
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   buttonArrow: {
     color: colors.text.primary,
@@ -406,13 +406,13 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: borderRadius.sm,
     marginTop: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.status.info,
+    borderStartWidth: 3,
+    borderStartColor: colors.status.info,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
   infoIcon: {
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
     marginTop: 2,
   },
   infoText: {
@@ -452,7 +452,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   visitorIcon: {
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   visitorButtonText: {
     color: colors.text.secondary,

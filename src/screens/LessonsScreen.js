@@ -312,7 +312,7 @@ const LessonsScreen = () => {
                 <Text style={[styles.pickerButtonText, !horseId && styles.placeholderText]}>
                   {getSelectedHorseName()}
                 </Text>
-                <Text style={styles.dropdownArrow}>{showHorsePicker ? '▲' : '▼'}</Text>
+                <FontAwesome5 name={showHorsePicker ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text.tertiary} solid />
               </TouchableOpacity>
 
               {showHorsePicker && horses.length > 0 && (
@@ -361,7 +361,7 @@ const LessonsScreen = () => {
                 <Text style={[styles.pickerButtonText, !clientId && styles.placeholderText]}>
                   {getSelectedClientName()}
                 </Text>
-                <Text style={styles.dropdownArrow}>{showClientPicker ? '▲' : '▼'}</Text>
+                <FontAwesome5 name={showClientPicker ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text.tertiary} solid />
               </TouchableOpacity>
 
               {showClientPicker && clients.length > 0 && (
@@ -410,7 +410,7 @@ const LessonsScreen = () => {
                 <Text style={[styles.pickerButtonText, !instructorId && styles.placeholderText]}>
                   {getSelectedInstructorName()}
                 </Text>
-                <Text style={styles.dropdownArrow}>{showInstructorPicker ? '▲' : '▼'}</Text>
+                <FontAwesome5 name={showInstructorPicker ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text.tertiary} solid />
               </TouchableOpacity>
 
               {showInstructorPicker && (
@@ -510,8 +510,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent.purple,
+    borderStartWidth: 3,
+    borderStartColor: colors.accent.purple,
     ...shadows.md,
   },
   cardHeader: {
@@ -630,8 +630,8 @@ const styles = StyleSheet.create({
   },
   pickerOptionSelected: {
     backgroundColor: colors.primary.subtle,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent.purple,
+    borderStartWidth: 3,
+    borderStartColor: colors.accent.purple,
   },
   pickerOptionText: {
     fontSize: typography.size.base,

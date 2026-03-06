@@ -137,7 +137,9 @@
     "noLessonsAdded": "لا توجد دروس مضافة",
     "myInfo": "معلوماتي",
     "jobTitle": "الوظيفة:",
-    "contactLabel": "الاتصال:"
+    "contactLabel": "الاتصال:",
+    "am": "صباحاً",
+    "pm": "مساءً"
   },
   "visitorHome": {
     "welcomeMessage": "مرحباً بك في مَرْبَطُ الأَمِين",
@@ -329,6 +331,8 @@
     "phoneNumber": "رقم الهاتف",
     "amountPaid": "المبلغ المدفوع",
     "amountPaidCurrency": "المبلغ المدفوع (₪)",
+    "addPayment": "إضافة دفعة",
+    "addPaymentPlaceholder": "أدخل المبلغ المدفوع الآن...",
     "amountDue": "المبلغ المستحق",
     "amountDueCurrency": "المبلغ المستحق (₪)",
     "lessonCount": "عدد الدروس",
@@ -404,7 +408,12 @@
     "tuesday": "الثلاثاء",
     "wednesday": "الأربعاء",
     "thursday": "الخميس",
-    "friday": "الجمعة"
+    "friday": "الجمعة",
+    "payment": "دفعة",
+    "payments": "المدفوعات",
+    "paymentAmount": "المبلغ",
+    "totalAfterPayment": "الإجمالي بعد الدفع",
+    "amountDue": "المبلغ المستحق"
   },
   "announcements": {
     "title": "الإعلانات",

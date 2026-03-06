@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+﻿import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, Image, ActivityIndicator } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';
@@ -382,7 +382,7 @@ const HorsesScreen = () => {
                         <Text style={styles.reminderBadgeText}>{horseReminders.length}</Text>
                       </View>
                     )}
-                    <Text style={styles.expandIcon}>{isExpanded ? '▼' : '◀'}</Text>
+                    <FontAwesome5 name={isExpanded ? 'chevron-down' : 'chevron-left'} size={14} color={colors.primary.main} solid style={styles.expandIcon} />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -498,7 +498,7 @@ const HorsesScreen = () => {
                 onChangeText={setName}
                 style={styles.input}
                 placeholder={t('horses.enterHorseName')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.text.muted}
               />
             </View>
 
@@ -551,7 +551,7 @@ const HorsesScreen = () => {
                 onChangeText={setBreed}
                 style={styles.input}
                 placeholder={t('horses.breedPlaceholder')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.text.muted}
               />
             </View>
 
@@ -565,7 +565,7 @@ const HorsesScreen = () => {
                 onChangeText={setOwner}
                 style={styles.input}
                 placeholder={t('horses.ownerPlaceholder')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.text.muted}
               />
             </View>
 
@@ -579,7 +579,7 @@ const HorsesScreen = () => {
                 onChangeText={setFeedSchedule}
                 style={styles.input}
                 placeholder={t('horses.enterFeedSchedule')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.text.muted}
                 multiline
               />
             </View>
@@ -594,7 +594,7 @@ const HorsesScreen = () => {
                 onChangeText={setNotes}
                 style={[styles.input, styles.notesInput]}
                 placeholder={t('horses.notesPlaceholder')}
-                placeholderTextColor="#64748b"
+                placeholderTextColor={colors.text.muted}
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
@@ -658,7 +658,7 @@ const HorsesScreen = () => {
                     onChangeText={setReminderNote}
                     style={[styles.modalInput, styles.modalNotesInput]}
                     placeholder={t('horses.enterReminderNotes')}
-                    placeholderTextColor="#64748b"
+                    placeholderTextColor={colors.text.muted}
                     multiline
                     numberOfLines={3}
                     textAlignVertical="top"
@@ -808,8 +808,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     borderRadius: borderRadius.md,
     marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
     overflow: 'hidden',
     ...shadows.md,
   },
@@ -851,7 +851,7 @@ const styles = StyleSheet.create({
   expandIcon: {
     fontSize: 14,
     color: colors.primary.main,
-    marginLeft: spacing.sm,
+    marginStart: spacing.sm,
   },
   expandedContent: {
     padding: spacing.md,
@@ -879,8 +879,8 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     backgroundColor: colors.surface.elevated,
     borderRadius: borderRadius.sm,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
   },
   notesLabel: {
     fontSize: typography.size.sm,
@@ -899,8 +899,8 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     backgroundColor: colors.surface.elevated,
     borderRadius: borderRadius.sm,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.status.warning,
+    borderStartWidth: 3,
+    borderStartColor: colors.status.warning,
   },
   remindersSectionHeader: {
     flexDirection: 'row',
@@ -1204,7 +1204,7 @@ const styles = StyleSheet.create({
   removeImageButton: {
     position: 'absolute',
     top: 8,
-    right: 8,
+    end: 8,
     backgroundColor: colors.status.error,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,

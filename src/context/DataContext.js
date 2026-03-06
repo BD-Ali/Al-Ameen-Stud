@@ -38,6 +38,7 @@ export const DataProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [weeklySchedules, setWeeklySchedules] = useState([]);
   const [announcements, setAnnouncements] = useState([]);
+  const [paymentHistory, setPaymentHistory] = useState([]);
 
   const { t } = useTranslation();
 
@@ -221,6 +222,39 @@ export const DataProvider = ({ children }) => {
 
     return unsubscribe;
   }, []);
+
+  // Subscribe to paymentHistory collection
+  useEffect(() => {
+    const q = query(collection(db, 'paymentHistory'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setPaymentHistory(data);
+    }, (error) => {
+      console.error('Error fetching payment history:', error);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  /**
+   * Add a payment record to payment history
+   */
+  const addPaymentRecord = async (clientId, record) => {
+    try {
+      await addDoc(collection(db, 'paymentHistory'), {
+        clientId,
+        ...record,
+        createdAt: serverTimestamp()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error adding payment record:', error);
+      return { success: false, error: error.message };
+    }
+  };
 
   /**
    * Create a new user account with Firebase Auth and store in Firestore
@@ -2202,6 +2236,9 @@ export const DataProvider = ({ children }) => {
         isWorkerAvailable,
         isHorseAvailable,
         isClientAvailable,
+        // Payment history
+        paymentHistory,
+        addPaymentRecord,
       }}
     >
       {children}

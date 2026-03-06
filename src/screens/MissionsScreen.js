@@ -275,12 +275,12 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.primary.main,
+    borderStartWidth: 3,
+    borderStartColor: colors.primary.main,
     ...shadows.sm,
   },
   completedCard: {
-    borderLeftColor: colors.status.success,
+    borderStartColor: colors.status.success,
     opacity: 0.8,
   },
   upcomingCard: {
@@ -288,8 +288,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     padding: spacing.md,
     marginBottom: spacing.md,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.status.warning,
+    borderStartWidth: 3,
+    borderStartColor: colors.status.warning,
     ...shadows.sm,
   },
   missionHeader: {
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
   },
   horseIcon: {
     fontSize: 20,
-    marginRight: spacing.sm,
+    marginEnd: spacing.sm,
   },
   horseName: {
     fontSize: typography.size.md,
