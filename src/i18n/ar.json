@@ -153,7 +153,9 @@
     "sendEmail": "إرسال بريد إلكتروني",
     "cannotOpenEmail": "لا يمكن فتح تطبيق البريد الإلكتروني",
     "phoneCall": "اتصال هاتفي",
-    "cannotMakeCall": "لا يمكن إجراء المكالمة"
+    "cannotMakeCall": "لا يمكن إجراء المكالمة",
+    "instagram": "انستغرام",
+    "cannotOpenInstagram": "لا يمكن فتح انستغرام"
   },
   "profile": {
     "accountInfo": "معلومات الحساب",

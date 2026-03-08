@@ -153,7 +153,9 @@
     "sendEmail": "Send Email",
     "cannotOpenEmail": "Cannot open email app",
     "phoneCall": "Phone Call",
-    "cannotMakeCall": "Cannot make the call"
+    "cannotMakeCall": "Cannot make the call",
+    "instagram": "Instagram",
+    "cannotOpenInstagram": "Cannot open Instagram"
   },
   "profile": {
     "accountInfo": "Account Info",

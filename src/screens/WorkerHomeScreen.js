@@ -151,6 +151,14 @@ const WorkerHomeScreen = ({ navigation }) => {
           }
         },
         {
+          text: t('visitorHome.instagram'),
+          onPress: () => {
+            Linking.openURL('https://www.instagram.com/alamein_stud').catch(() => {
+              Alert.alert(t('common.error'), t('visitorHome.cannotOpenInstagram'));
+            });
+          }
+        },
+        {
           text: t('common.cancel'),
           style: 'cancel'
         }

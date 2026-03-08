@@ -153,7 +153,9 @@
     "sendEmail": "שליחת דוא\"ל",
     "cannotOpenEmail": "לא ניתן לפתוח את אפליקציית הדוא\"ל",
     "phoneCall": "שיחה טלפונית",
-    "cannotMakeCall": "לא ניתן לבצע את השיחה"
+    "cannotMakeCall": "לא ניתן לבצע את השיחה",
+    "instagram": "אינסטגרם",
+    "cannotOpenInstagram": "לא ניתן לפתוח את אינסטגרם"
   },
   "profile": {
     "accountInfo": "פרטי חשבון",
