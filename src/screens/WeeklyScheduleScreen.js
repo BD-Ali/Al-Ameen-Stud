@@ -148,11 +148,11 @@ const WeeklyScheduleScreen = () => {
     return `${day} ${monthName}`;
   };
 
-  // Get schedule for specific day and time
-  const getScheduleForSlot = (day, timeSlot) => {
-    return weeklySchedules?.find(
+  // Get all schedules for specific day and time (supports multiple workers per slot)
+  const getSchedulesForSlot = (day, timeSlot) => {
+    return weeklySchedules?.filter(
       (s) => s.weekId === currentWeekId && s.day === day && s.timeSlot === timeSlot
-    );
+    ) || [];
   };
 
   // Get YYYY-MM-DD date string for a given day key in the current week
@@ -179,43 +179,50 @@ const WeeklyScheduleScreen = () => {
     return worker?.name || t('common.unknown');
   };
 
-  // Handle slot press
+  // Handle slot press — always toggle selection
   const handleSlotPress = (timeSlot) => {
-    const existingSchedule = getScheduleForSlot(selectedDay, timeSlot);
-
-    if (existingSchedule) {
-      // Edit existing schedule
-      Alert.alert(
-        t('weeklySchedule.editTask'),
-        t('weeklySchedule.whatToDo'),
-        [
-          { text: t('common.cancel'), style: 'cancel' },
-          {
-            text: t('common.edit'),
-            onPress: () => {
-              setEditMode(true);
-              setEditingScheduleId(existingSchedule.id);
-              setSelectedSlots([timeSlot]);
-              setSelectedWorker(existingSchedule.workerId);
-              setWorkDescription(existingSchedule.description || '');
-              setModalVisible(true);
-            },
-          },
-          {
-            text: t('weeklySchedule.deleteTask'),
-            style: 'destructive',
-            onPress: () => handleDeleteSchedule(existingSchedule.id),
-          },
-        ]
-      );
+    if (selectedSlots.includes(timeSlot)) {
+      setSelectedSlots(selectedSlots.filter((s) => s !== timeSlot));
     } else {
-      // Add to selected slots for multi-select
-      if (selectedSlots.includes(timeSlot)) {
-        setSelectedSlots(selectedSlots.filter((s) => s !== timeSlot));
-      } else {
-        setSelectedSlots([...selectedSlots, timeSlot]);
-      }
+      setSelectedSlots([...selectedSlots, timeSlot]);
     }
+  };
+
+  // Handle long press — show edit/delete for assigned slots
+  const handleSlotLongPress = (timeSlot) => {
+    const existingSchedules = getSchedulesForSlot(selectedDay, timeSlot);
+
+    if (existingSchedules.length === 0) return;
+
+    const buttons = [];
+
+    existingSchedules.forEach((schedule) => {
+      const workerName = getWorkerName(schedule.workerId);
+      buttons.push({
+        text: `${t('common.edit')}: ${workerName}`,
+        onPress: () => {
+          setEditMode(true);
+          setEditingScheduleId(schedule.id);
+          setSelectedSlots([timeSlot]);
+          setSelectedWorker(schedule.workerId);
+          setWorkDescription(schedule.description || '');
+          setModalVisible(true);
+        },
+      });
+      buttons.push({
+        text: `${t('weeklySchedule.deleteTask')}: ${workerName}`,
+        style: 'destructive',
+        onPress: () => handleDeleteSchedule(schedule.id),
+      });
+    });
+
+    buttons.push({ text: t('common.cancel'), style: 'cancel' });
+
+    Alert.alert(
+      t('weeklySchedule.existingTasks'),
+      t('weeklySchedule.whatToDo'),
+      buttons
+    );
   };
 
   // Open modal to assign work
@@ -263,6 +270,23 @@ const WeeklyScheduleScreen = () => {
           );
           setLoading(false);
           return;
+        }
+      }
+
+      // Check if the same worker is already assigned to the same slot (prevent duplicate)
+      if (!editMode) {
+        for (const timeSlot of selectedSlots) {
+          const existingInSlot = getSchedulesForSlot(selectedDay, timeSlot);
+          const alreadyAssigned = existingInSlot.some(s => s.workerId === selectedWorker);
+          if (alreadyAssigned) {
+            const workerName = workerUsers?.find(w => w.id === selectedWorker)?.name || t('common.unknown');
+            Alert.alert(
+              t('common.error'),
+              t('weeklySchedule.workerAlreadyAssigned', { name: workerName, slot: timeSlot })
+            );
+            setLoading(false);
+            return;
+          }
         }
       }
 
@@ -402,15 +426,17 @@ const WeeklyScheduleScreen = () => {
         data={timeSlots}
         keyExtractor={(item) => item}
         renderItem={({ item: timeSlot }) => {
-          const schedule = getScheduleForSlot(selectedDay, timeSlot);
+          const schedules = getSchedulesForSlot(selectedDay, timeSlot);
           const isSelected = selectedSlots.includes(timeSlot);
+          const hasAssignments = schedules.length > 0;
 
           return (
             <TouchableOpacity
               onPress={() => handleSlotPress(timeSlot)}
+              onLongPress={() => handleSlotLongPress(timeSlot)}
               style={[
                 styles.timeSlotCard,
-                schedule && styles.timeSlotCardAssigned,
+                hasAssignments && styles.timeSlotCardAssigned,
                 isSelected && styles.timeSlotCardSelected,
               ]}
             >
@@ -419,6 +445,11 @@ const WeeklyScheduleScreen = () => {
                   <FontAwesome5 name="clock" size={12} color="#5DADE2" solid />
                   <Text style={styles.timeSlotTime}>{timeSlot}</Text>
                 </View>
+                {hasAssignments && (
+                  <View style={styles.workerCountBadge}>
+                    <Text style={styles.workerCountText}>{schedules.length}</Text>
+                  </View>
+                )}
                 {isSelected && (
                   <View style={styles.selectedBadge}>
                     <FontAwesome5 name="check" size={12} color="#27AE60" solid />
@@ -426,17 +457,21 @@ const WeeklyScheduleScreen = () => {
                 )}
               </View>
 
-              {schedule ? (
+              {hasAssignments ? (
                 <View style={styles.assignmentInfo}>
-                  <View style={styles.workerNameRow}>
-                    <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-                    <Text style={styles.workerName}>
-                      {getWorkerName(schedule.workerId)}
-                    </Text>
-                  </View>
-                  <Text style={styles.workDescription} numberOfLines={2}>
-                    {schedule.description}
-                  </Text>
+                  {schedules.map((schedule, index) => (
+                    <View key={schedule.id} style={[styles.workerAssignment, index > 0 && styles.workerAssignmentDivider]}>
+                      <View style={styles.workerNameRow}>
+                        <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
+                        <Text style={styles.workerName}>
+                          {getWorkerName(schedule.workerId)}
+                        </Text>
+                      </View>
+                      <Text style={styles.workDescription} numberOfLines={1}>
+                        {schedule.description}
+                      </Text>
+                    </View>
+                  ))}
                 </View>
               ) : (
                 <Text style={styles.emptySlotText}>{t('common.notSpecified')}</Text>
@@ -673,6 +708,29 @@ const styles = StyleSheet.create({
   },
   assignmentInfo: {
     marginTop: spacing.xs,
+  },
+  workerAssignment: {
+    marginBottom: spacing.xs,
+  },
+  workerAssignmentDivider: {
+    marginTop: spacing.xs,
+    paddingTop: spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: colors.border.light,
+  },
+  workerCountBadge: {
+    backgroundColor: '#1ABC9C',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  workerCountText: {
+    color: '#FFFFFF',
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
   },
   workerNameRow: {
     flexDirection: 'row',
