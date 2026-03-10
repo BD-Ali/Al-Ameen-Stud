@@ -16,6 +16,7 @@ import InAppNotificationBanner from './src/components/InAppNotificationBanner';
 import notificationService from './src/services/notificationService';
 import lessonReminderService from './src/services/lessonReminderService';
 import { ActivityIndicator, View, StyleSheet, I18nManager, Animated } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFadeIn } from './src/utils/animations';
 
 // Allow RTL — actual direction is set dynamically by LanguageContext per language
@@ -234,13 +235,15 @@ function AppNavigator() {
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <AuthProvider>
-        <DataProvider>
-          <AppNavigator />
-        </DataProvider>
-      </AuthProvider>
-    </LanguageProvider>
+    <SafeAreaProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <DataProvider>
+            <AppNavigator />
+          </DataProvider>
+        </AuthProvider>
+      </LanguageProvider>
+    </SafeAreaProvider>
   );
 }
 

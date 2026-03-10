@@ -664,6 +664,7 @@ const styles = StyleSheet.create({
   },
   timeSlotsList: {
     padding: spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
   },
   timeSlotCard: {
     backgroundColor: colors.background.secondary,

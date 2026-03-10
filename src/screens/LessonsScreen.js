@@ -475,6 +475,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
   },
   headerSection: {
     flexDirection: 'row',

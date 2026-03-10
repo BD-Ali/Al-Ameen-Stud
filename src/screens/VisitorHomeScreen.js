@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated, SafeAreaView, I18nManager } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated, I18nManager, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.base,
-    paddingBottom: spacing.xl, // Extra padding at bottom
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   header: {
     alignItems: 'center',

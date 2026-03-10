@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, SafeAreaView, Linking, Image, ScrollView, Animated, I18nManager } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Linking, Image, ScrollView, Animated, I18nManager, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -349,6 +350,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.base,
   },
   paymentCard: {
     backgroundColor: colors.background.secondary,

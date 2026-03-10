@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Platform } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
   },
   headerSection: {
     flexDirection: 'row',

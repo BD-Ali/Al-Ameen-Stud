@@ -505,7 +505,10 @@ const AnnouncementsScreen = () => {
             <Text style={styles.emptySubtext}>{t('announcements.startCreating')}</Text>
           </View>
         }
-        contentContainerStyle={sortedAnnouncements.length === 0 && styles.emptyContainer}
+        contentContainerStyle={[
+          sortedAnnouncements.length === 0 && styles.emptyContainer,
+          Platform.OS === 'android' && { paddingBottom: 100 },
+        ]}
       />
 
       {/* Create Button */}

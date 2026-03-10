@@ -1,8 +1,9 @@
 import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
-import { TouchableOpacity, Text, StyleSheet, Alert, View, Image } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, Alert, View, Image, Platform } from 'react-native';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import { useTranslation } from '../i18n/LanguageContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -18,6 +19,7 @@ const Tab = createBottomTabNavigator();
 
 const AdminTabs = () => {
   const { logOut } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { t } = useTranslation();
 
@@ -59,8 +61,8 @@ const AdminTabs = () => {
         tabBarStyle: {
           backgroundColor: colors.background.secondary,
           borderTopColor: colors.border.light,
-          height: 64,
-          paddingBottom: spacing.sm,
+          height: 64 + (Platform.OS === 'android' ? insets.bottom : 0),
+          paddingBottom: Platform.OS === 'android' ? insets.bottom + spacing.sm : spacing.sm,
           paddingTop: spacing.sm,
         },
         tabBarActiveTintColor: colors.primary.main,
