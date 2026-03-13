@@ -14,7 +14,7 @@ import { useTranslation } from '../i18n/LanguageContext';
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
  */
 const WorkerHomeScreen = ({ navigation }) => {
-  const { schedules, horses, workers, lessons, clients, weeklySchedules, loading, confirmLesson, cancelLesson } = useContext(DataContext);
+  const { schedules, horses, workers, weeklySchedules, loading } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
 
@@ -106,13 +106,7 @@ const WorkerHomeScreen = ({ navigation }) => {
     return taskHour < currentHour;
   }).sort((a, b) => b.timeSlot.localeCompare(a.timeSlot));
 
-  // Filter lessons for this worker (exclude cancelled)
-  const myLessons = lessons?.filter((l) => l.instructorId === user?.uid && l.status !== 'cancelled') || [];
-  const todayLessons = myLessons.filter((l) => l.date === today);
-  const upcomingLessons = myLessons.filter((l) => l.date > today).slice(0, 5);
-
   const getHorseName = (id) => horses?.find((h) => h.id === id)?.name || id;
-  const getClientName = (id) => clients?.find((c) => c.id === id)?.name || id;
 
   const handleLogout = async () => {
     Alert.alert(
@@ -178,49 +172,6 @@ const WorkerHomeScreen = ({ navigation }) => {
     return `${h - 12} ${pm}`;
   };
 
-  const handleConfirmLesson = async (lessonId) => {
-    Alert.alert(
-      t('workerHome.confirmLesson'),
-      t('workerHome.confirmLessonQuestion'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.confirm'),
-          onPress: async () => {
-            const result = await confirmLesson(lessonId);
-            if (result.success) {
-              Alert.alert(t('common.success'), t('workerHome.lessonConfirmed'));
-            } else {
-              Alert.alert(t('common.error'), result.error || t('workerHome.confirmLessonFailed'));
-            }
-          }
-        }
-      ]
-    );
-  };
-
-  const handleCancelLesson = async (lessonId) => {
-    Alert.alert(
-      t('workerHome.cancelLesson'),
-      t('workerHome.cancelLessonQuestion'),
-      [
-        { text: t('common.back'), style: 'cancel' },
-        {
-          text: t('workerHome.cancelLesson'),
-          style: 'destructive',
-          onPress: async () => {
-            const result = await cancelLesson(lessonId, t('workerHome.cancelledByInstructor'));
-            if (result.success) {
-              Alert.alert(t('common.done'), t('workerHome.lessonCancelled'));
-            } else {
-              Alert.alert(t('common.error'), result.error || t('workerHome.cancelLessonFailed'));
-            }
-          }
-        }
-      ]
-    );
-  };
-
   const handleProfilePress = () => {
     navigation.navigate('Profile');
   };
@@ -230,8 +181,6 @@ const WorkerHomeScreen = ({ navigation }) => {
     { id: 'announcements', type: 'announcements' },
     { id: 'horses', type: 'horses' },
     { id: 'schedule', type: 'schedule' },
-    { id: 'lessons', type: 'lessons' },
-    { id: 'info', type: 'info' },
   ];
 
   const renderSection = ({ item }) => {
@@ -361,140 +310,6 @@ const WorkerHomeScreen = ({ navigation }) => {
           </View>
         );
 
-      case 'lessons':
-        return (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionTitleRow}>
-                <FontAwesome5 name="book-open" size={22} color="#9B59B6" solid />
-                <Text style={styles.sectionTitle}>{t('workerHome.myLessons')}</Text>
-              </View>
-            </View>
-
-            {myLessons.length > 0 ? (
-              <View style={styles.cardContainer}>
-                {/* Today's Lessons */}
-                {todayLessons.length > 0 && (
-                  <View style={styles.lessonGroup}>
-                    <Text style={styles.lessonGroupTitle}>{t('workerHome.todayLessons')}</Text>
-                    {todayLessons.map((lesson) => (
-                      <View key={lesson.id} style={styles.lessonCard}>
-                        <View style={styles.lessonHeader}>
-                          <View style={styles.lessonTimeRow}>
-                            <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-                            <Text style={styles.lessonTime}>{lesson.time}</Text>
-                          </View>
-                          {lesson.confirmed && (
-                            <View style={styles.confirmedBadge}>
-                              <FontAwesome5 name="check" size={10} color="#fff" solid />
-                              <Text style={styles.confirmedBadgeText}>{t('clientHome.completed')}</Text>
-                            </View>
-                          )}
-                          {lesson.status === 'cancelled' && (
-                            <View style={styles.cancelledBadge}>
-                              <FontAwesome5 name="times" size={10} color="#fff" solid />
-                              <Text style={styles.cancelledBadgeText}>{t('clientHome.cancelled')}</Text>
-                            </View>
-                          )}
-                        </View>
-                        <View style={styles.lessonDetails}>
-                          <View style={styles.lessonInfoRow}>
-                            <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-                            <Text style={styles.lessonLabel}>{t('lessons.client')} <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text></Text>
-                          </View>
-                          <View style={styles.lessonInfoRow}>
-                            <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-                            <Text style={styles.lessonLabel}>{t('lessons.horse')} <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text></Text>
-                          </View>
-                        </View>
-                        {!lesson.confirmed && lesson.status !== 'cancelled' && (
-                          <View style={styles.lessonActions}>
-                            <TouchableOpacity
-                              style={styles.confirmButton}
-                              onPress={() => handleConfirmLesson(lesson.id)}
-                            >
-                              <FontAwesome5 name="check" size={12} color="#fff" solid />
-                              <Text style={styles.confirmButtonText}>{t('workerHome.confirmCompletion')}</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              style={styles.cancelButton}
-                              onPress={() => handleCancelLesson(lesson.id)}
-                            >
-                              <FontAwesome5 name="times" size={12} color="#fff" solid />
-                              <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
-                            </TouchableOpacity>
-                          </View>
-                        )}
-                      </View>
-                    ))}
-                  </View>
-                )}
-
-                {/* Upcoming Lessons */}
-                {upcomingLessons.length > 0 && (
-                  <View style={styles.lessonGroup}>
-                    <Text style={styles.lessonGroupTitle}>{t('clientHome.upcomingLessons')}</Text>
-                    {upcomingLessons.map((lesson) => (
-                      <View key={lesson.id} style={styles.lessonCard}>
-                        <View style={styles.lessonHeader}>
-                          <View style={styles.lessonDateRow}>
-                            <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                            <Text style={styles.lessonDate}>{lesson.date}</Text>
-                          </View>
-                          <View style={styles.lessonTimeRow}>
-                            <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-                            <Text style={styles.lessonTime}>{lesson.time}</Text>
-                          </View>
-                        </View>
-                        <View style={styles.lessonDetails}>
-                          <View style={styles.lessonInfoRow}>
-                            <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-                            <Text style={styles.lessonLabel}>{t('lessons.client')} <Text style={styles.lessonValue}>{getClientName(lesson.clientId)}</Text></Text>
-                          </View>
-                          <View style={styles.lessonInfoRow}>
-                            <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-                            <Text style={styles.lessonLabel}>{t('lessons.horse')} <Text style={styles.lessonValue}>{getHorseName(lesson.horseId)}</Text></Text>
-                          </View>
-                        </View>
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            ) : (
-              <View style={styles.emptyState}>
-                <FontAwesome5 name="book-open" size={48} color="#9B59B6" solid />
-                <Text style={styles.emptyText}>{t('workerHome.noLessonsAdded')}</Text>
-              </View>
-            )}
-          </View>
-        );
-
-      case 'info':
-        return currentWorker ? (
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionTitleRow}>
-                <FontAwesome5 name="info-circle" size={24} color="#3B82F6" solid />
-                <Text style={styles.sectionTitle}>{t('workerHome.myInfo')}</Text>
-              </View>
-            </View>
-
-            <View style={styles.infoCard}>
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>{t('workerHome.jobTitle')}</Text>
-                <Text style={styles.infoValue}>{currentWorker.role || t('roles.worker')}</Text>
-              </View>
-              {currentWorker.contact && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>{t('workerHome.contactLabel')}</Text>
-                  <Text style={styles.infoValue}>{currentWorker.contact}</Text>
-                </View>
-              )}
-            </View>
-          </View>
-        ) : null;
-
       default:
         return null;
     }
@@ -610,29 +425,6 @@ const styles = StyleSheet.create({
   pastTaskText: {
     opacity: 0.6,
   },
-  infoCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
-    padding: spacing.base,
-    ...shadows.md,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border.light,
-  },
-  infoLabel: {
-    fontSize: typography.size.base,
-    color: colors.text.tertiary,
-    fontWeight: typography.weight.semibold,
-  },
-  infoValue: {
-    fontSize: typography.size.base,
-    color: colors.text.primary,
-    fontWeight: typography.weight.bold,
-  },
   emptyState: {
     backgroundColor: colors.background.secondary,
     borderRadius: borderRadius.lg,
@@ -645,129 +437,6 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     fontStyle: 'italic',
     marginTop: spacing.md,
-  },
-  lessonGroup: {
-    marginBottom: spacing.md,
-  },
-  lessonGroupTitle: {
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.bold,
-    color: colors.text.primary,
-    marginBottom: spacing.sm,
-  },
-  lessonCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
-    padding: spacing.base,
-    ...shadows.md,
-  },
-  lessonHeader: {
-    marginBottom: spacing.sm,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  lessonDateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  lessonTimeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  lessonDate: {
-    fontSize: typography.size.sm,
-    color: colors.primary.main,
-    fontWeight: typography.weight.semibold,
-  },
-  lessonTime: {
-    fontSize: typography.size.sm,
-    color: colors.text.secondary,
-  },
-  lessonDetails: {
-    gap: spacing.xs,
-  },
-  lessonInfoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginBottom: spacing.xs,
-  },
-  lessonLabel: {
-    fontSize: typography.size.sm,
-    color: colors.text.tertiary,
-  },
-  lessonValue: {
-    fontSize: typography.size.sm,
-    color: colors.text.primary,
-    fontWeight: typography.weight.semibold,
-  },
-  lessonActions: {
-    flexDirection: 'row',
-    marginTop: spacing.md,
-    gap: spacing.sm,
-  },
-  confirmButton: {
-    flex: 1,
-    backgroundColor: colors.status.success,
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
-  },
-  confirmButtonText: {
-    color: '#fff',
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.bold,
-  },
-  cancelButton: {
-    flex: 1,
-    backgroundColor: colors.status.error,
-    borderRadius: borderRadius.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
-  },
-  cancelButtonText: {
-    color: '#fff',
-    fontSize: typography.size.sm,
-    fontWeight: typography.weight.bold,
-  },
-  confirmedBadge: {
-    backgroundColor: colors.status.success,
-    borderRadius: borderRadius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  confirmedBadgeText: {
-    color: '#fff',
-    fontSize: typography.size.xs,
-    fontWeight: typography.weight.bold,
-  },
-  cancelledBadge: {
-    backgroundColor: colors.status.error,
-    borderRadius: borderRadius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  cancelledBadgeText: {
-    color: '#fff',
-    fontSize: typography.size.xs,
-    fontWeight: typography.weight.bold,
   },
   taskGroup: {
     marginBottom: spacing.md,

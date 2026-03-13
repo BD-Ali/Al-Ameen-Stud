@@ -13,7 +13,6 @@ class LessonReminderService {
     this.reminderIntervals = [
       { hours: 24, label: '24h', name: () => t('notifications.before24Hours') },
       { hours: 2, label: '2h', name: () => t('notifications.before2Hours') },
-      { minutes: 30, label: '30m', name: () => t('notifications.before30Minutes') },
     ];
   }
 

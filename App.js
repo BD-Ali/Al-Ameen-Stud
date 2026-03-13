@@ -7,8 +7,8 @@ import { DataProvider } from './src/context/DataContext';
 import { LanguageProvider, useTranslation } from './src/i18n/LanguageContext';
 import LoginScreen from './src/screens/LoginScreen';
 import AdminTabs from './src/components/AdminTabs';
-import ClientHomeScreen from './src/screens/ClientHomeScreen';
-import WorkerHomeScreen from './src/screens/WorkerHomeScreen';
+import ClientTabs from './src/components/ClientTabs';
+import WorkerTabs from './src/components/WorkerTabs';
 import VisitorHomeScreen from './src/screens/VisitorHomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import UserHistoryScreen from './src/screens/UserHistoryScreen';
@@ -166,15 +166,14 @@ function AppNavigator() {
               />
             </>
           ) : userRole === 'worker' ? (
-            // Worker user - show worker home
+            // Worker user - show worker tabs
             <>
               <Stack.Screen
-                name="WorkerHome"
-                component={WorkerHomeScreen}
+                name="WorkerTabs"
+                component={WorkerTabs}
                 options={{
                   headerShown: false,
                 }}
-                initialParams={{ highlightAnnouncementId: deepLinkAnnouncementId }}
               />
               <Stack.Screen
                 name="Profile"
@@ -188,15 +187,14 @@ function AppNavigator() {
               />
             </>
           ) : userRole === 'client' ? (
-            // Client user - show client home
+            // Client user - show client tabs
             <>
               <Stack.Screen
-                name="ClientHome"
-                component={ClientHomeScreen}
+                name="ClientTabs"
+                component={ClientTabs}
                 options={{
                   headerShown: false,
                 }}
-                initialParams={{ highlightAnnouncementId: deepLinkAnnouncementId }}
               />
               <Stack.Screen
                 name="Profile"

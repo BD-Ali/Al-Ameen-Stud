@@ -370,10 +370,6 @@ export const DataProvider = ({ children }) => {
         createdAt: serverTimestamp()
       });
 
-      // Send notification about new client registration
-      const clientWithId = { ...client, id: clientRef.id };
-      await notificationService.sendClientRegisteredNotification(clientWithId);
-
       return { success: true, id: clientRef.id };
     } catch (error) {
       console.error('Error adding client:', error);
@@ -392,13 +388,6 @@ export const DataProvider = ({ children }) => {
         ...updates,
         updatedAt: serverTimestamp()
       });
-
-      // Send payment notification if amountPaid increased
-      if (currentClient && updates.amountPaid && updates.amountPaid > (currentClient.amountPaid || 0)) {
-        const paymentAmount = updates.amountPaid - (currentClient.amountPaid || 0);
-        const clientWithUpdates = { ...currentClient, ...updates, id };
-        await notificationService.sendPaymentReceivedNotification(clientWithUpdates, paymentAmount);
-      }
 
       // Send subscription expiring notification if lessons are running low
       if (updates.subscriptionLessons !== undefined) {
@@ -659,17 +648,10 @@ export const DataProvider = ({ children }) => {
         console.warn('Could not add lesson to weekly schedule:', weeklyErr);
       }
 
-      // Schedule automatic lesson reminder notifications for the client
+      // Schedule automatic lesson reminder notifications (24h + 2h before)
       const client = clients.find(c => c.id === lesson.clientId);
       if (client) {
         await lessonReminderService.scheduleLessonReminders(lessonWithId, client);
-      }
-
-      // Send notification to instructor about new lesson
-      const instructor = workerUsers.find(w => w.id === lesson.instructorId);
-      const horse = horses.find(h => h.id === lesson.horseId);
-      if (instructor && client && horse) {
-        await notificationService.sendLessonCreatedNotification(lessonWithId, client, instructor, horse);
       }
 
       return { success: true, id: lessonRef.id };
@@ -817,15 +799,6 @@ export const DataProvider = ({ children }) => {
 
         if (client) {
           await lessonReminderService.rescheduleLessonReminders(id, updatedLesson, client);
-
-          // Send notification about lesson update
-          const changeDescription = dateChanged && timeChanged
-            ? t('dataContext.dateTimeChangedTo', { date: updates.date, time: updates.time })
-            : dateChanged
-            ? t('dataContext.dateChangedTo', { date: updates.date })
-            : t('dataContext.timeChangedTo', { time: updates.time });
-
-          await notificationService.sendLessonUpdatedNotification(updatedLesson, client, changeDescription);
         }
       }
 
@@ -897,9 +870,6 @@ export const DataProvider = ({ children }) => {
         }
 
         await updateDoc(doc(db, 'clients', lesson.clientId), updateData);
-
-        // Send confirmation notification
-        await notificationService.sendLessonConfirmedNotification(lesson, client);
       }
 
       return { success: true };
@@ -984,12 +954,6 @@ export const DataProvider = ({ children }) => {
 
       // 6. Cancel lesson reminder notifications
       await lessonReminderService.cancelLessonReminders(lessonId);
-
-      // 7. Send cancellation notification to the client
-      const client = clients.find(c => c.id === lesson.clientId);
-      if (client) {
-        await notificationService.sendLessonCancelledNotification(lesson, client, reason);
-      }
 
       return { success: true };
     } catch (error) {
@@ -1260,23 +1224,6 @@ export const DataProvider = ({ children }) => {
         createdAt: serverTimestamp()
       });
 
-      // Send notification to worker about new schedule/mission
-      if (schedule.workerId) {
-        const worker = workerUsers.find(w => w.id === schedule.workerId) ||
-                       workers.find(w => w.id === schedule.workerId);
-        if (worker) {
-          const missionData = {
-            id: missionRef.id,
-            workerId: schedule.workerId,
-            title: schedule.description || t('dataContext.workTask'),
-            description: t('dataContext.scheduledAt', { time: schedule.timeSlot }),
-            dueDate: schedule.date,
-            time: schedule.timeSlot,
-          };
-          await notificationService.sendMissionAssignedNotification(missionData, worker);
-        }
-      }
-
       return { success: true };
     } catch (error) {
       console.error('Error adding schedule:', error);
@@ -1455,16 +1402,6 @@ export const DataProvider = ({ children }) => {
         createdAt: serverTimestamp()
       });
 
-      // Send notification to worker about new mission
-      if (mission.workerId) {
-        const worker = workerUsers.find(w => w.id === mission.workerId) ||
-                       workers.find(w => w.id === mission.workerId);
-        if (worker) {
-          const missionWithId = { ...mission, id: missionRef.id };
-          await notificationService.sendMissionAssignedNotification(missionWithId, worker);
-        }
-      }
-
       return { success: true, id: missionRef.id };
     } catch (error) {
       console.error('Error adding mission:', error);
@@ -1477,24 +1414,10 @@ export const DataProvider = ({ children }) => {
    */
   const updateMission = async (id, updates) => {
     try {
-      const currentMission = missions.find(m => m.id === id);
-
       await updateDoc(doc(db, 'missions', id), {
         ...updates,
         updatedAt: serverTimestamp()
       });
-
-      // Send notification when mission is marked as completed
-      if (updates.completed === true && currentMission && !currentMission.completed) {
-        if (currentMission.workerId) {
-          const worker = workerUsers.find(w => w.id === currentMission.workerId) ||
-                         workers.find(w => w.id === currentMission.workerId);
-          if (worker) {
-            const updatedMission = { ...currentMission, ...updates, id };
-            await notificationService.sendMissionCompletedNotification(updatedMission, worker);
-          }
-        }
-      }
 
       return { success: true };
     } catch (error) {

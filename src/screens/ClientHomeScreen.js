@@ -12,12 +12,12 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
- * ClientHomeScreen displays a client's upcoming and past lessons along with
- * their current payment status. The client is automatically identified from
- * their authenticated account.
+ * ClientHomeScreen displays announcements, upcoming scheduled lessons,
+ * horses gallery, and contact FAB. Payment and lesson history live in
+ * the ClientHistoryScreen (second tab).
  */
 const ClientHomeScreen = ({ navigation }) => {
-  const { clients, lessons, horses, workers, getConfirmedLessons, getScheduledLessons, getCancelledLessons } = useContext(DataContext);
+  const { clients, horses, workers, getScheduledLessons } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
 
@@ -28,18 +28,14 @@ const ClientHomeScreen = ({ navigation }) => {
   // Find client by matching user ID
   const selectedClient = clients.find((c) => c.id === user?.uid);
 
-  // Get confirmed lessons (completed) and scheduled lessons separately
-  const confirmedLessons = getConfirmedLessons ? getConfirmedLessons(user?.uid) : [];
+  // Only upcoming scheduled lessons (not completed/cancelled)
   const scheduledLessons = getScheduledLessons ? getScheduledLessons(user?.uid) : [];
-  const cancelledLessons = getCancelledLessons ? getCancelledLessons(user?.uid) : [];
 
-  // Combine for display: show confirmed, scheduled, and cancelled lessons
-  const clientLessons = [...confirmedLessons, ...scheduledLessons, ...cancelledLessons].sort((a, b) => {
-    // Sort by date descending (newest first)
-    const dateCompare = new Date(b.date) - new Date(a.date);
+  // Sort scheduled lessons: nearest first (ascending date)
+  const upcomingLessons = [...scheduledLessons].sort((a, b) => {
+    const dateCompare = new Date(a.date) - new Date(b.date);
     if (dateCompare !== 0) return dateCompare;
-    // Then by time descending
-    return b.time.localeCompare(a.time);
+    return a.time.localeCompare(b.time);
   });
 
   const getHorseName = (id) => horses.find((h) => h.id === id)?.name || id;
@@ -128,35 +124,16 @@ const ClientHomeScreen = ({ navigation }) => {
 
       {selectedClient ? (
         <FlatList
-          data={clientLessons}
+          data={upcomingLessons}
           keyExtractor={(item) => item.id}
           ListHeaderComponent={
             <>
               {/* Announcements Feed */}
               <AnnouncementsFeed userRole="client" />
 
-              {/* Payment Status Card */}
-              <AnimatedCard index={0} delay={100} style={styles.paymentCard}>
-                <View style={styles.paymentHeader}>
-                  <FontAwesome5 name="money-bill-wave" size={20} color="#27AE60" solid />
-                  <Text style={styles.paymentTitle}> {t('clientHome.paymentStatus')}</Text>
-                </View>
-                <View style={styles.paymentRow}>
-                  <View style={styles.paymentItem}>
-                    <Text style={styles.paymentLabel}>{t('clientHome.amountPaid')}</Text>
-                    <Text style={styles.paymentAmountPaid}>₪{selectedClient.amountPaid || 0}</Text>
-                  </View>
-                  <View style={styles.paymentDivider} />
-                  <View style={styles.paymentItem}>
-                    <Text style={styles.paymentLabel}>{t('clientHome.amountDue')}</Text>
-                    <Text style={styles.paymentAmountDue}>₪{selectedClient.amountDue || 0}</Text>
-                  </View>
-                </View>
-              </AnimatedCard>
-
               {/* Subscription Card - Only show if client has subscription */}
               {selectedClient.hasSubscription && (
-                <AnimatedCard index={1} delay={100} style={styles.subscriptionCard}>
+                <AnimatedCard index={0} delay={100} style={styles.subscriptionCard}>
                   <View style={styles.subscriptionHeader}>
                     <View style={styles.subscriptionTitleContainer}>
                       <FontAwesome5 name="ticket-alt" size={18} color="#9B59B6" solid />
@@ -244,75 +221,52 @@ const ClientHomeScreen = ({ navigation }) => {
                 </>
               )}
 
-              {/* Lessons Section */}
+              {/* Upcoming Lessons Section */}
               <View style={styles.lessonsHeader}>
                 <View style={styles.sectionTitleRow}>
                   <FontAwesome5 name="calendar-check" size={22} color="#9B59B6" solid />
-                  <Text style={styles.sectionTitle}>{t('clientHome.yourLessons')}</Text>
+                  <Text style={styles.sectionTitle}>{t('clientHome.upcomingLessons')}</Text>
                 </View>
                 <View style={styles.lessonsBadge}>
-                  <Text style={styles.lessonsBadgeText}>{clientLessons.length}</Text>
+                  <Text style={styles.lessonsBadgeText}>{upcomingLessons.length}</Text>
                 </View>
               </View>
             </>
           }
-          renderItem={({ item, index }) => {
-            const isConfirmed = item.confirmed === true || item.status === 'completed';
-            const isCancelled = item.status === 'cancelled';
-
-            return (
-              <AnimatedCard
-                index={index + 2}
-                delay={80}
-                style={[
-                  styles.lessonCard,
-                  isConfirmed && styles.lessonCardConfirmed,
-                  isCancelled && styles.lessonCardCancelled
-                ]}
-              >
-                <View style={styles.lessonHeader}>
-                  <View style={styles.lessonDateContainer}>
-                    <View style={styles.lessonDateRow}>
-                      <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                      <Text style={styles.lessonDate}>{formatDate(item.date)}</Text>
-                    </View>
-                    {isConfirmed && (
-                      <View style={styles.confirmedBadge}>
-                        <FontAwesome5 name="check-circle" size={12} color="#27AE60" solid />
-                        <Text style={styles.confirmedBadgeText}> {t('clientHome.completed')}</Text>
-                      </View>
-                    )}
-                    {!isConfirmed && !isCancelled && (
-                      <View style={styles.scheduledBadge}>
-                        <FontAwesome5 name="hourglass-half" size={12} color="#F39C12" solid />
-                        <Text style={styles.scheduledBadgeText}> {t('clientHome.scheduled')}</Text>
-                      </View>
-                    )}
-                    {isCancelled && (
-                      <View style={styles.cancelledBadge}>
-                        <FontAwesome5 name="times-circle" size={12} color="#E74C3C" solid />
-                        <Text style={styles.cancelledBadgeText}> {t('clientHome.cancelled')}</Text>
-                      </View>
-                    )}
+          renderItem={({ item, index }) => (
+            <AnimatedCard
+              index={index + 2}
+              delay={80}
+              style={styles.lessonCard}
+            >
+              <View style={styles.lessonHeader}>
+                <View style={styles.lessonDateContainer}>
+                  <View style={styles.lessonDateRow}>
+                    <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                    <Text style={styles.lessonDate}>{formatDate(item.date)}</Text>
                   </View>
-                  <View style={styles.lessonTimeRow}>
-                    <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-                    <Text style={styles.lessonTime}>{item.time}</Text>
+                  <View style={styles.scheduledBadge}>
+                    <FontAwesome5 name="hourglass-half" size={12} color="#F39C12" solid />
+                    <Text style={styles.scheduledBadgeText}> {t('clientHome.scheduled')}</Text>
                   </View>
                 </View>
-                <View style={styles.lessonDetails}>
-                  <View style={styles.lessonDetail}>
-                    <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-                    <Text style={styles.lessonDetailText}>{getHorseName(item.horseId)}</Text>
-                  </View>
-                  <View style={styles.lessonDetail}>
-                    <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
-                    <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
-                  </View>
+                <View style={styles.lessonTimeRow}>
+                  <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                  <Text style={styles.lessonTime}>{item.time}</Text>
                 </View>
-              </AnimatedCard>
-            );
-          }}
+              </View>
+              <View style={styles.lessonDetails}>
+                <View style={styles.lessonDetail}>
+                  <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                  <Text style={styles.lessonDetailText}>{getHorseName(item.horseId)}</Text>
+                </View>
+                <View style={styles.lessonDetail}>
+                  <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
+                  <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
+                </View>
+              </View>
+            </AnimatedCard>
+          )}
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <FontAwesome5 name="calendar-times" size={48} color="#95A5A6" solid />
@@ -351,57 +305,6 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.base,
     paddingBottom: Platform.OS === 'android' ? 100 : spacing.base,
-  },
-  paymentCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
-    padding: spacing.base,
-    marginBottom: spacing.lg,
-    ...shadows.md,
-  },
-  paymentHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.md,
-  },
-  paymentEmoji: {
-    fontSize: 20,
-    marginEnd: spacing.sm,
-  },
-  paymentTitle: {
-    fontSize: typography.size.md,
-    fontWeight: typography.weight.bold,
-    color: colors.text.primary,
-  },
-  paymentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  paymentItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  paymentLabel: {
-    fontSize: typography.size.xs,
-    color: colors.text.tertiary,
-    marginBottom: spacing.sm,
-    textTransform: 'uppercase',
-    fontWeight: typography.weight.semibold,
-  },
-  paymentAmountPaid: {
-    fontSize: typography.size.xxl,
-    fontWeight: typography.weight.bold,
-    color: colors.status.success,
-  },
-  paymentAmountDue: {
-    fontSize: typography.size.xxl,
-    fontWeight: typography.weight.bold,
-    color: colors.status.warning,
-  },
-  paymentDivider: {
-    width: 1.5,
-    height: 36,
-    backgroundColor: colors.border.light,
   },
   lessonsHeader: {
     flexDirection: 'row',
@@ -456,14 +359,6 @@ const styles = StyleSheet.create({
     borderStartColor: colors.primary.main,
     ...shadows.sm,
   },
-  lessonCardConfirmed: {
-    borderStartColor: colors.status.success,
-    opacity: 0.9,
-  },
-  lessonCardCancelled: {
-    borderStartColor: colors.status.error,
-    opacity: 0.7,
-  },
   lessonHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -479,20 +374,6 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
   },
-  confirmedBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.status.success,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
-    gap: 2,
-  },
-  confirmedBadgeText: {
-    color: '#fff',
-    fontSize: typography.size.xs,
-    fontWeight: typography.weight.bold,
-  },
   scheduledBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -503,20 +384,6 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   scheduledBadgeText: {
-    color: '#fff',
-    fontSize: typography.size.xs,
-    fontWeight: typography.weight.bold,
-  },
-  cancelledBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.status.error,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
-    gap: 2,
-  },
-  cancelledBadgeText: {
     color: '#fff',
     fontSize: typography.size.xs,
     fontWeight: typography.weight.bold,
