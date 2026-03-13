@@ -842,7 +842,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.lg,
-    paddingBottom: spacing.xxl,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   headerCard: {
     alignItems: 'center',

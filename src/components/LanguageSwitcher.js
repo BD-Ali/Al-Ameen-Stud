@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useTranslation } from '../i18n/LanguageContext';
-import { colors } from '../styles/theme';
+import { colors, typography, spacing, borderRadius } from '../styles/theme';
 
 const LanguageSwitcher = ({ style }) => {
   const { language, setLanguage, t } = useTranslation();
@@ -37,15 +37,18 @@ const LanguageSwitcher = ({ style }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderRadius: 8,
+    borderRadius: borderRadius.sm,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.primary.main,
   },
   option: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     backgroundColor: 'transparent',
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   optionBorder: {
     borderEndWidth: 1,
@@ -55,8 +58,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary.main,
   },
   optionText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.semibold,
     color: colors.primary.main,
   },
   activeText: {

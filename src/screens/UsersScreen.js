@@ -11,7 +11,8 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Linking
+  Linking,
+  I18nManager
 } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -411,7 +412,7 @@ const UsersScreen = () => {
                 </View>
               </View>
             </View>
-            <FontAwesome5 name={isExpanded ? 'chevron-down' : 'chevron-left'} size={14} color={colors.text.tertiary} solid />
+            <FontAwesome5 name={isExpanded ? 'chevron-down' : (I18nManager.isRTL ? 'chevron-left' : 'chevron-right')} size={14} color={colors.text.tertiary} solid />
           </View>
         </TouchableOpacity>
 
@@ -1044,7 +1045,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.base,
-    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   card: {
     backgroundColor: colors.background.secondary,

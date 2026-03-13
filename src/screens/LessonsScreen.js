@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.base,
-    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   headerSection: {
     flexDirection: 'row',

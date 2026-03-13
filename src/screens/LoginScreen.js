@@ -14,6 +14,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Animated,
+  I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -185,7 +186,7 @@ const LoginScreen = ({ navigation }) => {
                     <Text style={styles.primaryButtonText}>
                       {isSignUp ? t('auth.createAccount') : t('auth.signIn')}
                     </Text>
-                    <FontAwesome5 name="arrow-left" size={16} color={colors.text.primary} solid />
+                    <FontAwesome5 name={I18nManager.isRTL ? 'arrow-left' : 'arrow-right'} size={16} color={colors.text.primary} solid />
                   </>
                 )}
               </Animated.View>

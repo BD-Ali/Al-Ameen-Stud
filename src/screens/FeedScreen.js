@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.base,
-    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   headerSection: {
     flexDirection: 'row',
@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.lg * 1.4,
   },
   scheduleContainer: {
     gap: spacing.xs,
@@ -147,10 +148,12 @@ const styles = StyleSheet.create({
     fontSize: typography.size.md,
     color: colors.text.secondary,
     fontWeight: typography.weight.semibold,
+    lineHeight: typography.size.md * 1.4,
   },
   emptySubtext: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
+    lineHeight: typography.size.sm * 1.5,
   },
 });
 

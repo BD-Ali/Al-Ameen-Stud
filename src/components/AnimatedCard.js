@@ -46,8 +46,8 @@ const styles = StyleSheet.create({
   reflection: {
     position: 'absolute',
     top: 0,
-    left: 0,
-    right: 0,
+    start: 0,
+    end: 0,
     height: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },

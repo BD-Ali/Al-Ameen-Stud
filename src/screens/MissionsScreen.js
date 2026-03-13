@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.primary,
   },
   scrollContent: {
-    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   section: {
     marginBottom: spacing.lg,
@@ -253,6 +253,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.lg * 1.4,
   },
   badge: {
     backgroundColor: colors.primary.main,
@@ -315,6 +316,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.md * 1.4,
   },
   timeRow: {
     flexDirection: 'row',
@@ -396,6 +398,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.md,
     color: colors.text.tertiary,
     textAlign: 'center',
+    lineHeight: typography.size.md * 1.4,
   },
 });
 

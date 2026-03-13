@@ -664,7 +664,7 @@ const styles = StyleSheet.create({
   },
   timeSlotsList: {
     padding: spacing.base,
-    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   timeSlotCard: {
     backgroundColor: colors.background.secondary,
@@ -775,9 +775,11 @@ const styles = StyleSheet.create({
   },
   clearButton: {
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     borderRadius: borderRadius.sm,
     backgroundColor: colors.border.medium,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   clearButtonText: {
     color: colors.text.primary,
@@ -786,9 +788,11 @@ const styles = StyleSheet.create({
   },
   assignButton: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     borderRadius: borderRadius.sm,
     backgroundColor: colors.primary.main,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   assignButtonText: {
     color: colors.text.primary,

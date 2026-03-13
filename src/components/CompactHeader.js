@@ -185,6 +185,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.lg * 1.4,
   },
   actionButtons: {
     flexDirection: 'row',

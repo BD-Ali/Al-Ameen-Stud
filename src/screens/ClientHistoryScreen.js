@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: Platform.OS === 'android' ? 100 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
 
   // ── Section Headers ──────────────────────────────────────────────
@@ -314,6 +314,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.lg * 1.4,
   },
   badge: {
     backgroundColor: colors.primary.main,
@@ -530,6 +531,7 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontWeight: typography.weight.semibold,
     marginTop: spacing.md,
+    lineHeight: typography.size.md * 1.4,
   },
 
   // ── Loading ──────────────────────────────────────────────────────

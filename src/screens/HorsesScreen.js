@@ -1,5 +1,5 @@
 ﻿import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, Image, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, ScrollView, Platform, TouchableWithoutFeedback, Keyboard, Image, ActivityIndicator, I18nManager } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';
 import * as ImagePicker from 'expo-image-picker';
@@ -382,7 +382,7 @@ const HorsesScreen = () => {
                         <Text style={styles.reminderBadgeText}>{horseReminders.length}</Text>
                       </View>
                     )}
-                    <FontAwesome5 name={isExpanded ? 'chevron-down' : 'chevron-left'} size={14} color={colors.primary.main} solid style={styles.expandIcon} />
+                    <FontAwesome5 name={isExpanded ? 'chevron-down' : (I18nManager.isRTL ? 'chevron-left' : 'chevron-right')} size={14} color={colors.primary.main} solid style={styles.expandIcon} />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -769,7 +769,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: spacing.base,
-    paddingBottom: Platform.OS === 'android' ? 80 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   headerSection: {
     flexDirection: 'row',

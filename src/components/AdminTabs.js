@@ -61,8 +61,8 @@ const AdminTabs = () => {
         tabBarStyle: {
           backgroundColor: colors.background.secondary,
           borderTopColor: colors.border.light,
-          height: 64 + (Platform.OS === 'android' ? insets.bottom : 0),
-          paddingBottom: Platform.OS === 'android' ? insets.bottom + spacing.sm : spacing.sm,
+          height: 64 + (Platform.OS === 'ios' ? Math.round(insets.bottom * 0.65) : insets.bottom),
+          paddingBottom: (Platform.OS === 'ios' ? Math.round(insets.bottom * 0.65) : insets.bottom) + spacing.sm,
           paddingTop: spacing.sm,
         },
         tabBarActiveTintColor: colors.primary.main,

@@ -66,7 +66,7 @@ const Toast = ({ visible, message, type, onHide }) => {
         { backgroundColor: bgColor, transform: [{ translateY }] },
       ]}
     >
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+      <View style={styles.toastContent}>
         <FontAwesome5
           name={type === 'success' ? 'check-circle' : 'times-circle'}
           size={16}
@@ -410,7 +410,7 @@ const AnnouncementsScreen = () => {
         <Text style={styles.cardContent} numberOfLines={3}>{item.content}</Text>
 
         <View style={styles.cardMeta}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <View style={styles.metaRow}>
             <FontAwesome5 name="users" size={12} color={colors.text.tertiary} solid />
             <Text style={styles.metaText}>{audienceLabel}</Text>
           </View>
@@ -507,7 +507,7 @@ const AnnouncementsScreen = () => {
         }
         contentContainerStyle={[
           sortedAnnouncements.length === 0 && styles.emptyContainer,
-          Platform.OS === 'android' && { paddingBottom: 100 },
+          { paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl },
         ]}
       />
 
@@ -886,7 +886,7 @@ const AnnouncementsScreen = () => {
                   {isSubmitting ? (
                     <ActivityIndicator size="small" color={colors.text.primary} />
                   ) : (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <View style={styles.saveButtonContent}>
                       <FontAwesome5
                         name={editingId ? 'check' : 'paper-plane'}
                         size={14}
@@ -1004,6 +1004,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: spacing.sm,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   metaText: {
     fontSize: typography.size.xs,
@@ -1322,6 +1327,11 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
   },
+  saveButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
   disabledButton: {
     opacity: 0.6,
   },
@@ -1439,6 +1449,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
+  },
+  toastContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
   },
   toastText: {
     color: colors.text.primary,

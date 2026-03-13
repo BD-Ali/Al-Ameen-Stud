@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: Platform.OS === 'android' ? 100 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
 
   // ── Section Headers ──────────────────────────────────────────────
@@ -284,6 +284,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.lg * 1.4,
   },
   badge: {
     backgroundColor: colors.primary.main,
@@ -349,11 +350,13 @@ const styles = StyleSheet.create({
   lessonLabel: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
+    lineHeight: typography.size.sm * 1.5,
   },
   lessonValue: {
     fontSize: typography.size.sm,
     color: colors.text.primary,
     fontWeight: typography.weight.semibold,
+    lineHeight: typography.size.sm * 1.5,
   },
 
   // ── Badges ───────────────────────────────────────────────────────
@@ -429,6 +432,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     fontStyle: 'italic',
     marginTop: spacing.md,
+    lineHeight: typography.size.base * 1.5,
   },
 });
 

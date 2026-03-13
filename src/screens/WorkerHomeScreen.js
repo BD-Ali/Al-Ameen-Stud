@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     padding: spacing.base,
   },
   contentContainer: {
-    paddingBottom: Platform.OS === 'android' ? 100 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   section: {
     marginBottom: spacing.lg,
@@ -378,6 +378,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.lg * 1.4,
   },
   cardContainer: {
     gap: spacing.md,
@@ -437,6 +438,7 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
     fontStyle: 'italic',
     marginTop: spacing.md,
+    lineHeight: typography.size.base * 1.5,
   },
   taskGroup: {
     marginBottom: spacing.md,
@@ -451,6 +453,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.md * 1.4,
   },
   // Horses gallery styles
   horsesBadge: {
@@ -505,6 +508,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
     marginBottom: spacing.xs,
+    lineHeight: typography.size.md * 1.4,
   },
   horseCardCompactBreed: {
     fontSize: typography.size.sm,

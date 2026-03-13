@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.base,
-    paddingBottom: Platform.OS === 'android' ? 100 : spacing.base,
+    paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   lessonsHeader: {
     flexDirection: 'row',
@@ -321,6 +321,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.lg * 1.4,
   },
   subscriptionDateRow: {
     flexDirection: 'row',
@@ -419,10 +420,12 @@ const styles = StyleSheet.create({
     color: colors.text.secondary,
     fontWeight: typography.weight.semibold,
     marginBottom: spacing.xs,
+    lineHeight: typography.size.md * 1.4,
   },
   emptySubtext: {
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
+    lineHeight: typography.size.sm * 1.5,
   },
   loadingContainer: {
     flex: 1,
@@ -461,6 +464,7 @@ const styles = StyleSheet.create({
     fontSize: typography.size.lg,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
+    lineHeight: typography.size.lg * 1.4,
   },
   subscriptionStatusBadge: {
     flexDirection: 'row',
@@ -575,6 +579,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
     marginBottom: spacing.xs,
+    lineHeight: typography.size.md * 1.4,
   },
   horseCardCompactBreed: {
     fontSize: typography.size.sm,

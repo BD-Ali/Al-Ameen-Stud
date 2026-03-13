@@ -236,7 +236,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
                   <View style={styles.cardFooter}>
                     <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
-                    <Text style={styles.readMore}>{t('announcements.readMore')} <FontAwesome5 name={I18nManager.isRTL ? 'arrow-right' : 'arrow-left'} size={12} color={colors.primary.main} /></Text>
+                    <Text style={styles.readMore}>{t('announcements.readMore')} <FontAwesome5 name={I18nManager.isRTL ? 'arrow-left' : 'arrow-right'} size={12} color={colors.primary.main} /></Text>
                   </View>
                 </TouchableOpacity>
               </View>

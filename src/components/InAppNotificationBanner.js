@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface.card,
+    backgroundColor: colors.surface.elevated,
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     shadowColor: '#000',
@@ -185,13 +185,16 @@ const styles = StyleSheet.create({
     marginEnd: spacing.sm,
   },
   title: {
-    ...typography.h4,
+    fontSize: typography.size.md,
+    fontWeight: typography.weight.bold,
     color: colors.text.primary,
     marginBottom: spacing.xs,
+    lineHeight: typography.size.md * 1.4,
   },
   body: {
-    ...typography.body2,
+    fontSize: typography.size.sm,
     color: colors.text.secondary,
+    lineHeight: typography.size.sm * 1.5,
   },
   dismissButton: {
     width: 44,
