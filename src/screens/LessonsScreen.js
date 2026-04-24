@@ -1,5 +1,5 @@
 ﻿import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, TextInput } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -28,6 +28,9 @@ const LessonsScreen = () => {
   const [showHorsePicker, setShowHorsePicker] = useState(false);
   const [showClientPicker, setShowClientPicker] = useState(false);
   const [showInstructorPicker, setShowInstructorPicker] = useState(false);
+  const [horseSearch, setHorseSearch] = useState('');
+  const [clientSearch, setClientSearch] = useState('');
+  const [instructorSearch, setInstructorSearch] = useState('');
 
   const handleDateChange = (event, selectedDate) => {
     if (Platform.OS === 'android' && event.type === 'dismissed') {
@@ -317,6 +320,9 @@ const LessonsScreen = () => {
                   setShowHorsePicker(!showHorsePicker);
                   setShowClientPicker(false);
                   setShowInstructorPicker(false);
+                  setHorseSearch('');
+                  setClientSearch('');
+                  setInstructorSearch('');
                 }}
               >
                 <Text style={[styles.pickerButtonText, !horseId && styles.placeholderText]}>
@@ -326,28 +332,44 @@ const LessonsScreen = () => {
               </TouchableOpacity>
 
               {showHorsePicker && horses.length > 0 && (
-                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
-                  {horses.map((horse) => (
-                    <TouchableOpacity
-                      key={horse.id}
-                      style={[
-                        styles.pickerOption,
-                        horseId === horse.id && styles.pickerOptionSelected
-                      ]}
-                      onPress={() => {
-                        setHorseId(horse.id);
-                        setShowHorsePicker(false);
-                      }}
-                    >
-                      <Text style={[
-                        styles.pickerOptionText,
-                        horseId === horse.id && styles.pickerOptionTextSelected
-                      ]}>
-                        {horse.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+                <View style={styles.pickerDropdownContainer}>
+                  <View style={[styles.pickerSearchWrapper, { flexDirection: rowDirection }]}>
+                    <FontAwesome5 name="search" size={13} color={colors.text.muted} solid />
+                    <TextInput
+                      style={[styles.pickerSearchInput, { textAlign }]}
+                      placeholder={t('lessons.searchHorse')}
+                      placeholderTextColor={colors.text.muted}
+                      value={horseSearch}
+                      onChangeText={setHorseSearch}
+                      autoCorrect={false}
+                    />
+                  </View>
+                  <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                    {horses
+                      .filter(h => h.name.toLowerCase().includes(horseSearch.toLowerCase()))
+                      .map((horse) => (
+                        <TouchableOpacity
+                          key={horse.id}
+                          style={[
+                            styles.pickerOption,
+                            horseId === horse.id && styles.pickerOptionSelected
+                          ]}
+                          onPress={() => {
+                            setHorseId(horse.id);
+                            setShowHorsePicker(false);
+                            setHorseSearch('');
+                          }}
+                        >
+                          <Text style={[
+                            styles.pickerOptionText,
+                            horseId === horse.id && styles.pickerOptionTextSelected
+                          ]}>
+                            {horse.name}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                  </ScrollView>
+                </View>
               )}
 
               {horses.length === 0 && (
@@ -366,6 +388,9 @@ const LessonsScreen = () => {
                   setShowClientPicker(!showClientPicker);
                   setShowHorsePicker(false);
                   setShowInstructorPicker(false);
+                  setHorseSearch('');
+                  setClientSearch('');
+                  setInstructorSearch('');
                 }}
               >
                 <Text style={[styles.pickerButtonText, !clientId && styles.placeholderText]}>
@@ -375,28 +400,44 @@ const LessonsScreen = () => {
               </TouchableOpacity>
 
               {showClientPicker && clients.length > 0 && (
-                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
-                  {clients.map((client) => (
-                    <TouchableOpacity
-                      key={client.id}
-                      style={[
-                        styles.pickerOption,
-                        clientId === client.id && styles.pickerOptionSelected
-                      ]}
-                      onPress={() => {
-                        setClientId(client.id);
-                        setShowClientPicker(false);
-                      }}
-                    >
-                      <Text style={[
-                        styles.pickerOptionText,
-                        clientId === client.id && styles.pickerOptionTextSelected
-                      ]}>
-                        {client.name}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+                <View style={styles.pickerDropdownContainer}>
+                  <View style={[styles.pickerSearchWrapper, { flexDirection: rowDirection }]}>
+                    <FontAwesome5 name="search" size={13} color={colors.text.muted} solid />
+                    <TextInput
+                      style={[styles.pickerSearchInput, { textAlign }]}
+                      placeholder={t('lessons.searchClient')}
+                      placeholderTextColor={colors.text.muted}
+                      value={clientSearch}
+                      onChangeText={setClientSearch}
+                      autoCorrect={false}
+                    />
+                  </View>
+                  <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                    {clients
+                      .filter(c => c.name.toLowerCase().includes(clientSearch.toLowerCase()))
+                      .map((client) => (
+                        <TouchableOpacity
+                          key={client.id}
+                          style={[
+                            styles.pickerOption,
+                            clientId === client.id && styles.pickerOptionSelected
+                          ]}
+                          onPress={() => {
+                            setClientId(client.id);
+                            setShowClientPicker(false);
+                            setClientSearch('');
+                          }}
+                        >
+                          <Text style={[
+                            styles.pickerOptionText,
+                            clientId === client.id && styles.pickerOptionTextSelected
+                          ]}>
+                            {client.name}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                  </ScrollView>
+                </View>
               )}
 
               {clients.length === 0 && (
@@ -415,6 +456,9 @@ const LessonsScreen = () => {
                   setShowInstructorPicker(!showInstructorPicker);
                   setShowHorsePicker(false);
                   setShowClientPicker(false);
+                  setHorseSearch('');
+                  setClientSearch('');
+                  setInstructorSearch('');
                 }}
               >
                 <Text style={[styles.pickerButtonText, !instructorId && styles.placeholderText]}>
@@ -424,35 +468,53 @@ const LessonsScreen = () => {
               </TouchableOpacity>
 
               {showInstructorPicker && (
-                <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                <View style={styles.pickerDropdownContainer}>
                   {workerUsers && workerUsers.length > 0 ? (
-                    workerUsers.map((worker) => (
-                      <TouchableOpacity
-                        key={worker.id}
-                        style={[
-                          styles.pickerOption,
-                          instructorId === worker.id && styles.pickerOptionSelected
-                        ]}
-                        onPress={() => {
-                          setInstructorId(worker.id);
-                          setShowInstructorPicker(false);
-                        }}
-                      >
-                        <Text style={[
-                          styles.pickerOptionText,
-                          instructorId === worker.id && styles.pickerOptionTextSelected
-                        ]}>
-                          {worker.name}
-                        </Text>
-                      </TouchableOpacity>
-                    ))
+                    <>
+                      <View style={[styles.pickerSearchWrapper, { flexDirection: rowDirection }]}>
+                        <FontAwesome5 name="search" size={13} color={colors.text.muted} solid />
+                        <TextInput
+                          style={[styles.pickerSearchInput, { textAlign }]}
+                          placeholder={t('lessons.searchInstructor')}
+                          placeholderTextColor={colors.text.muted}
+                          value={instructorSearch}
+                          onChangeText={setInstructorSearch}
+                          autoCorrect={false}
+                        />
+                      </View>
+                      <ScrollView style={styles.pickerDropdown} nestedScrollEnabled={true}>
+                        {workerUsers
+                          .filter(w => w.name.toLowerCase().includes(instructorSearch.toLowerCase()))
+                          .map((worker) => (
+                            <TouchableOpacity
+                              key={worker.id}
+                              style={[
+                                styles.pickerOption,
+                                instructorId === worker.id && styles.pickerOptionSelected
+                              ]}
+                              onPress={() => {
+                                setInstructorId(worker.id);
+                                setShowInstructorPicker(false);
+                                setInstructorSearch('');
+                              }}
+                            >
+                              <Text style={[
+                                styles.pickerOptionText,
+                                instructorId === worker.id && styles.pickerOptionTextSelected
+                              ]}>
+                                {worker.name}
+                              </Text>
+                            </TouchableOpacity>
+                          ))}
+                      </ScrollView>
+                    </>
                   ) : (
                     <View style={styles.emptyPickerState}>
                       <Text style={[styles.emptyPickerText, { writingDirection, textAlign }]}>{t('lessons.noInstructorsAvailable')}</Text>
                       <Text style={styles.emptyPickerSubtext}>{t('lessons.addWorkersFirst')}</Text>
                     </View>
                   )}
-                </ScrollView>
+                </View>
               )}
 
               {!workerUsers || workerUsers.length === 0 ? (
@@ -628,10 +690,32 @@ const styles = StyleSheet.create({
   pickerDropdown: {
     maxHeight: 180,
     backgroundColor: colors.background.primary,
+    borderTopWidth: 1,
+    borderTopColor: colors.border.light,
+  },
+  pickerDropdownContainer: {
     borderWidth: 1.5,
     borderColor: colors.border.light,
     borderRadius: borderRadius.md,
     marginTop: spacing.sm,
+    overflow: 'hidden',
+    backgroundColor: colors.background.primary,
+  },
+  pickerSearchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.light,
+    backgroundColor: colors.background.secondary,
+  },
+  pickerSearchInput: {
+    flex: 1,
+    fontSize: typography.size.sm,
+    color: colors.text.primary,
+    paddingVertical: 0,
   },
   pickerOption: {
     padding: spacing.md,
