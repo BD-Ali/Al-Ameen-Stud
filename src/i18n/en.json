@@ -319,7 +319,9 @@
     "instructor": "Instructor:",
     "completed": "Completed",
     "cancelled": "Cancelled",
-    "scheduledStatus": "Scheduled"
+    "scheduledStatus": "Scheduled",
+    "markAsClinicLesson": "Mark as clinic subscription lesson",
+    "clinicBadge": "Clinic Sub"
   },
   "missions": {
     "todayMissions": "Today's Missions",

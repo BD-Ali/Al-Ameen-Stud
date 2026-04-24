@@ -319,7 +319,9 @@
     "instructor": "המדריך:",
     "completed": "הושלם",
     "cancelled": "בוטל",
-    "scheduledStatus": "מתוכנן"
+    "scheduledStatus": "מתוזמן",
+    "markAsClinicLesson": "סמן כשיעור מנוי קליניקה",
+    "clinicBadge": "מנוי קליניקה"
   },
   "missions": {
     "todayMissions": "משימות היום",

@@ -389,17 +389,6 @@ export const DataProvider = ({ children }) => {
         updatedAt: serverTimestamp()
       });
 
-      // Send subscription expiring notification if lessons are running low
-      if (updates.subscriptionLessons !== undefined) {
-        const remainingLessons = updates.subscriptionLessons;
-
-        // Notify when 3 or fewer lessons remain and subscription is active
-        if (remainingLessons > 0 && remainingLessons <= 3 && (currentClient?.subscriptionActive || updates.subscriptionActive)) {
-          const clientWithUpdates = { ...currentClient, ...updates, id };
-          await notificationService.sendSubscriptionExpiringNotification(clientWithUpdates, remainingLessons);
-        }
-      }
-
       return { success: true };
     } catch (error) {
       console.error('Error updating client:', error);
@@ -851,21 +840,15 @@ export const DataProvider = ({ children }) => {
           updatedAt: serverTimestamp()
         };
 
-        // Handle subscription deduction if client has active subscription
-        if (client.hasSubscription && client.subscriptionLessons > 0) {
+        // Handle subscription deduction only if this lesson is marked as a clinic subscription lesson
+        if (lesson.isClinicLesson && client.hasSubscription && client.subscriptionLessons > 0) {
           const newSubscriptionBalance = client.subscriptionLessons - 1;
           updateData.subscriptionLessons = newSubscriptionBalance;
           updateData.subscriptionUsedLessons = (client.subscriptionUsedLessons || 0) + 1;
 
-          // If subscription is depleted, optionally mark it as inactive
+          // If subscription is depleted, mark it as inactive
           if (newSubscriptionBalance === 0) {
             updateData.subscriptionActive = false;
-          }
-
-          // Send notification if subscription is running low (3 or fewer lessons)
-          if (newSubscriptionBalance > 0 && newSubscriptionBalance <= 3 && client.subscriptionActive) {
-            const clientWithUpdates = { ...client, ...updateData };
-            await notificationService.sendSubscriptionExpiringNotification(clientWithUpdates, newSubscriptionBalance);
           }
         }
 
@@ -940,8 +923,8 @@ export const DataProvider = ({ children }) => {
             lessonCount: Math.max((client.lessonCount || 1) - 1, 0),
             updatedAt: serverTimestamp()
           };
-          // Restore subscription lesson if client has a subscription
-          if (client.hasSubscription) {
+          // Restore subscription lesson only if it was a clinic subscription lesson
+          if (lesson.isClinicLesson && client.hasSubscription) {
             updateData.subscriptionLessons = (client.subscriptionLessons || 0) + 1;
             updateData.subscriptionUsedLessons = Math.max((client.subscriptionUsedLessons || 1) - 1, 0);
             if (!client.subscriptionActive && updateData.subscriptionLessons > 0) {

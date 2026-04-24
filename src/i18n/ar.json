@@ -319,7 +319,9 @@
     "instructor": "المدرب:",
     "completed": "مكتمل",
     "cancelled": "ملغي",
-    "scheduledStatus": "مجدول"
+    "scheduledStatus": "مجدول",
+    "markAsClinicLesson": "تحديد كدرس اشتراك عيادة",
+    "clinicBadge": "اشتراك عيادة"
   },
   "missions": {
     "todayMissions": "مهام اليوم",

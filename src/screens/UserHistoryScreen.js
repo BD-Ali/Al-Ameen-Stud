@@ -33,6 +33,16 @@ const UserHistoryScreen = ({ route }) => {
 
   // Active filter tab
   const [activeFilter, setActiveFilter] = useState('all'); // all | lessons | missions | schedules
+  const [expandedDates, setExpandedDates] = useState(new Set());
+
+  const toggleDate = (date) => {
+    setExpandedDates(prev => {
+      const next = new Set(prev);
+      if (next.has(date)) next.delete(date);
+      else next.add(date);
+      return next;
+    });
+  };
 
   // ── helpers ──────────────────────────────────────────────────────────
   const getHorseName = (id) => horses?.find(h => h.id === id)?.name || '';
@@ -45,6 +55,20 @@ const UserHistoryScreen = ({ route }) => {
       const dt = new Date(d);
       return `${String(dt.getDate()).padStart(2, '0')}-${String(dt.getMonth() + 1).padStart(2, '0')}-${dt.getFullYear()}`;
     } catch { return d; }
+  };
+
+  // Compute exact calendar date for a schedule task given weekStart and day key
+  const getScheduleDate = (weekStart, dayKey) => {
+    if (!weekStart) return weekStart;
+    const dayMapping = { saturday: 0, sunday: 1, monday: 2, tuesday: 3, wednesday: 4, thursday: 5, friday: 6 };
+    const offset = dayMapping[dayKey] ?? 0;
+    const [y, m, d] = weekStart.split('-').map(Number);
+    const dt = new Date(y, m - 1, d);
+    dt.setDate(dt.getDate() + offset);
+    const yy = dt.getFullYear();
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const dd = String(dt.getDate()).padStart(2, '0');
+    return `${yy}-${mm}-${dd}`;
   };
 
   // Status colours & icons
@@ -71,6 +95,7 @@ const UserHistoryScreen = ({ route }) => {
         time: l.time,
         status: l.status,
         confirmed: l.confirmed,
+        isClinicLesson: l.isClinicLesson || false,
         horseName: getHorseName(l.horseId),
         partnerName: userType === 'client' ? getWorkerName(l.instructorId) : getClientName(l.clientId),
         partnerRole: userType === 'client' ? t('userHistory.instructor') : t('userHistory.client'),
@@ -104,11 +129,10 @@ const UserHistoryScreen = ({ route }) => {
         items.push({
           id: `weekly-${s.id}`,
           type: 'schedule',
-          date: s.weekStart || '',
+          date: getScheduleDate(s.weekStart, s.day),
           time: s.timeSlot || '',
           day: s.day,
           description: s.description,
-          weekId: s.weekId,
           raw: s,
         });
       });
@@ -146,6 +170,71 @@ const UserHistoryScreen = ({ route }) => {
     if (activeFilter === 'all') return timeline;
     return timeline.filter(i => i.type === activeFilter);
   }, [timeline, activeFilter]);
+
+  // ── worker: date-grouped flat list with consecutive schedule merging ─
+  const workerFlatList = useMemo(() => {
+    if (userType !== 'worker') return [];
+
+    const addHour = (t) => {
+      if (!t) return t;
+      const [h, m] = t.split(':').map(Number);
+      return `${String(h + 1).padStart(2, '0')}:${String(m || 0).padStart(2, '0')}`;
+    };
+
+    // Group by date
+    const byDate = {};
+    filteredTimeline.forEach(item => {
+      const d = item.date || '';
+      if (!byDate[d]) byDate[d] = [];
+      byDate[d].push(item);
+    });
+
+    const sortedDates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
+    const flat = [];
+
+    sortedDates.forEach(date => {
+      const dayItems = byDate[date];
+      const schedItems = dayItems.filter(i => i.type === 'schedule');
+      const otherItems = dayItems.filter(i => i.type !== 'schedule');
+
+      // Merge consecutive same-description schedule slots
+      const mergedSchedules = [];
+      if (schedItems.length > 0) {
+        const sorted = [...schedItems].sort((a, b) => (a.time || '').localeCompare(b.time || ''));
+        let i = 0;
+        while (i < sorted.length) {
+          const cur = sorted[i];
+          let endTime = addHour(cur.time);
+          let j = i + 1;
+          while (
+            j < sorted.length &&
+            sorted[j].description === cur.description &&
+            sorted[j].time === endTime
+          ) {
+            endTime = addHour(sorted[j].time);
+            j++;
+          }
+          mergedSchedules.push({
+            ...cur,
+            id: j > i + 1 ? `merged-sched-${date}-${i}` : cur.id,
+            timeRange: j > i + 1 ? `${cur.time} - ${endTime}` : null,
+          });
+          i = j;
+        }
+      }
+
+      const allItems = [...otherItems, ...mergedSchedules].sort((a, b) =>
+        (a.time || '').localeCompare(b.time || '')
+      );
+
+      flat.push({ _listType: 'header', id: `header-${date}`, date, count: allItems.length });
+      if (expandedDates.has(date)) {
+        allItems.forEach(item => flat.push({ ...item, _listType: 'item' }));
+      }
+    });
+
+    return flat;
+  }, [userType, filteredTimeline, expandedDates]);
 
   // ── stats ───────────────────────────────────────────────────────────
   const stats = useMemo(() => {
@@ -203,8 +292,40 @@ const UserHistoryScreen = ({ route }) => {
     return map[dayKey] || dayKey;
   };
 
+  // ── date section header ─────────────────────────────────────────────
+  const renderDateHeader = (item) => {
+    const isOpen = expandedDates.has(item.date);
+    let label = fmtDate(item.date);
+    try {
+      const dt = new Date(item.date);
+      const dayKeys = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+      label = `${translateDay(dayKeys[dt.getDay()])}, ${fmtDate(item.date)}`;
+    } catch {}
+    return (
+      <TouchableOpacity
+        key={item.id}
+        onPress={() => toggleDate(item.date)}
+        activeOpacity={0.7}
+        style={[styles.dateSectionHeader, isOpen && styles.dateSectionHeaderOpen, { flexDirection: rowDirection }]}
+      >
+        <FontAwesome5 name="calendar-day" size={14} color={colors.accent.teal} solid />
+        <Text style={[styles.dateSectionText, { writingDirection, textAlign, flex: 1 }]}>{label}</Text>
+        <View style={styles.dateSectionBadge}>
+          <Text style={styles.dateSectionBadgeText}>{item.count}</Text>
+        </View>
+        <FontAwesome5
+          name={isOpen ? 'chevron-up' : 'chevron-down'}
+          size={12}
+          color={colors.text.tertiary}
+          solid
+        />
+      </TouchableOpacity>
+    );
+  };
+
   // ── render a single timeline card ──────────────────────────────────
   const renderItem = ({ item, index }) => {
+    if (item._listType === 'header') return renderDateHeader(item);
     if (item.type === 'lesson') return renderLessonCard(item, index);
     if (item.type === 'mission') return renderMissionCard(item, index);
     if (item.type === 'schedule') return renderScheduleCard(item, index);
@@ -226,12 +347,20 @@ const UserHistoryScreen = ({ route }) => {
             <FontAwesome5 name={meta.icon} size={10} color={colors.text.primary} solid />
             <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{meta.label}</Text>
           </View>
+          {item.isClinicLesson && (
+            <View style={[styles.statusBadge, { backgroundColor: '#9B59B6' }]}>
+              <FontAwesome5 name="ticket-alt" size={10} color={colors.text.primary} solid />
+              <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{t('lessons.clinicBadge')}</Text>
+            </View>
+          )}
         </View>
 
         {/* Date + time */}
         <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
           <FontAwesome5 name="calendar-alt" size={14} color={colors.accent.teal} solid />
-          <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{fmtDate(item.date)}  •  {item.time}</Text>
+          <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>
+            {userType === 'worker' ? item.time : `${fmtDate(item.date)}  •  ${item.time}`}
+          </Text>
         </View>
 
         {/* Horse */}
@@ -274,7 +403,9 @@ const UserHistoryScreen = ({ route }) => {
 
         <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
           <FontAwesome5 name="calendar-alt" size={14} color={colors.accent.teal} solid />
-          <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{fmtDate(item.date)}{item.time ? `  •  ${item.time}` : ''}</Text>
+          <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>
+            {userType === 'worker' ? (item.time || '') : `${fmtDate(item.date)}${item.time ? `  •  ${item.time}` : ''}`}
+          </Text>
         </View>
       </AnimatedCard>
     );
@@ -332,16 +463,13 @@ const UserHistoryScreen = ({ route }) => {
             <FontAwesome5 name="calendar-alt" size={10} color={colors.text.primary} solid />
             <Text style={[styles.typeBadgeText, { writingDirection, textAlign }]}>{t('userHistory.scheduleTask')}</Text>
           </View>
-          {item.weekId ? (
-            <Text style={[styles.weekIdText, { writingDirection, textAlign }]}>{item.weekId}</Text>
-          ) : null}
         </View>
 
         {item.description ? <RTLText style={styles.missionTitle}>{item.description}</RTLText> : null}
 
         <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="clock" size={14} color={colors.primary.light} solid />
-          <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{translateDay(item.day)}  •  {item.time}</Text>
+          <FontAwesome5 name="clock" size={14} color={colors.accent.teal} solid />
+          <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{item.timeRange || item.time}</Text>
         </View>
       </AnimatedCard>
     );
@@ -366,11 +494,6 @@ const UserHistoryScreen = ({ route }) => {
             <FontAwesome5 name="book-open" size={16} color={colors.accent.purple} solid />
             <Text style={[styles.statValue, { writingDirection, textAlign }]}>{stats.totalLessons}</Text>
             <Text style={[styles.statLabel, { writingDirection, textAlign }]}>{t('userHistory.lessons')}</Text>
-          </View>
-          <View style={styles.statCard}>
-            <FontAwesome5 name="check-circle" size={16} color={colors.status.success} solid />
-            <Text style={[styles.statValue, { writingDirection, textAlign }]}>{stats.completedLessons}</Text>
-            <Text style={[styles.statLabel, { writingDirection, textAlign }]}>{t('userHistory.completed')}</Text>
           </View>
           {userType === 'worker' ? (
             <View style={styles.statCard}>
@@ -407,7 +530,7 @@ const UserHistoryScreen = ({ route }) => {
 
       {/* Timeline list */}
       <FlatList
-        data={filteredTimeline}
+        data={userType === 'worker' ? workerFlatList : filteredTimeline}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
@@ -602,6 +725,47 @@ const styles = StyleSheet.create({
     fontSize: typography.size.sm,
     color: colors.text.tertiary,
     marginBottom: spacing.sm,
+  },
+
+  // Date section header (worker grouped view)
+  dateSectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
+    marginTop: spacing.sm,
+    marginBottom: 2,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.background.secondary,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    ...shadows.sm,
+  },
+  dateSectionHeaderOpen: {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    borderBottomColor: colors.accent.teal,
+    borderBottomWidth: 2,
+  },
+  dateSectionText: {
+    flex: 1,
+    fontSize: typography.size.base,
+    fontWeight: typography.weight.bold,
+    color: colors.text.primary,
+  },
+  dateSectionBadge: {
+    backgroundColor: colors.accent.teal,
+    borderRadius: borderRadius.full,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+    minWidth: 22,
+    alignItems: 'center',
+  },
+  dateSectionBadgeText: {
+    color: colors.text.primary,
+    fontSize: typography.size.xs,
+    fontWeight: typography.weight.bold,
   },
 
   // Empty state

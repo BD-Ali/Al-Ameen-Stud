@@ -199,18 +199,26 @@ const ClientHistoryScreen = ({ navigation }) => {
                 <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
               </View>
             </View>
-            {isConfirmed && (
-              <View style={[styles.completedBadge, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="check-circle" size={12} color="#fff" solid />
-                <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('clientHome.completed')}</Text>
-              </View>
-            )}
-            {isCancelled && (
-              <View style={[styles.cancelledBadge, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="times-circle" size={12} color="#fff" solid />
-                <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('clientHome.cancelled')}</Text>
-              </View>
-            )}
+            <View style={[{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }]}>
+              {item.isClinicLesson && (
+                <View style={[styles.clinicBadge, { flexDirection: rowDirection }]}>
+                  <FontAwesome5 name="ticket-alt" size={10} color="#fff" solid />
+                  <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('lessons.clinicBadge')}</Text>
+                </View>
+              )}
+              {isConfirmed && (
+                <View style={[styles.completedBadge, { flexDirection: rowDirection }]}>
+                  <FontAwesome5 name="check-circle" size={12} color="#fff" solid />
+                  <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('clientHome.completed')}</Text>
+                </View>
+              )}
+              {isCancelled && (
+                <View style={[styles.cancelledBadge, { flexDirection: rowDirection }]}>
+                  <FontAwesome5 name="times-circle" size={12} color="#fff" solid />
+                  <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('clientHome.cancelled')}</Text>
+                </View>
+              )}
+            </View>
           </View>
           <View style={styles.lessonDetails}>
             <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
@@ -440,6 +448,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.status.error,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 3,
+    borderRadius: borderRadius.sm,
+    gap: 2,
+  },
+  clinicBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#9B59B6',
     paddingHorizontal: spacing.sm,
     paddingVertical: 3,
     borderRadius: borderRadius.sm,

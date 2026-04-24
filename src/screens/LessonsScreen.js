@@ -1,5 +1,5 @@
 ﻿import React, { useContext, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, TextInput } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform, TextInput, Switch } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -31,6 +31,7 @@ const LessonsScreen = () => {
   const [horseSearch, setHorseSearch] = useState('');
   const [clientSearch, setClientSearch] = useState('');
   const [instructorSearch, setInstructorSearch] = useState('');
+  const [isClinicLesson, setIsClinicLesson] = useState(false);
 
   const handleDateChange = (event, selectedDate) => {
     if (Platform.OS === 'android' && event.type === 'dismissed') {
@@ -106,7 +107,8 @@ const LessonsScreen = () => {
       time: formattedTime,
       horseId,
       clientId,
-      instructorId
+      instructorId,
+      isClinicLesson,
     });
 
     if (result.success) {
@@ -116,6 +118,7 @@ const LessonsScreen = () => {
       setHorseId('');
       setClientId('');
       setInstructorId('');
+      setIsClinicLesson(false);
     } else {
       Alert.alert(t('common.error'), result.error || t('lessons.lessonScheduleFailed'));
     }
@@ -445,6 +448,25 @@ const LessonsScreen = () => {
               )}
             </View>
 
+            {/* Clinic subscription toggle — only shown when selected client has an active subscription */}
+            {clientId && (() => {
+              const selectedClient = clients?.find(c => c.id === clientId);
+              return selectedClient?.hasSubscription && selectedClient?.subscriptionActive;
+            })() && (
+              <View style={[styles.clinicToggleRow, { flexDirection: rowDirection }]}>
+                <FontAwesome5 name="ticket-alt" size={14} color="#9B59B6" solid />
+                <Text style={[styles.clinicToggleLabel, { writingDirection, textAlign, flex: 1 }]}>
+                  {t('lessons.markAsClinicLesson')}
+                </Text>
+                <Switch
+                  value={isClinicLesson}
+                  onValueChange={setIsClinicLesson}
+                  trackColor={{ false: colors.border?.default || '#ccc', true: '#9B59B6' }}
+                  thumbColor={isClinicLesson ? '#fff' : '#f4f3f4'}
+                />
+              </View>
+            )}
+
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
@@ -658,6 +680,22 @@ const styles = StyleSheet.create({
   },
   inputGroup: {
     marginBottom: spacing.md,
+  },
+  clinicToggleRow: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(155, 89, 182, 0.08)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(155, 89, 182, 0.3)',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
+    gap: spacing.sm,
+  },
+  clinicToggleLabel: {
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.semibold,
+    color: '#9B59B6',
   },
   label: {
     fontSize: typography.size.sm,

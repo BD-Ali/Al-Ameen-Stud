@@ -206,6 +206,11 @@ const UsersScreen = () => {
         amountDue: String(user.amountDue || 0),
         amountDueEdited: false,
         lessonCount: String(user.lessonCount || 0),
+        hasSubscription: user.hasSubscription || false,
+        subscriptionActive: user.subscriptionActive || false,
+        subscriptionLessons: String(user.subscriptionLessons || 0),
+        subscriptionUsedLessons: String(user.subscriptionUsedLessons || 0),
+        subscriptionStartDate: user.subscriptionStartDate || '',
       });
     } else {
       setEditFormData({
@@ -249,10 +254,29 @@ const UsersScreen = () => {
       if (dueNum < paidNum) dueNum = paidNum;
       const paymentDiff = paidNum - previousPaid;
 
+      const remainingNum = parseInt(editFormData.subscriptionLessons) || 0;
+      const usedNum = parseInt(editFormData.subscriptionUsedLessons) || 0;
+
+      const subUpdates = editFormData.hasSubscription ? {
+        hasSubscription: true,
+        subscriptionActive: editFormData.subscriptionActive || false,
+        subscriptionLessons: remainingNum,
+        subscriptionUsedLessons: usedNum,
+        subscriptionTotalLessons: remainingNum + usedNum,
+        subscriptionStartDate: editFormData.subscriptionStartDate || new Date().toISOString().split('T')[0],
+      } : {
+        hasSubscription: false,
+        subscriptionActive: false,
+        subscriptionLessons: 0,
+        subscriptionUsedLessons: 0,
+        subscriptionTotalLessons: 0,
+      };
+
       const result = await updateClient(userId, {
         amountPaid: paidNum,
         amountDue: dueNum,
-        lessonCount: lessonCountNum
+        lessonCount: lessonCountNum,
+        ...subUpdates,
       });
 
       // Save payment receipt if amount paid increased
@@ -513,6 +537,86 @@ const UsersScreen = () => {
                           placeholder="0"
                           placeholderTextColor={colors.text.muted}
                         />
+                      </View>
+
+                      {/* Subscription edit section */}
+                      <View style={styles.editSubscriptionSection}>
+                        <TouchableOpacity
+                          style={styles.subscriptionToggle}
+                          onPress={() => setEditFormData({ ...editFormData, hasSubscription: !editFormData.hasSubscription })}
+                          activeOpacity={0.7}
+                        >
+                          <View style={[styles.checkboxContainer, { flexDirection: rowDirection }]}>
+                            <View style={[styles.checkbox, editFormData.hasSubscription && styles.checkboxChecked]}>
+                              {editFormData.hasSubscription && (
+                                <FontAwesome5 name="check" size={14} color="#27AE60" solid />
+                              )}
+                            </View>
+                            <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                              <FontAwesome5 name="ticket-alt" size={14} color="#9B59B6" solid />
+                              <Text style={[styles.checkboxLabel, { writingDirection, textAlign }]}>{t('users.hasSubscription')}</Text>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+
+                        {editFormData.hasSubscription && (
+                          <>
+                            <TouchableOpacity
+                              style={[styles.subscriptionToggle, { marginTop: spacing.xs }]}
+                              onPress={() => setEditFormData({ ...editFormData, subscriptionActive: !editFormData.subscriptionActive })}
+                              activeOpacity={0.7}
+                            >
+                              <View style={[styles.checkboxContainer, { flexDirection: rowDirection }]}>
+                                <View style={[styles.checkbox, editFormData.subscriptionActive && styles.checkboxChecked]}>
+                                  {editFormData.subscriptionActive && (
+                                    <FontAwesome5 name="check" size={14} color="#27AE60" solid />
+                                  )}
+                                </View>
+                                <Text style={[styles.checkboxLabel, { writingDirection, textAlign }]}>{t('clientHome.active')}</Text>
+                              </View>
+                            </TouchableOpacity>
+
+                            <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                              <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                                <FontAwesome5 name="layer-group" size={13} color="#E67E22" solid />
+                                <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.remaining')}</Text>
+                              </View>
+                              <TextInput
+                                value={editFormData.subscriptionLessons}
+                                onChangeText={(text) => setEditFormData({ ...editFormData, subscriptionLessons: text })}
+                                keyboardType="numeric"
+                                style={[styles.editInput, { textAlign }]}
+                                placeholder="0"
+                                placeholderTextColor={colors.text.muted}
+                              />
+                            </View>
+
+                            <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                              <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                                <FontAwesome5 name="check-double" size={13} color="#27AE60" solid />
+                                <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.used')}</Text>
+                              </View>
+                              <TextInput
+                                value={editFormData.subscriptionUsedLessons}
+                                onChangeText={(text) => setEditFormData({ ...editFormData, subscriptionUsedLessons: text })}
+                                keyboardType="numeric"
+                                style={[styles.editInput, { textAlign }]}
+                                placeholder="0"
+                                placeholderTextColor={colors.text.muted}
+                              />
+                            </View>
+
+                            <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                              <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                                <FontAwesome5 name="list-ol" size={13} color="#3498DB" solid />
+                                <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.total')}</Text>
+                              </View>
+                              <Text style={[styles.detailValue, { writingDirection, textAlign }]}>
+                                {(parseInt(editFormData.subscriptionLessons) || 0) + (parseInt(editFormData.subscriptionUsedLessons) || 0)}
+                              </Text>
+                            </View>
+                          </>
+                        )}
                       </View>
 
                       <View style={[styles.editButtonsRow, { flexDirection: rowDirection }]}>
@@ -1498,6 +1602,15 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     borderWidth: 1,
     borderColor: colors.border.light,
+  },
+  editSubscriptionSection: {
+    marginTop: spacing.sm,
+    marginBottom: spacing.sm,
+    padding: spacing.md,
+    backgroundColor: 'rgba(155, 89, 182, 0.06)',
+    borderRadius: borderRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(155, 89, 182, 0.25)',
   },
   subscriptionHeader: {
     marginBottom: spacing.sm,
