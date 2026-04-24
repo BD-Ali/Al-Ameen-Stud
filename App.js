@@ -130,6 +130,7 @@ function AppNavigator() {
                 options={{
                   headerShown: true,
                   title: t('nav.visitorArea'),
+                  headerBackTitle: t('common.back'),
                   headerStyle: { backgroundColor: '#1e293b' },
                   headerTintColor: '#fff',
                 }}
@@ -150,6 +151,7 @@ function AppNavigator() {
                 options={{
                   headerShown: true,
                   title: t('nav.profile'),
+                  headerBackTitle: t('common.back'),
                   headerStyle: { backgroundColor: '#141b2d' },
                   headerTintColor: '#fff',
                 }}
@@ -160,6 +162,7 @@ function AppNavigator() {
                 options={{
                   headerShown: true,
                   title: t('nav.userHistory'),
+                  headerBackTitle: t('common.back'),
                   headerStyle: { backgroundColor: '#141b2d' },
                   headerTintColor: '#fff',
                 }}
@@ -181,6 +184,7 @@ function AppNavigator() {
                 options={{
                   headerShown: true,
                   title: t('nav.profile'),
+                  headerBackTitle: t('common.back'),
                   headerStyle: { backgroundColor: '#141b2d' },
                   headerTintColor: '#fff',
                 }}
@@ -202,6 +206,7 @@ function AppNavigator() {
                 options={{
                   headerShown: true,
                   title: t('nav.profile'),
+                  headerBackTitle: t('common.back'),
                   headerStyle: { backgroundColor: '#141b2d' },
                   headerTintColor: '#fff',
                 }}

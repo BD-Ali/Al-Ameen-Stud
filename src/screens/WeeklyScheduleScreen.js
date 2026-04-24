@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+﻿import React, { useContext, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -19,12 +19,15 @@ import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { useFadeIn } from '../utils/animations';
 import { useTranslation } from '../i18n/LanguageContext';
 
 const WeeklyScheduleScreen = () => {
   const { weeklySchedules, workerUsers, addWeeklySchedule, updateWeeklySchedule, removeWeeklySchedule, lessons, isWorkerAvailable } = useContext(DataContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   const [currentWeekStart, setCurrentWeekStart] = useState(null);
   const [currentWeekId, setCurrentWeekId] = useState('');
@@ -376,7 +379,7 @@ const WeeklyScheduleScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.weekInfo}>
-          <Text style={styles.weekSubtitle}>{t('weeklySchedule.week')} {currentWeekId}</Text>
+          <Text style={[styles.weekSubtitle, { writingDirection, textAlign }]}>{t('weeklySchedule.week')} {currentWeekId}</Text>
         </View>
 
         {/* Day Selector - Using FlatList instead of ScrollView */}
@@ -402,6 +405,7 @@ const WeeklyScheduleScreen = () => {
                 style={[
                   styles.dayButtonText,
                   selectedDay === day.key && styles.dayButtonTextActive,
+                  { writingDirection, textAlign },
                 ]}
               >
                 {day.label}
@@ -410,6 +414,7 @@ const WeeklyScheduleScreen = () => {
                 style={[
                   styles.dayButtonDate,
                   selectedDay === day.key && styles.dayButtonDateActive,
+                  { writingDirection, textAlign },
                 ]}
               >
                 {getDateForDay(day.key)}
@@ -440,14 +445,14 @@ const WeeklyScheduleScreen = () => {
                 isSelected && styles.timeSlotCardSelected,
               ]}
             >
-              <View style={styles.timeSlotHeader}>
-                <View style={styles.timeSlotTimeRow}>
+              <View style={[styles.timeSlotHeader, { flexDirection: rowDirection }]}>
+                <View style={[styles.timeSlotTimeRow, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="clock" size={12} color="#5DADE2" solid />
-                  <Text style={styles.timeSlotTime}>{timeSlot}</Text>
+                  <Text style={[styles.timeSlotTime, { writingDirection, textAlign }]}>{timeSlot}</Text>
                 </View>
                 {hasAssignments && (
                   <View style={styles.workerCountBadge}>
-                    <Text style={styles.workerCountText}>{schedules.length}</Text>
+                    <Text style={[styles.workerCountText, { writingDirection, textAlign }]}>{schedules.length}</Text>
                   </View>
                 )}
                 {isSelected && (
@@ -461,20 +466,20 @@ const WeeklyScheduleScreen = () => {
                 <View style={styles.assignmentInfo}>
                   {schedules.map((schedule, index) => (
                     <View key={schedule.id} style={[styles.workerAssignment, index > 0 && styles.workerAssignmentDivider]}>
-                      <View style={styles.workerNameRow}>
+                      <View style={[styles.workerNameRow, { flexDirection: rowDirection }]}>
                         <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-                        <Text style={styles.workerName}>
+                        <Text style={[styles.workerName, { writingDirection, textAlign }]}>
                           {getWorkerName(schedule.workerId)}
                         </Text>
                       </View>
-                      <Text style={styles.workDescription} numberOfLines={1}>
+                      <RTLText style={styles.workDescription} numberOfLines={1}>
                         {schedule.description}
-                      </Text>
+                      </RTLText>
                     </View>
                   ))}
                 </View>
               ) : (
-                <Text style={styles.emptySlotText}>{t('common.notSpecified')}</Text>
+                <Text style={[styles.emptySlotText, { writingDirection, textAlign }]}>{t('common.notSpecified')}</Text>
               )}
             </TouchableOpacity>
           );
@@ -483,16 +488,16 @@ const WeeklyScheduleScreen = () => {
 
       {/* Action Buttons */}
       {selectedSlots.length > 0 && (
-        <View style={styles.actionBar}>
-          <Text style={styles.selectionCount}>
+        <View style={[styles.actionBar, { flexDirection: rowDirection }]}>
+          <Text style={[styles.selectionCount, { writingDirection, textAlign }]}>
             {t('weeklySchedule.timeSelected', { count: selectedSlots.length })}
           </Text>
-          <View style={styles.actionButtons}>
+          <View style={[styles.actionButtons, { flexDirection: rowDirection }]}>
             <TouchableOpacity onPress={clearSelections} style={styles.clearButton}>
-              <Text style={styles.clearButtonText}>{t('common.cancel')}</Text>
+              <Text style={[styles.clearButtonText, { writingDirection, textAlign }]}>{t('common.cancel')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={openAssignModal} style={styles.assignButton}>
-              <Text style={styles.assignButtonText}>{t('weeklySchedule.assignWork')}</Text>
+              <Text style={[styles.assignButtonText, { writingDirection, textAlign }]}>{t('weeklySchedule.assignWork')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -507,8 +512,8 @@ const WeeklyScheduleScreen = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+            <View style={[styles.modalHeader, { flexDirection: rowDirection }]}>
+              <Text style={[styles.modalTitle, { writingDirection, textAlign }]}>
                 {editMode ? t('weeklySchedule.editTaskTitle') : t('weeklySchedule.assignWork')}
               </Text>
               <TouchableOpacity onPress={closeModal}>
@@ -525,8 +530,8 @@ const WeeklyScheduleScreen = () => {
                 <ScrollView contentContainerStyle={styles.modalBody}>
                   {/* Selected Time Info */}
                   <View style={styles.selectedTimeInfo}>
-                    <Text style={styles.selectedTimeLabel}>{t('weeklySchedule.selectedTime')}</Text>
-                    <Text style={styles.selectedTimeText}>
+                    <Text style={[styles.selectedTimeLabel, { writingDirection, textAlign }]}>{t('weeklySchedule.selectedTime')}</Text>
+                    <Text style={[styles.selectedTimeText, { writingDirection, textAlign }]}>
                       {editMode
                         ? selectedSlots[0]
                         : selectedSlots.sort().join(', ')}
@@ -534,7 +539,7 @@ const WeeklyScheduleScreen = () => {
                   </View>
 
                   {/* Worker Selection - Using FlatList */}
-                  <Text style={styles.inputLabel}>{t('weeklySchedule.chooseWorker')}</Text>
+                  <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('weeklySchedule.chooseWorker')}</Text>
                   <FlatList
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -559,6 +564,7 @@ const WeeklyScheduleScreen = () => {
                           style={[
                             styles.workerCardName,
                             selectedWorker === worker.id && styles.workerCardNameSelected,
+                            { writingDirection, textAlign },
                           ]}
                           numberOfLines={1}
                         >
@@ -569,9 +575,9 @@ const WeeklyScheduleScreen = () => {
                   />
 
                   {/* Work Description */}
-                  <Text style={styles.inputLabel}>{t('weeklySchedule.workDescription')}</Text>
+                  <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('weeklySchedule.workDescription')}</Text>
                   <TextInput
-                    style={styles.textArea}
+                    style={[styles.textArea, { textAlign }]}
                     placeholder={t('weeklySchedule.enterWorkDesc')}
                     placeholderTextColor={colors.text.muted}
                     value={workDescription}
@@ -590,7 +596,7 @@ const WeeklyScheduleScreen = () => {
                     {loading ? (
                       <ActivityIndicator color="#fff" />
                     ) : (
-                      <Text style={styles.saveButtonText}>
+                      <Text style={[styles.saveButtonText, { writingDirection, textAlign }]}>
                         {editMode ? t('common.update') : t('common.save')}
                       </Text>
                     )}

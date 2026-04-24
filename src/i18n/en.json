@@ -52,7 +52,7 @@
     "workerLessons": "Lessons"
   },
   "auth": {
-    "brandName": "Al-Ameen Farm",
+    "brandName": "Al-Ameen Stud",
     "signIn": "Sign In",
     "createAccount": "Create Account",
     "email": "Email",
@@ -152,7 +152,7 @@
     "pm": "PM"
   },
   "visitorHome": {
-    "welcomeMessage": "Welcome to Al-Ameen Farm",
+    "welcomeMessage": "Welcome to Al-Ameen Stud",
     "ourHorses": "Our Horses",
     "latestAnnouncements": "Latest Announcements",
     "noAnnouncements": "No announcements at the moment",
@@ -456,6 +456,11 @@
     "linkTextLabel": "Button Text",
     "linkTextPlaceholder": "Click here",
     "tagLabel": "Category",
+    "tagUpdate": "Update",
+    "tagPromo": "Promo",
+    "tagAlert": "Alert",
+    "tagEvent": "Event",
+    "tagInfo": "Info",
     "targetAudience": "Target Audience",
     "statusLabel": "Status",
     "pinAnnouncement": "📌 Pin Announcement (appears at top)",

@@ -1,10 +1,12 @@
-import React, { useContext } from 'react';
+﻿import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Alert, FlatList, TouchableOpacity, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import CompactHeader from '../components/CompactHeader';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 
@@ -16,6 +18,7 @@ const WorkerLessonsScreen = ({ navigation }) => {
   const { lessons, horses, clients, workers, loading, confirmLesson, cancelLesson } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   const currentWorker = workers?.find((w) => w.id === user?.uid);
 
@@ -122,10 +125,10 @@ const WorkerLessonsScreen = ({ navigation }) => {
     // Section header
     if (item.type === 'header') {
       return (
-        <View style={[styles.sectionHeader, index > 0 && styles.sectionHeaderSpaced]}>
-          <View style={styles.sectionTitleRow}>
+        <View style={[styles.sectionHeader, index > 0 && styles.sectionHeaderSpaced, { flexDirection: rowDirection }]}>
+          <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
             <FontAwesome5 name={item.icon} size={22} color={item.iconColor} solid />
-            <Text style={styles.sectionTitle}>{item.title}</Text>
+            <RTLText style={styles.sectionTitle}>{item.title}</RTLText>
           </View>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{item.count}</Text>
@@ -139,7 +142,7 @@ const WorkerLessonsScreen = ({ navigation }) => {
       return (
         <View style={styles.emptyState}>
           <FontAwesome5 name="book-open" size={36} color="#95A5A6" solid />
-          <Text style={styles.emptyText}>{item.message}</Text>
+          <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{item.message}</RTLText>
         </View>
       );
     }
@@ -149,41 +152,41 @@ const WorkerLessonsScreen = ({ navigation }) => {
       return (
         <View style={styles.lessonCard}>
           <View style={styles.lessonHeader}>
-            <View style={styles.lessonTimeRow}>
+            <View style={[styles.lessonTimeRow, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-              <Text style={styles.lessonTime}>{item.time}</Text>
+              <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
             </View>
             {item.confirmed && (
-              <View style={styles.completedBadge}>
+              <View style={[styles.completedBadge, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="check" size={10} color="#fff" solid />
-                <Text style={styles.statusBadgeText}>{t('clientHome.completed')}</Text>
+                <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{t('clientHome.completed')}</Text>
               </View>
             )}
             {item.status === 'cancelled' && (
-              <View style={styles.cancelledBadge}>
+              <View style={[styles.cancelledBadge, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="times" size={10} color="#fff" solid />
-                <Text style={styles.statusBadgeText}>{t('clientHome.cancelled')}</Text>
+                <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{t('clientHome.cancelled')}</Text>
               </View>
             )}
           </View>
           <View style={styles.lessonDetails}>
-            <View style={styles.lessonInfoRow}>
+            <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-              <Text style={styles.lessonLabel}>
+              <Text style={[styles.lessonLabel, { writingDirection, textAlign }]}>
                 {t('lessons.client')}{' '}
-                <Text style={styles.lessonValue}>{getClientName(item.clientId)}</Text>
+                <Text style={[styles.lessonValue, { writingDirection, textAlign }]}>{getClientName(item.clientId)}</Text>
               </Text>
             </View>
-            <View style={styles.lessonInfoRow}>
+            <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
               <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-              <Text style={styles.lessonLabel}>
+              <Text style={[styles.lessonLabel, { writingDirection, textAlign }]}>
                 {t('lessons.horse')}{' '}
-                <Text style={styles.lessonValue}>{getHorseName(item.horseId)}</Text>
+                <Text style={[styles.lessonValue, { writingDirection, textAlign }]}>{getHorseName(item.horseId)}</Text>
               </Text>
             </View>
           </View>
           {!item.confirmed && item.status !== 'cancelled' && (
-            <View style={styles.lessonActions}>
+            <View style={[styles.lessonActions, { flexDirection: rowDirection }]}>
               <TouchableOpacity style={styles.confirmButton} onPress={() => handleConfirmLesson(item.id)}>
                 <FontAwesome5 name="check" size={12} color="#fff" solid />
                 <Text style={styles.actionButtonText}>{t('workerHome.confirmCompletion')}</Text>
@@ -203,28 +206,28 @@ const WorkerLessonsScreen = ({ navigation }) => {
       return (
         <View style={[styles.lessonCard, styles.upcomingCard]}>
           <View style={styles.lessonHeader}>
-            <View style={styles.lessonDateRow}>
+            <View style={[styles.lessonDateRow, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-              <Text style={styles.lessonDate}>{formatDate(item.date)}</Text>
+              <Text style={[styles.lessonDate, { writingDirection, textAlign }]}>{formatDate(item.date)}</Text>
             </View>
-            <View style={styles.lessonTimeRow}>
+            <View style={[styles.lessonTimeRow, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-              <Text style={styles.lessonTime}>{item.time}</Text>
+              <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
             </View>
           </View>
           <View style={styles.lessonDetails}>
-            <View style={styles.lessonInfoRow}>
+            <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
-              <Text style={styles.lessonLabel}>
+              <Text style={[styles.lessonLabel, { writingDirection, textAlign }]}>
                 {t('lessons.client')}{' '}
-                <Text style={styles.lessonValue}>{getClientName(item.clientId)}</Text>
+                <Text style={[styles.lessonValue, { writingDirection, textAlign }]}>{getClientName(item.clientId)}</Text>
               </Text>
             </View>
-            <View style={styles.lessonInfoRow}>
+            <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
               <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-              <Text style={styles.lessonLabel}>
+              <Text style={[styles.lessonLabel, { writingDirection, textAlign }]}>
                 {t('lessons.horse')}{' '}
-                <Text style={styles.lessonValue}>{getHorseName(item.horseId)}</Text>
+                <Text style={[styles.lessonValue, { writingDirection, textAlign }]}>{getHorseName(item.horseId)}</Text>
               </Text>
             </View>
           </View>

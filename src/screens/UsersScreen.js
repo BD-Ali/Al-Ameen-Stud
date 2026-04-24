@@ -17,6 +17,8 @@ import {
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useNavigation } from '@react-navigation/native';
@@ -28,6 +30,7 @@ import { useNavigation } from '@react-navigation/native';
 const UsersScreen = () => {
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
   const {
     clients,
     workers,
@@ -386,27 +389,27 @@ const UsersScreen = () => {
       <AnimatedCard index={index} delay={80} style={styles.card}>
         {/* Compact Header - Always Visible */}
         <TouchableOpacity onPress={() => toggleExpand(item.id)} activeOpacity={0.7}>
-          <View style={styles.cardHeader}>
-            <View style={styles.userHeaderLeft}>
+          <View style={[styles.cardHeader, { flexDirection: rowDirection }]}>
+            <View style={[styles.userHeaderLeft, { flexDirection: rowDirection }]}>
               <View style={[styles.avatarCircle, isClient && styles.avatarClient]}>
                 <Text style={styles.avatarText}>{item.name?.charAt(0) || '?'}</Text>
               </View>
               <View style={styles.userHeaderInfo}>
-                <Text style={styles.userName}>{item.name}</Text>
-                <View style={styles.userMetaRow}>
+                <RTLText style={styles.userName}>{item.name}</RTLText>
+                <View style={[styles.userMetaRow, { flexDirection: rowDirection }]}>
                   {item.phoneNumber && (
                     <TouchableOpacity
-                      style={styles.phoneRow}
+                      style={[styles.phoneRow, { flexDirection: rowDirection }]}
                       onPress={() => handlePhoneCall(item.phoneNumber)}
                       activeOpacity={0.7}
                     >
                       <FontAwesome5 name="phone-alt" size={12} color={colors.primary.main} solid />
-                      <Text style={[styles.userMetaText, styles.phoneLink]}>{item.phoneNumber}</Text>
+                      <Text style={[styles.userMetaText, styles.phoneLink, { writingDirection, textAlign }]}>{item.phoneNumber}</Text>
                     </TouchableOpacity>
                   )}
                   {isClient && item.amountDue > 0 && (
                     <View style={styles.dueBadge}>
-                      <Text style={styles.dueBadgeText}>₪{item.amountDue}</Text>
+                      <Text style={[styles.dueBadgeText, { writingDirection, textAlign }]}>₪{item.amountDue}</Text>
                     </View>
                   )}
                 </View>
@@ -421,29 +424,29 @@ const UsersScreen = () => {
           <View style={styles.expandedSection}>
             {/* Details Card */}
             <View style={styles.detailsCard}>
-              <View style={styles.detailsTitleRow}>
+              <View style={[styles.detailsTitleRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="clipboard-list" size={16} color={colors.primary.main} solid />
-                <Text style={styles.detailsTitle}>{t('users.basicInfo')}</Text>
+                <RTLText style={styles.detailsTitle}>{t('users.basicInfo')}</RTLText>
               </View>
 
               {item.email && (
-                <View style={styles.detailRow}>
-                  <View style={styles.labelRow}>
+                <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                     <FontAwesome5 name="envelope" size={14} color="#3B82F6" solid />
-                    <Text style={styles.detailLabel}>{t('users.email')}</Text>
+                    <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.email')}</Text>
                   </View>
-                  <Text style={styles.detailValue}>{item.email}</Text>
+                  <Text style={[styles.detailValue, { writingDirection, textAlign }]}>{item.email}</Text>
                 </View>
               )}
 
               {item.phoneNumber && (
-                <View style={styles.detailRow}>
-                  <View style={styles.labelRow}>
+                <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                     <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
-                    <Text style={styles.detailLabel}>{t('users.phoneNumber')}</Text>
+                    <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.phoneNumber')}</Text>
                   </View>
                   <TouchableOpacity onPress={() => handlePhoneCall(item.phoneNumber)}>
-                    <Text style={[styles.detailValue, styles.phoneLink]}>{item.phoneNumber}</Text>
+                    <Text style={[styles.detailValue, styles.phoneLink, { writingDirection, textAlign }]}>{item.phoneNumber}</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -453,140 +456,140 @@ const UsersScreen = () => {
                   {isEditing ? (
                     <>
                       <View style={styles.quickPaymentSection}>
-                        <View style={styles.labelRow}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="plus-circle" size={14} color="#27AE60" solid />
-                          <Text style={styles.detailLabel}>{t('users.addPayment')}</Text>
+                          <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.addPayment')}</Text>
                         </View>
                         <TextInput
                           value={editFormData.quickPayment}
                           onChangeText={handleQuickPayment}
                           keyboardType="numeric"
-                          style={[styles.editInput, styles.quickPaymentInput]}
+                          style={[styles.editInput, styles.quickPaymentInput, { textAlign }]}
                           placeholder={t('users.addPaymentPlaceholder')}
                           placeholderTextColor={colors.text.muted}
                         />
                       </View>
 
-                      <View style={styles.detailRow}>
-                        <View style={styles.labelRow}>
+                      <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
-                          <Text style={styles.detailLabel}>{t('users.amountPaidCurrency')}</Text>
+                          <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.amountPaidCurrency')}</Text>
                         </View>
                         <TextInput
                           value={editFormData.amountPaid}
                           onChangeText={(text) => setEditFormData({...editFormData, amountPaid: text, quickPayment: '', _basePaid: undefined})}
                           keyboardType="numeric"
-                          style={styles.editInput}
+                          style={[styles.editInput, { textAlign }]}
                           placeholder="0"
                           placeholderTextColor={colors.text.muted}
                         />
                       </View>
 
-                      <View style={styles.detailRow}>
-                        <View style={styles.labelRow}>
+                      <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="file-invoice-dollar" size={14} color="#F39C12" solid />
-                          <Text style={styles.detailLabel}>{t('users.amountDueCurrency')}</Text>
+                          <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.amountDueCurrency')}</Text>
                         </View>
                         <TextInput
                           value={editFormData.amountDue}
                           onChangeText={(text) => setEditFormData({...editFormData, amountDue: text, amountDueEdited: true})}
                           keyboardType="numeric"
-                          style={styles.editInput}
+                          style={[styles.editInput, { textAlign }]}
                           placeholder="0"
                           placeholderTextColor={colors.text.muted}
                         />
                       </View>
 
-                      <View style={styles.detailRow}>
-                        <View style={styles.labelRow}>
+                      <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="book-open" size={14} color="#9B59B6" solid />
-                          <Text style={styles.detailLabel}>{t('users.lessonCount')}</Text>
+                          <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.lessonCount')}</Text>
                         </View>
                         <TextInput
                           value={editFormData.lessonCount}
                           onChangeText={(text) => setEditFormData({...editFormData, lessonCount: text})}
                           keyboardType="numeric"
-                          style={styles.editInput}
+                          style={[styles.editInput, { textAlign }]}
                           placeholder="0"
                           placeholderTextColor={colors.text.muted}
                         />
                       </View>
 
-                      <View style={styles.editButtonsRow}>
+                      <View style={[styles.editButtonsRow, { flexDirection: rowDirection }]}>
                         <TouchableOpacity
                           style={[styles.editButton, styles.saveButton]}
                           onPress={() => saveUserDetails(item.id)}
                         >
                           <FontAwesome5 name="save" size={14} color="#fff" solid />
-                          <Text style={styles.editButtonText}>{t('common.save')}</Text>
+                          <Text style={[styles.editButtonText, { writingDirection, textAlign }]}>{t('common.save')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={[styles.editButton, styles.cancelButton]}
                           onPress={cancelEditing}
                         >
                           <FontAwesome5 name="times" size={14} color="#fff" solid />
-                          <Text style={styles.editButtonText}>{t('common.cancel')}</Text>
+                          <Text style={[styles.editButtonText, { writingDirection, textAlign }]}>{t('common.cancel')}</Text>
                         </TouchableOpacity>
                       </View>
                     </>
                   ) : (
                     <>
-                      <View style={styles.detailRow}>
-                        <View style={styles.labelRow}>
+                      <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
-                          <Text style={styles.detailLabel}>{t('users.amountPaid')}</Text>
+                          <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.amountPaid')}</Text>
                         </View>
-                        <Text style={[styles.detailValue, styles.paidText]}>₪{item.amountPaid || 0}</Text>
+                        <Text style={[styles.detailValue, styles.paidText, { writingDirection, textAlign }]}>₪{item.amountPaid || 0}</Text>
                       </View>
 
-                      <View style={styles.detailRow}>
-                        <View style={styles.labelRow}>
+                      <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="file-invoice-dollar" size={14} color="#F39C12" solid />
-                          <Text style={styles.detailLabel}>{t('users.amountDue')}</Text>
+                          <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.amountDue')}</Text>
                         </View>
-                        <Text style={[styles.detailValue, styles.dueText]}>₪{item.amountDue || 0}</Text>
+                        <Text style={[styles.detailValue, styles.dueText, { writingDirection, textAlign }]}>₪{item.amountDue || 0}</Text>
                       </View>
 
-                      <View style={styles.detailRow}>
-                        <View style={styles.labelRow}>
+                      <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="book-open" size={14} color="#9B59B6" solid />
-                          <Text style={styles.detailLabel}>{t('users.lessonCount')}</Text>
+                          <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.lessonCount')}</Text>
                         </View>
-                        <Text style={styles.detailValue}>{item.lessonCount || 0}</Text>
+                        <Text style={[styles.detailValue, { writingDirection, textAlign }]}>{item.lessonCount || 0}</Text>
                       </View>
 
                       {/* Subscription Information */}
                       {item.hasSubscription && (
                         <View style={styles.subscriptionInfoCard}>
-                          <View style={styles.subscriptionInfoHeader}>
-                            <View style={styles.labelRow}>
+                          <View style={[styles.subscriptionInfoHeader, { flexDirection: rowDirection }]}>
+                            <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                               <FontAwesome5 name="ticket-alt" size={14} color="#9B59B6" solid />
-                              <Text style={styles.subscriptionInfoTitle}>{t('users.subscription')}</Text>
+                              <Text style={[styles.subscriptionInfoTitle, { writingDirection, textAlign }]}>{t('users.subscription')}</Text>
                             </View>
                             <View style={[styles.subscriptionStatusBadge, item.subscriptionActive && styles.subscriptionActiveBadge]}>
-                              <Text style={styles.subscriptionStatusText}>
+                              <Text style={[styles.subscriptionStatusText, { writingDirection, textAlign }]}>
                                 {item.subscriptionActive ? t('clientHome.active') : t('clientHome.expired')}
                               </Text>
                             </View>
                           </View>
-                          <View style={styles.subscriptionStats}>
+                          <View style={[styles.subscriptionStats, { flexDirection: rowDirection }]}>
                             <View style={styles.subscriptionStatItem}>
-                              <Text style={styles.subscriptionStatLabel}>{t('users.remaining')}</Text>
+                              <Text style={[styles.subscriptionStatLabel, { writingDirection, textAlign }]}>{t('users.remaining')}</Text>
                               <Text style={styles.subscriptionStatValue}>{item.subscriptionLessons || 0}</Text>
                             </View>
                             <View style={styles.subscriptionStatDivider} />
                             <View style={styles.subscriptionStatItem}>
-                              <Text style={styles.subscriptionStatLabel}>{t('users.used')}</Text>
+                              <Text style={[styles.subscriptionStatLabel, { writingDirection, textAlign }]}>{t('users.used')}</Text>
                               <Text style={styles.subscriptionStatValue}>{item.subscriptionUsedLessons || 0}</Text>
                             </View>
                             <View style={styles.subscriptionStatDivider} />
                             <View style={styles.subscriptionStatItem}>
-                              <Text style={styles.subscriptionStatLabel}>{t('users.total')}</Text>
+                              <Text style={[styles.subscriptionStatLabel, { writingDirection, textAlign }]}>{t('users.total')}</Text>
                               <Text style={styles.subscriptionStatValue}>{item.subscriptionTotalLessons || 0}</Text>
                             </View>
                           </View>
                           {item.subscriptionStartDate && (
-                            <Text style={styles.subscriptionDate}>
+                            <Text style={[styles.subscriptionDate, { writingDirection, textAlign }]}>
                               {t('users.startDate', { date: formatDate(item.subscriptionStartDate) })}
                             </Text>
                           )}
@@ -598,19 +601,19 @@ const UsersScreen = () => {
                         onPress={() => startEditing(item)}
                       >
                         <FontAwesome5 name="edit" size={14} color="#fff" solid />
-                        <Text style={styles.editDetailsButtonText}>{t('users.editDetails')}</Text>
+                        <Text style={[styles.editDetailsButtonText, { writingDirection, textAlign }]}>{t('users.editDetails')}</Text>
                       </TouchableOpacity>
                     </>
                   )}
                 </>
               ) : (
-                <>
-                  <View style={styles.detailRow}>
-                    <View style={styles.labelRow}>
+                <>  
+                  <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                    <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                       <FontAwesome5 name="briefcase" size={14} color="#3B82F6" solid />
-                      <Text style={styles.detailLabel}>{t('users.job')}</Text>
+                      <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.job')}</Text>
                     </View>
-                    <Text style={styles.detailValue}>{item.role || t('roles.worker')}</Text>
+                    <Text style={[styles.detailValue, { writingDirection, textAlign }]}>{item.role || t('roles.worker')}</Text>
                   </View>
                 </>
               )}
@@ -619,17 +622,17 @@ const UsersScreen = () => {
             {/* Client-specific: Next Lesson & Lesson History */}
             {isClient && nextLesson && (
               <View style={styles.nextLessonCard}>
-                <View style={styles.labelRow}>
+                <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="bullseye" size={16} color="#E74C3C" solid />
-                  <Text style={styles.sectionTitle}>{t('users.nextLesson')}</Text>
+                  <Text style={[styles.sectionTitle, { writingDirection, textAlign }]}>{t('users.nextLesson')}</Text>
                 </View>
-                <View style={styles.lessonInfoRow}>
+                <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                  <Text style={styles.lessonInfoText}>{formatDate(nextLesson.date)} - {nextLesson.time}</Text>
+                  <Text style={[styles.lessonInfoText, { writingDirection, textAlign }]}>{formatDate(nextLesson.date)} - {nextLesson.time}</Text>
                 </View>
-                <View style={styles.lessonInfoRow}>
+                <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
                   <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-                  <Text style={styles.lessonInfoText}>{getHorseName(nextLesson.horseId)}</Text>
+                  <Text style={[styles.lessonInfoText, { writingDirection, textAlign }]}>{getHorseName(nextLesson.horseId)}</Text>
                 </View>
               </View>
             )}
@@ -638,10 +641,10 @@ const UsersScreen = () => {
               <View style={styles.lessonsSection}>
                 {upcomingLessons.length > 0 && (
                   <View style={styles.lessonGroup}>
-                    <View style={styles.lessonGroupHeader}>
-                      <View style={styles.labelRow}>
+                    <View style={[styles.lessonGroupHeader, { flexDirection: rowDirection }]}>
+                      <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                         <FontAwesome5 name="calendar-check" size={14} color="#3B82F6" solid />
-                        <Text style={styles.lessonGroupTitle}>{t('users.upcomingLessons')}</Text>
+                        <Text style={[styles.lessonGroupTitle, { writingDirection, textAlign }]}>{t('users.upcomingLessons')}</Text>
                       </View>
                       <View style={styles.countBadgeSmall}>
                         <Text style={styles.countBadgeSmallText}>{upcomingLessons.length}</Text>
@@ -649,28 +652,28 @@ const UsersScreen = () => {
                     </View>
                     {upcomingLessons.slice(0, 3).map(lesson => (
                       <View key={lesson.id} style={styles.lessonItem}>
-                        <View style={styles.lessonItemRow}>
+                        <View style={[styles.lessonItemRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
-                          <Text style={styles.lessonItemText}>{formatDate(lesson.date)} - {lesson.time}</Text>
+                          <Text style={[styles.lessonItemText, { writingDirection, textAlign }]}>{formatDate(lesson.date)} - {lesson.time}</Text>
                         </View>
-                        <View style={styles.lessonItemRow}>
+                        <View style={[styles.lessonItemRow, { flexDirection: rowDirection }]}>
                           <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-                          <Text style={styles.lessonItemSubtext}>{getHorseName(lesson.horseId)}</Text>
+                          <Text style={[styles.lessonItemSubtext, { writingDirection, textAlign }]}>{getHorseName(lesson.horseId)}</Text>
                         </View>
                       </View>
                     ))}
                     {upcomingLessons.length > 3 && (
-                      <Text style={styles.moreText}>{t('users.moreOtherLessons', { count: upcomingLessons.length - 3 })}</Text>
+                      <Text style={[styles.moreText, { writingDirection, textAlign }]}>{t('users.moreOtherLessons', { count: upcomingLessons.length - 3 })}</Text>
                     )}
                   </View>
                 )}
 
                 {pastLessons.length > 0 && (
                   <View style={styles.lessonGroup}>
-                    <View style={styles.lessonGroupHeader}>
-                      <View style={styles.labelRow}>
+                    <View style={[styles.lessonGroupHeader, { flexDirection: rowDirection }]}>
+                      <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                         <FontAwesome5 name="scroll" size={14} color="#7C3AED" solid />
-                        <Text style={styles.lessonGroupTitle}>{t('users.lessonHistory')}</Text>
+                        <Text style={[styles.lessonGroupTitle, { writingDirection, textAlign }]}>{t('users.lessonHistory')}</Text>
                       </View>
                       <View style={[styles.countBadgeSmall, styles.countBadgePast]}>
                         <Text style={styles.countBadgeSmallText}>{pastLessons.length}</Text>
@@ -678,18 +681,18 @@ const UsersScreen = () => {
                     </View>
                     {pastLessons.slice(0, 3).map(lesson => (
                       <View key={lesson.id} style={[styles.lessonItem, styles.lessonItemPast]}>
-                        <View style={styles.lessonItemRow}>
+                        <View style={[styles.lessonItemRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="check-circle" size={12} color="#27AE60" solid />
-                          <Text style={styles.lessonItemText}>{formatDate(lesson.date)} - {lesson.time}</Text>
+                          <Text style={[styles.lessonItemText, { writingDirection, textAlign }]}>{formatDate(lesson.date)} - {lesson.time}</Text>
                         </View>
-                        <View style={styles.lessonItemRow}>
+                        <View style={[styles.lessonItemRow, { flexDirection: rowDirection }]}>
                           <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
-                          <Text style={styles.lessonItemSubtext}>{getHorseName(lesson.horseId)}</Text>
+                          <Text style={[styles.lessonItemSubtext, { writingDirection, textAlign }]}>{getHorseName(lesson.horseId)}</Text>
                         </View>
                       </View>
                     ))}
                     {pastLessons.length > 3 && (
-                      <Text style={styles.moreText}>{t('users.moreOtherLessons', { count: pastLessons.length - 3 })}</Text>
+                      <Text style={[styles.moreText, { writingDirection, textAlign }]}>{t('users.moreOtherLessons', { count: pastLessons.length - 3 })}</Text>
                     )}
                   </View>
                 )}
@@ -706,9 +709,9 @@ const UsersScreen = () => {
               })}
               activeOpacity={0.7}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
                 <FontAwesome5 name="history" size={14} color="#fff" solid />
-                <Text style={styles.historyButtonText}>{t('users.viewHistory')}</Text>
+                <Text style={[styles.historyButtonText, { writingDirection, textAlign }]}>{t('users.viewHistory')}</Text>
               </View>
             </TouchableOpacity>
 
@@ -717,9 +720,9 @@ const UsersScreen = () => {
               style={styles.removeButton}
               onPress={() => handleRemoveUser(item.id, item.name)}
             >
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
                 <FontAwesome5 name="trash-alt" size={14} color="#E74C3C" solid />
-                <Text style={styles.removeButtonText}>{isClient ? t('users.deleteClient') : t('users.deleteWorker')}</Text>
+                <Text style={[styles.removeButtonText, { writingDirection, textAlign }]}>{isClient ? t('users.deleteClient') : t('users.deleteWorker')}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -736,9 +739,9 @@ const UsersScreen = () => {
     >
       {/* Header with Tabs */}
       <View style={styles.header}>
-        <View style={styles.titleRow}>
+        <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
           <FontAwesome5 name="users" size={24} color="#3B82F6" solid />
-          <Text style={styles.pageTitle}>{t('users.title')}</Text>
+          <RTLText style={styles.pageTitle}>{t('users.title')}</RTLText>
         </View>
 
         {/* Tab Selector */}
@@ -748,7 +751,7 @@ const UsersScreen = () => {
             onPress={() => switchTab('clients')}
             activeOpacity={0.7}
           >
-            <Text style={[styles.tabText, activeTab === 'clients' && styles.tabTextActive]}>
+            <Text style={[styles.tabText, activeTab === 'clients' && styles.tabTextActive, { writingDirection, textAlign }]}>
               {t('users.clientsTab')} ({clients.length})
             </Text>
           </TouchableOpacity>
@@ -757,7 +760,7 @@ const UsersScreen = () => {
             onPress={() => switchTab('workers')}
             activeOpacity={0.7}
           >
-            <Text style={[styles.tabText, activeTab === 'workers' && styles.tabTextActive]}>
+            <Text style={[styles.tabText, activeTab === 'workers' && styles.tabTextActive, { writingDirection, textAlign }]}>
               {t('users.workersTab')} ({(workerUsers || workers).length})
             </Text>
           </TouchableOpacity>
@@ -767,7 +770,7 @@ const UsersScreen = () => {
         <View style={styles.searchContainer}>
           <FontAwesome5 name="search" size={16} color={colors.text.secondary} solid style={styles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { textAlign }]}
             placeholder={t('users.searchPlaceholder')}
             placeholderTextColor={colors.text.muted}
             value={searchQuery}
@@ -799,46 +802,46 @@ const UsersScreen = () => {
                 color="#95A5A6" 
                 solid 
               />
-              <Text style={styles.emptyText}>
+              <RTLText style={styles.emptyText}>
                 {searchQuery ? t('users.noResults') : (activeTab === 'clients' ? t('users.noClientsYet') : t('users.noWorkersYet'))}
-              </Text>
-              <Text style={styles.emptySubtext}>
+              </RTLText>
+              <RTLText style={styles.emptySubtext}>
                 {searchQuery ? t('users.tryOtherSearch') : (activeTab === 'clients' ? t('users.addFirstClient') : t('users.addFirstWorker'))}
-              </Text>
+              </RTLText>
             </View>
           }
           ListFooterComponent={
             <View style={styles.formSection}>
               {/* Add New User Form */}
               <View style={styles.newUserForm}>
-                <View style={styles.formTitleRow}>
+                <View style={[styles.formTitleRow, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
-                  <Text style={styles.formTitle}>
+                  <RTLText style={styles.formTitle}>
                     {activeTab === 'clients' ? t('users.addNewClient') : t('users.addNewWorker')}
-                  </Text>
+                  </RTLText>
                 </View>
-                <Text style={styles.formSubtitle}>{t('users.autoAccountNote')}</Text>
+                <Text style={[styles.formSubtitle, { writingDirection, textAlign }]}>{t('users.autoAccountNote')}</Text>
 
                 <View style={styles.inputGroup}>
-                  <View style={styles.labelRow}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                     <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
-                    <Text style={styles.label}>{t('users.nameLabel')}</Text>
+                    <Text style={[styles.label, { writingDirection, textAlign }]}>{t('users.nameLabel')}</Text>
                   </View>
                   <TextInput
                     value={newUserForm.name}
                     onChangeText={(text) => setNewUserForm({...newUserForm, name: text})}
                     placeholder={activeTab === 'clients' ? t('users.enterClientName') : t('users.enterWorkerName')}
                     placeholderTextColor={colors.text.muted}
-                    style={styles.input}
+                    style={[styles.input, { textAlign }]}
                     returnKeyType="next"
                     blurOnSubmit={false}
                   />
                 </View>
 
                 <View style={styles.inputGroup}>
-                  <View style={styles.labelRow}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                     <FontAwesome5 name="envelope" size={14} color="#3B82F6" solid />
-                    <Text style={styles.label}>{t('users.email')}</Text>
+                    <Text style={[styles.label, { writingDirection, textAlign }]}>{t('users.email')}</Text>
                   </View>
                   <TextInput
                     value={newUserForm.email}
@@ -847,16 +850,16 @@ const UsersScreen = () => {
                     keyboardType="email-address"
                     autoCapitalize="none"
                     placeholderTextColor={colors.text.muted}
-                    style={styles.input}
+                    style={[styles.input, { textAlign }]}
                     returnKeyType="next"
                     blurOnSubmit={false}
                   />
                 </View>
 
                 <View style={styles.inputGroup}>
-                  <View style={styles.labelRow}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                     <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
-                    <Text style={styles.label}>{t('users.phoneNumber')}</Text>
+                    <Text style={[styles.label, { writingDirection, textAlign }]}>{t('users.phoneNumber')}</Text>
                   </View>
                   <TextInput
                     value={newUserForm.phone}
@@ -864,7 +867,7 @@ const UsersScreen = () => {
                     placeholder={t('users.enterPhone')}
                     keyboardType="phone-pad"
                     placeholderTextColor={colors.text.muted}
-                    style={styles.input}
+                    style={[styles.input, { textAlign }]}
                     returnKeyType="done"
                   />
                 </View>
@@ -873,9 +876,9 @@ const UsersScreen = () => {
                 {activeTab === 'clients' && (
                   <View style={styles.subscriptionSection}>
                     <View style={styles.subscriptionHeader}>
-                      <View style={styles.labelRow}>
+                      <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                         <FontAwesome5 name="ticket-alt" size={16} color="#9B59B6" solid />
-                        <Text style={styles.subscriptionTitle}>{t('users.subscription')}</Text>
+                        <Text style={[styles.subscriptionTitle, { writingDirection, textAlign }]}>{t('users.subscription')}</Text>
                       </View>
                     </View>
 
@@ -888,21 +891,21 @@ const UsersScreen = () => {
                       })}
                       activeOpacity={0.7}
                     >
-                      <View style={styles.checkboxContainer}>
+                      <View style={[styles.checkboxContainer, { flexDirection: rowDirection }]}>
                         <View style={[styles.checkbox, newUserForm.hasSubscription && styles.checkboxChecked]}>
                           {newUserForm.hasSubscription && (
                             <FontAwesome5 name="check" size={14} color="#27AE60" solid />
                           )}
                         </View>
-                        <Text style={styles.checkboxLabel}>{t('users.hasSubscription')}</Text>
+                        <Text style={[styles.checkboxLabel, { writingDirection, textAlign }]}>{t('users.hasSubscription')}</Text>
                       </View>
                     </TouchableOpacity>
 
                     {newUserForm.hasSubscription && (
                       <View style={styles.inputGroup}>
-                        <View style={styles.labelRow}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <FontAwesome5 name="chart-bar" size={14} color="#E67E22" solid />
-                          <Text style={styles.label}>{t('users.subscriptionLessonsCount')}</Text>
+                          <Text style={[styles.label, { writingDirection, textAlign }]}>{t('users.subscriptionLessonsCount')}</Text>
                         </View>
                         <TextInput
                           value={newUserForm.subscriptionLessons}
@@ -910,10 +913,10 @@ const UsersScreen = () => {
                           placeholder={t('users.subscriptionLessonsPlaceholder')}
                           keyboardType="number-pad"
                           placeholderTextColor={colors.text.muted}
-                          style={styles.input}
+                          style={[styles.input, { textAlign }]}
                           returnKeyType="done"
                         />
-                        <Text style={styles.helpText}>
+                        <Text style={[styles.helpText, { writingDirection, textAlign }]}>
                           {t('users.subscriptionDeductNote')}
                         </Text>
                       </View>
@@ -927,9 +930,9 @@ const UsersScreen = () => {
                   disabled={isAddingUser}
                   activeOpacity={0.7}
                 >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm }}>
+                  <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
                     <FontAwesome5 name="plus" size={14} color="#fff" solid />
-                    <Text style={styles.addButtonText}>
+                    <Text style={[styles.addButtonText, { writingDirection, textAlign }]}>
                       {isAddingUser ? t('users.adding') : (activeTab === 'clients' ? t('users.addClient') : t('users.addWorker'))}
                     </Text>
                   </View>

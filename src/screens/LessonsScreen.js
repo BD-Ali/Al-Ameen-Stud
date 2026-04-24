@@ -1,9 +1,12 @@
-import React, { useContext, useState } from 'react';
+﻿import React, { useContext, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLRow from '../components/RTLRow';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 
@@ -13,6 +16,7 @@ import { useTranslation } from '../i18n/LanguageContext';
  */
 const LessonsScreen = () => {
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
   const { lessons, addLesson, removeLesson, horses, clients, workers, workerUsers } = useContext(DataContext);
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
@@ -145,95 +149,101 @@ const LessonsScreen = () => {
         data={lessons}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
-          <View style={styles.headerSection}>
-            <View style={styles.titleRow}>
+          <View style={[styles.headerSection, { flexDirection: rowDirection }]}>
+            <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="book-open" size={24} color="#9B59B6" solid />
-              <Text style={styles.pageTitle}>{t('lessons.title')}</Text>
+              <RTLText style={styles.pageTitle}>{t('lessons.title')}</RTLText>
             </View>
             <View style={styles.countBadge}>
-              <Text style={styles.countText}>{lessons.length}</Text>
+              <Text style={[styles.countText, { writingDirection, textAlign }]}>{lessons.length}</Text>
             </View>
           </View>
         }
         renderItem={({ item, index }) => (
           <AnimatedCard index={index} delay={80} style={styles.card}>
-            <View style={styles.cardHeader}>
+            <View style={[styles.cardHeader, { flexDirection: rowDirection }]}>
               <View style={styles.dateTimeContainer}>
-                <View style={styles.dateTimeRow}>
+                <View style={[styles.dateTimeRow, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                  <Text style={styles.lessonDateTime}>{item.date}</Text>
+                  <Text style={[styles.lessonDateTime, { writingDirection, textAlign }]}>{item.date}</Text>
                 </View>
-                <View style={styles.dateTimeRow}>
+                <View style={[styles.dateTimeRow, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-                  <Text style={styles.lessonTime}>{item.time}</Text>
+                  <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
                 </View>
               </View>
               {item.confirmed && (
-                <View style={styles.confirmedBadge}>
+                <View style={[styles.confirmedBadge, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="check-circle" size={14} color="#27AE60" solid />
-                  <Text style={styles.confirmedBadgeText}>{t('lessons.completed')}</Text>
+                  <Text style={[styles.confirmedBadgeText, { writingDirection, textAlign }]}>{t('lessons.completed')}</Text>
                 </View>
               )}
               {item.status === 'cancelled' && (
-                <View style={styles.cancelledBadge}>
+                <View style={[styles.cancelledBadge, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="times-circle" size={14} color="#E74C3C" solid />
-                  <Text style={styles.cancelledBadgeText}>{t('lessons.cancelled')}</Text>
+                  <Text style={[styles.cancelledBadgeText, { writingDirection, textAlign }]}>{t('lessons.cancelled')}</Text>
                 </View>
               )}
               {item.status === 'scheduled' && !item.confirmed && (
-                <View style={styles.scheduledBadge}>
+                <View style={[styles.scheduledBadge, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="hourglass-half" size={14} color="#F39C12" solid />
-                  <Text style={styles.scheduledBadgeText}>{t('lessons.scheduledStatus')}</Text>
+                  <Text style={[styles.scheduledBadgeText, { writingDirection, textAlign }]}>{t('lessons.scheduledStatus')}</Text>
                 </View>
               )}
             </View>
-            <View style={styles.cardRow}>
-              <View style={styles.labelRow}>
-                <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-                <Text style={styles.cardLabel}>{t('lessons.horse')}</Text>
-              </View>
-              <Text style={styles.cardValue}>{getHorseName(item.horseId)}</Text>
-            </View>
-            <View style={styles.cardRow}>
-              <View style={styles.labelRow}>
-                <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
-                <Text style={styles.cardLabel}>{t('lessons.client')}</Text>
-              </View>
-              <Text style={styles.cardValue}>{getClientName(item.clientId)}</Text>
-            </View>
-            <View style={styles.cardRow}>
-              <View style={styles.labelRow}>
-                <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
-                <Text style={styles.cardLabel}>{t('lessons.instructor')}</Text>
-              </View>
-              <Text style={styles.cardValue}>{getWorkerName(item.instructorId)}</Text>
-            </View>
+            <RTLRow
+              icon={<MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />}
+              label={t('lessons.horse')}
+              value={getHorseName(item.horseId)}
+              showColon={false}
+              labelStyle={styles.cardLabel}
+              valueStyle={styles.cardValue}
+              style={styles.cardRow}
+            />
+            <RTLRow
+              icon={<FontAwesome5 name="user" size={14} color="#1ABC9C" solid />}
+              label={t('lessons.client')}
+              value={getClientName(item.clientId)}
+              showColon={false}
+              labelStyle={styles.cardLabel}
+              valueStyle={styles.cardValue}
+              style={styles.cardRow}
+            />
+            <RTLRow
+              icon={<FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />}
+              label={t('lessons.instructor')}
+              value={getWorkerName(item.instructorId)}
+              showColon={false}
+              labelStyle={styles.cardLabel}
+              valueStyle={styles.cardValue}
+              style={styles.cardRow}
+            />
             <TouchableOpacity
-              style={styles.removeButton}
+              style={[styles.removeButton, { flexDirection: rowDirection }]}
               onPress={() => handleRemoveLesson(item.id)}
             >
               <FontAwesome5 name="trash-alt" size={14} color="#E74C3C" solid />
-              <Text style={styles.removeButtonText}>{t('lessons.deleteLesson')}</Text>
+              <Text style={[styles.removeButtonText, { writingDirection, textAlign }]}>{t('lessons.deleteLesson')}</Text>
             </TouchableOpacity>
           </AnimatedCard>
         )}
         ListFooterComponent={
           <View style={styles.formSection}>
-            <View style={styles.formTitleRow}>
+            <View style={[styles.formTitleRow, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
-              <Text style={styles.formTitle}>{t('lessons.scheduleNewLesson')}</Text>
+              <RTLText style={styles.formTitle}>{t('lessons.scheduleNewLesson')}</RTLText>
             </View>
 
             <View style={styles.inputGroup}>
-              <View style={styles.labelRow}>
+              <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                <Text style={styles.label}>{t('lessons.selectDate')}</Text>
+                <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectDate')}</Text>
               </View>
               <TouchableOpacity
-                style={styles.pickerButton}
+                style={[styles.pickerButton, { flexDirection: rowDirection }]}
                 onPress={() => setShowDatePicker(true)}
               >
-                <Text style={styles.pickerButtonText}>
+                <Text style={[styles.pickerButtonText, { writingDirection, textAlign }]}>
                   {formatDate(date)}
                 </Text>
                 <FontAwesome5 name="calendar-alt" size={16} color="#5DADE2" solid />
@@ -253,7 +263,7 @@ const LessonsScreen = () => {
                       style={styles.confirmButton}
                       onPress={() => setShowDatePicker(false)}
                     >
-                      <Text style={styles.confirmButtonText}>{t('common.ok')}</Text>
+                      <Text style={[styles.confirmButtonText, { writingDirection, textAlign }]}>{t('common.ok')}</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -261,15 +271,15 @@ const LessonsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <View style={styles.labelRow}>
+              <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-                  <Text style={styles.label}>{t('lessons.selectTime')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectTime')}</Text>
               </View>
               <TouchableOpacity
-                style={styles.pickerButton}
+                style={[styles.pickerButton, { flexDirection: rowDirection }]}
                 onPress={() => setShowTimePicker(true)}
               >
-                <Text style={styles.pickerButtonText}>
+                <Text style={[styles.pickerButtonText, { writingDirection, textAlign }]}>
                   {formatTime(time)}
                 </Text>
                 <FontAwesome5 name="clock" size={16} color="#F39C12" solid />
@@ -289,7 +299,7 @@ const LessonsScreen = () => {
                       style={styles.confirmButton}
                       onPress={() => setShowTimePicker(false)}
                     >
-                      <Text style={styles.confirmButtonText}>{t('common.ok')}</Text>
+                      <Text style={[styles.confirmButtonText, { writingDirection, textAlign }]}>{t('common.ok')}</Text>
                     </TouchableOpacity>
                   )}
                 </>
@@ -297,12 +307,12 @@ const LessonsScreen = () => {
             </View>
 
             <View style={styles.inputGroup}>
-              <View style={styles.labelRow}>
+              <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                 <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-                <Text style={styles.label}>{t('lessons.selectHorse')}</Text>
+                <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectHorse')}</Text>
               </View>
               <TouchableOpacity
-                style={styles.pickerButton}
+                style={[styles.pickerButton, { flexDirection: rowDirection }]}
                 onPress={() => {
                   setShowHorsePicker(!showHorsePicker);
                   setShowClientPicker(false);
@@ -341,17 +351,17 @@ const LessonsScreen = () => {
               )}
 
               {horses.length === 0 && (
-                <Text style={styles.helpText}>{t('lessons.addHorsesFirst')}</Text>
+                <Text style={[styles.helpText, { writingDirection, textAlign }]}>{t('lessons.addHorsesFirst')}</Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <View style={styles.labelRow}>
+              <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
-                <Text style={styles.label}>{t('lessons.selectClient')}</Text>
+                <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectClient')}</Text>
               </View>
               <TouchableOpacity
-                style={styles.pickerButton}
+                style={[styles.pickerButton, { flexDirection: rowDirection }]}
                 onPress={() => {
                   setShowClientPicker(!showClientPicker);
                   setShowHorsePicker(false);
@@ -390,17 +400,17 @@ const LessonsScreen = () => {
               )}
 
               {clients.length === 0 && (
-                <Text style={styles.helpText}>{t('lessons.addClientsFirst')}</Text>
+                <Text style={[styles.helpText, { writingDirection, textAlign }]}>{t('lessons.addClientsFirst')}</Text>
               )}
             </View>
 
             <View style={styles.inputGroup}>
-              <View style={styles.labelRow}>
+              <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
-                <Text style={styles.label}>{t('lessons.selectInstructor')}</Text>
+                <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectInstructor')}</Text>
               </View>
               <TouchableOpacity
-                style={styles.pickerButton}
+                style={[styles.pickerButton, { flexDirection: rowDirection }]}
                 onPress={() => {
                   setShowInstructorPicker(!showInstructorPicker);
                   setShowHorsePicker(false);
@@ -438,7 +448,7 @@ const LessonsScreen = () => {
                     ))
                   ) : (
                     <View style={styles.emptyPickerState}>
-                      <Text style={styles.emptyPickerText}>{t('lessons.noInstructorsAvailable')}</Text>
+                      <Text style={[styles.emptyPickerText, { writingDirection, textAlign }]}>{t('lessons.noInstructorsAvailable')}</Text>
                       <Text style={styles.emptyPickerSubtext}>{t('lessons.addWorkersFirst')}</Text>
                     </View>
                   )}
@@ -446,12 +456,12 @@ const LessonsScreen = () => {
               )}
 
               {!workerUsers || workerUsers.length === 0 ? (
-                <Text style={styles.helpText}>{t('lessons.noWorkersHint')}</Text>
+                <Text style={[styles.helpText, { writingDirection, textAlign }]}>{t('lessons.noWorkersHint')}</Text>
               ) : null}
             </View>
 
             <TouchableOpacity style={styles.addButton} onPress={handleAddLesson}>
-              <Text style={styles.addButtonText}>{t('lessons.scheduleLesson')}</Text>
+              <Text style={[styles.addButtonText, { writingDirection, textAlign }]}>{t('lessons.scheduleLesson')}</Text>
             </TouchableOpacity>
           </View>
         }
@@ -459,8 +469,8 @@ const LessonsScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <FontAwesome5 name="book-open" size={64} color="#9B59B6" solid />
-            <Text style={styles.emptyText}>{t('lessons.noScheduledLessons')}</Text>
-            <Text style={styles.emptySubtext}>{t('lessons.scheduleFirstLesson')}</Text>
+            <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('lessons.noScheduledLessons')}</RTLText>
+            <RTLText style={[styles.emptySubtext, { writingDirection, textAlign }]}>{t('lessons.scheduleFirstLesson')}</RTLText>
           </View>
         }
       />
@@ -534,7 +544,6 @@ const styles = StyleSheet.create({
     color: colors.text.tertiary,
   },
   cardRow: {
-    flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: spacing.xs,
   },

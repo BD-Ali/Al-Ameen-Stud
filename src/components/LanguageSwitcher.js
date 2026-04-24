@@ -37,21 +37,21 @@ const LanguageSwitcher = ({ style }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    borderRadius: borderRadius.sm,
+    borderRadius: borderRadius.md,
     overflow: 'hidden',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.primary.main,
   },
   option: {
     paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
+    paddingHorizontal: spacing.base,
     backgroundColor: 'transparent',
     minHeight: 44,
     justifyContent: 'center',
     alignItems: 'center',
   },
   optionBorder: {
-    borderEndWidth: 1,
+    borderEndWidth: 1.5,
     borderEndColor: colors.primary.main,
   },
   activeOption: {
@@ -60,10 +60,12 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: typography.size.sm,
     fontWeight: typography.weight.semibold,
-    color: colors.primary.main,
+    color: colors.primary.light,
+    letterSpacing: 0.3,
   },
   activeText: {
     color: '#fff',
+    fontWeight: typography.weight.bold,
   },
 });
 

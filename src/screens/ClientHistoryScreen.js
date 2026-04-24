@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+﻿import React, { useContext, useMemo } from 'react';
 import { View, Text, SectionList, StyleSheet, Platform, I18nManager } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
@@ -6,6 +6,8 @@ import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import CompactHeader from '../components/CompactHeader';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 
@@ -17,6 +19,7 @@ const ClientHistoryScreen = ({ navigation }) => {
   const { clients, horses, workers, getConfirmedLessons, getCancelledLessons, paymentHistory } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   const selectedClient = clients.find((c) => c.id === user?.uid);
 
@@ -95,14 +98,14 @@ const ClientHistoryScreen = ({ navigation }) => {
 
     if (section.title === 'lessonHistory') {
       return (
-        <View style={styles.sectionHeader}>
-          <View style={styles.sectionTitleRow}>
+        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
             <FontAwesome5 name="book-open" size={20} color="#9B59B6" solid />
-            <Text style={styles.sectionTitle}>{t('clientHome.lessonHistory')}</Text>
+            <RTLText style={styles.sectionTitle}>{t('clientHome.lessonHistory')}</RTLText>
           </View>
           {lessonHistory.length > 0 && (
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>{lessonHistory.length}</Text>
+              <Text style={[styles.badgeText, { writingDirection, textAlign }]}>{lessonHistory.length}</Text>
             </View>
           )}
         </View>
@@ -111,14 +114,14 @@ const ClientHistoryScreen = ({ navigation }) => {
 
     if (section.title === 'paymentHistory') {
       return (
-        <View style={styles.sectionHeader}>
-          <View style={styles.sectionTitleRow}>
+        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
             <FontAwesome5 name="money-bill-wave" size={20} color="#27AE60" solid />
-            <Text style={styles.sectionTitle}>{t('clientHome.paymentHistory')}</Text>
+            <RTLText style={styles.sectionTitle}>{t('clientHome.paymentHistory')}</RTLText>
           </View>
           {clientPayments.length > 0 && (
             <View style={[styles.badge, { backgroundColor: '#27AE60' }]}>
-              <Text style={styles.badgeText}>{clientPayments.length}</Text>
+              <Text style={[styles.badgeText, { writingDirection, textAlign }]}>{clientPayments.length}</Text>
             </View>
           )}
         </View>
@@ -133,19 +136,19 @@ const ClientHistoryScreen = ({ navigation }) => {
     if (section.title === 'paymentSummary' && item === 'paymentSummary') {
       return (
         <AnimatedCard index={0} delay={100} style={styles.paymentSummaryCard}>
-          <View style={styles.paymentHeader}>
+          <View style={[styles.paymentHeader, { flexDirection: rowDirection }]}>
             <FontAwesome5 name="wallet" size={20} color="#5DADE2" solid />
-            <Text style={styles.paymentHeaderTitle}> {t('clientHome.paymentStatus')}</Text>
+            <RTLText style={styles.paymentHeaderTitle}> {t('clientHome.paymentStatus')}</RTLText>
           </View>
-          <View style={styles.paymentRow}>
+          <View style={[styles.paymentRow, { flexDirection: rowDirection }]}>
             <View style={styles.paymentItem}>
-              <Text style={styles.paymentLabel}>{t('clientHome.amountPaid')}</Text>
-              <Text style={styles.paymentAmountPaid}>₪{selectedClient?.amountPaid || 0}</Text>
+              <Text style={[styles.paymentLabel, { writingDirection, textAlign }]}>{t('clientHome.amountPaid')}</Text>
+              <Text style={[styles.paymentAmountPaid, { writingDirection, textAlign }]}>₪{selectedClient?.amountPaid || 0}</Text>
             </View>
             <View style={styles.paymentDivider} />
             <View style={styles.paymentItem}>
-              <Text style={styles.paymentLabel}>{t('clientHome.amountDue')}</Text>
-              <Text style={styles.paymentAmountDue}>₪{selectedClient?.amountDue || 0}</Text>
+              <Text style={[styles.paymentLabel, { writingDirection, textAlign }]}>{t('clientHome.amountDue')}</Text>
+              <Text style={[styles.paymentAmountDue, { writingDirection, textAlign }]}>₪{selectedClient?.amountDue || 0}</Text>
             </View>
           </View>
         </AnimatedCard>
@@ -157,7 +160,7 @@ const ClientHistoryScreen = ({ navigation }) => {
       return (
         <View style={styles.emptyState}>
           <FontAwesome5 name="book-open" size={36} color="#95A5A6" solid />
-          <Text style={styles.emptyText}>{t('clientHome.noLessonHistory')}</Text>
+          <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('clientHome.noLessonHistory')}</RTLText>
         </View>
       );
     }
@@ -165,7 +168,7 @@ const ClientHistoryScreen = ({ navigation }) => {
       return (
         <View style={styles.emptyState}>
           <FontAwesome5 name="receipt" size={36} color="#95A5A6" solid />
-          <Text style={styles.emptyText}>{t('clientHome.noPayments')}</Text>
+          <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('clientHome.noPayments')}</RTLText>
         </View>
       );
     }
@@ -185,38 +188,38 @@ const ClientHistoryScreen = ({ navigation }) => {
             isCancelled && styles.lessonCardCancelled,
           ]}
         >
-          <View style={styles.lessonHeader}>
+          <View style={[styles.lessonHeader, { flexDirection: rowDirection }]}>
             <View style={styles.lessonLeftCol}>
-              <View style={styles.lessonDateRow}>
+              <View style={[styles.lessonDateRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                <Text style={styles.lessonDate}>{formatDate(item.date)}</Text>
+                <Text style={[styles.lessonDate, { writingDirection, textAlign }]}>{formatDate(item.date)}</Text>
               </View>
-              <View style={styles.lessonTimeRow}>
+              <View style={[styles.lessonTimeRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="clock" size={13} color="#F39C12" solid />
-                <Text style={styles.lessonTime}>{item.time}</Text>
+                <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
               </View>
             </View>
             {isConfirmed && (
-              <View style={styles.completedBadge}>
+              <View style={[styles.completedBadge, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="check-circle" size={12} color="#fff" solid />
-                <Text style={styles.statusBadgeText}> {t('clientHome.completed')}</Text>
+                <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('clientHome.completed')}</Text>
               </View>
             )}
             {isCancelled && (
-              <View style={styles.cancelledBadge}>
+              <View style={[styles.cancelledBadge, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="times-circle" size={12} color="#fff" solid />
-                <Text style={styles.statusBadgeText}> {t('clientHome.cancelled')}</Text>
+                <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('clientHome.cancelled')}</Text>
               </View>
             )}
           </View>
           <View style={styles.lessonDetails}>
-            <View style={styles.lessonDetail}>
+            <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
               <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-              <Text style={styles.lessonDetailText}>{getHorseName(item.horseId)}</Text>
+              <Text style={[styles.lessonDetailText, { writingDirection, textAlign }]}>{getHorseName(item.horseId)}</Text>
             </View>
-            <View style={styles.lessonDetail}>
+            <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="chalkboard-teacher" size={13} color="#3498DB" solid />
-              <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
+              <Text style={[styles.lessonDetailText, { writingDirection, textAlign }]}>{getWorkerName(item.instructorId)}</Text>
             </View>
           </View>
         </AnimatedCard>
@@ -227,27 +230,27 @@ const ClientHistoryScreen = ({ navigation }) => {
     if (section.title === 'paymentHistory') {
       return (
         <AnimatedCard index={index + 1} delay={60} style={styles.paymentCard}>
-          <View style={styles.paymentCardRow}>
+          <View style={[styles.paymentCardRow, { flexDirection: rowDirection }]}>
             <View style={styles.paymentIconContainer}>
               <FontAwesome5 name="shekel-sign" size={16} color="#27AE60" solid />
             </View>
             <View style={styles.paymentCardInfo}>
-              <Text style={styles.paymentCardAmount}>₪{item.amount || 0}</Text>
-              <View style={styles.paymentCardDateRow}>
+              <Text style={[styles.paymentCardAmount, { writingDirection, textAlign }]}>₪{item.amount || 0}</Text>
+              <View style={[styles.paymentCardDateRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
-                <Text style={styles.paymentCardDate}>{formatDate(item.date)}</Text>
+                <Text style={[styles.paymentCardDate, { writingDirection, textAlign }]}>{formatDate(item.date)}</Text>
                 {item.time ? (
                   <>
                     <FontAwesome5 name="clock" size={12} color="#F39C12" solid />
-                    <Text style={styles.paymentCardDate}>{item.time}</Text>
+                    <Text style={[styles.paymentCardDate, { writingDirection, textAlign }]}>{item.time}</Text>
                   </>
                 ) : null}
               </View>
             </View>
             {item.totalAfter != null && (
               <View style={styles.paymentTotalContainer}>
-                <Text style={styles.paymentTotalLabel}>{t('clientHome.totalPaid')}</Text>
-                <Text style={styles.paymentTotalValue}>₪{item.totalAfter}</Text>
+                <Text style={[styles.paymentTotalLabel, { writingDirection, textAlign }]}>{t('clientHome.totalPaid')}</Text>
+                <Text style={[styles.paymentTotalValue, { writingDirection, textAlign }]}>₪{item.totalAfter}</Text>
               </View>
             )}
           </View>
@@ -280,7 +283,7 @@ const ClientHistoryScreen = ({ navigation }) => {
       ) : (
         <View style={styles.loadingContainer}>
           <FontAwesome5 name="spinner" size={48} color="#3B82F6" />
-          <Text style={styles.loadingText}>{t('clientHome.loadingInfo')}</Text>
+          <Text style={[styles.loadingText, { writingDirection, textAlign }]}>{t('clientHome.loadingInfo')}</Text>
         </View>
       )}
     </SafeAreaView>

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+﻿import React, { useContext, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,8 @@ import { updatePassword, updateEmail, EmailAuthProvider, reauthenticateWithCrede
 import { doc, updateDoc, getDoc, deleteDoc, query, collection, where, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { useTranslation } from '../i18n/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
@@ -38,6 +40,7 @@ const ProfileScreen = ({ navigation }) => {
   const { user, userRole } = useContext(AuthContext);
   const { clients, workers } = useContext(DataContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   // Enable LayoutAnimation on Android
   if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -502,9 +505,9 @@ const ProfileScreen = ({ navigation }) => {
                 {displayName.substring(0, 2).toUpperCase()}
               </Text>
             </View>
-            <Text style={styles.displayName}>{displayName}</Text>
-            <Text style={styles.displayEmail}>{displayEmail}</Text>
-            <View style={[styles.roleBadgeLarge, { backgroundColor: roleInfo.color + '15', borderColor: roleInfo.color }]}>
+            <Text style={[styles.displayName, { writingDirection, textAlign }]}>{displayName}</Text>
+            <Text style={[styles.displayEmail, { writingDirection, textAlign }]}>{displayEmail}</Text>
+            <View style={[styles.roleBadgeLarge, { backgroundColor: roleInfo.color + '15', borderColor: roleInfo.color, flexDirection: rowDirection }]}>
               <FontAwesome5 name={roleInfo.icon} size={16} color={roleInfo.iconColor} solid style={styles.roleIconLarge} />
               <Text style={[styles.roleBadgeText, { color: roleInfo.color }]}>
                 {roleInfo.label}
@@ -515,30 +518,30 @@ const ProfileScreen = ({ navigation }) => {
           {/* Profile Information (Read-only) */}
           <AnimatedCard index={1} delay={150} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
-              <View style={styles.titleWithIcon}>
+              <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="clipboard-list" size={22} color={colors.primary.light} solid />
-                <Text style={styles.cardTitle}>{t('profile.accountInfo')}</Text>
+                <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('profile.accountInfo')}</Text>
               </View>
             </View>
             <View style={styles.infoContainer}>
               {/* Name Frame */}
-              <View style={styles.infoItemFrame}>
-                <Text style={styles.infoItemLabel}>{t('profile.name')} <Text style={styles.infoItemValue}>{displayName}</Text></Text>
+              <View style={[styles.infoItemFrame, { flexDirection: rowDirection }]}>
+                <Text style={[styles.infoItemLabel, { writingDirection, textAlign }]}>{t('profile.name')} <Text style={styles.infoItemValue}>{displayName}</Text></Text>
               </View>
 
               {/* Email Frame */}
-              <View style={styles.infoItemFrame}>
-                <Text style={styles.infoItemLabel}>{t('profile.emailLabel')} <Text style={styles.infoItemValue}>{displayEmail}</Text></Text>
+              <View style={[styles.infoItemFrame, { flexDirection: rowDirection }]}>
+                <Text style={[styles.infoItemLabel, { writingDirection, textAlign }]}>{t('profile.emailLabel')} <Text style={styles.infoItemValue}>{displayEmail}</Text></Text>
               </View>
 
               {/* Role Frame */}
-              <View style={[styles.infoItemFrame, { borderColor: roleInfo.color }]}>
-                <Text style={styles.infoItemLabel}>{t('profile.roleLabel')} <Text style={[styles.infoItemValue, { color: roleInfo.color }]}>{roleInfo.label}</Text></Text>
+              <View style={[styles.infoItemFrame, { borderColor: roleInfo.color, flexDirection: rowDirection }]}>
+                <Text style={[styles.infoItemLabel, { writingDirection, textAlign }]}>{t('profile.roleLabel')} <Text style={[styles.infoItemValue, { color: roleInfo.color }]}>{roleInfo.label}</Text></Text>
               </View>
             </View>
             <View style={styles.infoNote}>
               <FontAwesome5 name="info-circle" size={18} color={colors.status.info} solid style={styles.infoNoteIcon} />
-              <Text style={styles.infoNoteText}>
+              <Text style={[styles.infoNoteText, { writingDirection, textAlign }]}>
                 {userRole === 'admin'
                   ? t('profile.adminNameChangeNote')
                   : t('profile.nonAdminNameChangeNote')}
@@ -551,13 +554,13 @@ const ProfileScreen = ({ navigation }) => {
             <AnimatedCard index={2} delay={175} style={styles.card}>
               <View style={styles.sectionTitleContainer}>
                 <TouchableOpacity
-                  style={styles.sectionHeaderButton}
+                  style={[styles.sectionHeaderButton, { flexDirection: rowDirection }]}
                   onPress={() => toggleSection(setShowNameSection)}
                   activeOpacity={0.7}
                 >
-                  <View style={styles.titleWithIcon}>
+                  <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
                     <FontAwesome5 name="user-edit" size={20} color={colors.accent.teal} solid />
-                    <Text style={styles.cardTitle}>{t('profile.changeName')}</Text>
+                    <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('profile.changeName')}</Text>
                   </View>
                   <Ionicons name={showNameSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
                 </TouchableOpacity>
@@ -567,9 +570,9 @@ const ProfileScreen = ({ navigation }) => {
                 <View style={styles.framedContent}>
                   <View style={styles.formSection}>
                     <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>{t('profile.newName')}</Text>
+                      <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('profile.newName')}</Text>
                       <TextInput
-                        style={styles.input}
+                        style={[styles.input, { textAlign }]}
                         value={newName}
                         onChangeText={setNewName}
                         placeholder={t('profile.enterNewName')}
@@ -588,7 +591,7 @@ const ProfileScreen = ({ navigation }) => {
                       {loading ? (
                         <ActivityIndicator color={colors.text.primary} size="small" />
                       ) : (
-                        <Text style={styles.actionButtonText}>{t('profile.saveNewName')}</Text>
+                        <Text style={[styles.actionButtonText, { writingDirection, textAlign }]}>{t('profile.saveNewName')}</Text>
                       )}
                     </TouchableOpacity>
                   </View>
@@ -601,13 +604,13 @@ const ProfileScreen = ({ navigation }) => {
           <AnimatedCard index={userRole === 'admin' ? 3 : 2} delay={200} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <TouchableOpacity
-                style={styles.sectionHeaderButton}
+                style={[styles.sectionHeaderButton, { flexDirection: rowDirection }]}
                 onPress={() => toggleSection(setShowPasswordSection)}
                 activeOpacity={0.7}
               >
-                <View style={styles.titleWithIcon}>
+                <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="lock" size={22} color={colors.accent.amber} solid />
-                  <Text style={styles.cardTitle}>{t('profile.changePassword')}</Text>
+                  <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('profile.changePassword')}</Text>
                 </View>
                 <Ionicons name={showPasswordSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
@@ -617,9 +620,9 @@ const ProfileScreen = ({ navigation }) => {
               <View style={styles.framedContent}>
                 <View style={styles.formSection}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>{t('profile.currentPassword')}</Text>
+                    <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('profile.currentPassword')}</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[styles.input, { textAlign }]}
                       value={currentPassword}
                       onChangeText={setCurrentPassword}
                       secureTextEntry
@@ -631,9 +634,9 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>{t('profile.newPassword')}</Text>
+                    <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('profile.newPassword')}</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[styles.input, { textAlign }]}
                       value={newPassword}
                       onChangeText={setNewPassword}
                       secureTextEntry
@@ -645,9 +648,9 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>{t('profile.confirmNewPassword')}</Text>
+                    <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('profile.confirmNewPassword')}</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[styles.input, { textAlign }]}
                       value={confirmPassword}
                       onChangeText={setConfirmPassword}
                       secureTextEntry
@@ -667,7 +670,7 @@ const ProfileScreen = ({ navigation }) => {
                     {loading ? (
                       <ActivityIndicator color={colors.text.primary} size="small" />
                     ) : (
-                      <Text style={styles.actionButtonText}>{t('profile.saveNewPassword')}</Text>
+                      <Text style={[styles.actionButtonText, { writingDirection, textAlign }]}>{t('profile.saveNewPassword')}</Text>
                     )}
                   </TouchableOpacity>
                 </View>
@@ -679,13 +682,13 @@ const ProfileScreen = ({ navigation }) => {
           <AnimatedCard index={userRole === 'admin' ? 4 : 3} delay={250} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <TouchableOpacity
-                style={styles.sectionHeaderButton}
+                style={[styles.sectionHeaderButton, { flexDirection: rowDirection }]}
                 onPress={() => toggleSection(setShowEmailSection)}
                 activeOpacity={0.7}
               >
-                <View style={styles.titleWithIcon}>
+                <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="envelope" size={20} color={colors.status.error} solid />
-                  <Text style={styles.cardTitle}>{t('profile.changeEmail')}</Text>
+                  <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('profile.changeEmail')}</Text>
                 </View>
                 <Ionicons name={showEmailSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
@@ -695,9 +698,9 @@ const ProfileScreen = ({ navigation }) => {
               <View style={styles.framedContent}>
                 <View style={styles.formSection}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>{t('profile.currentPassword')}</Text>
+                    <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('profile.currentPassword')}</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[styles.input, { textAlign }]}
                       value={currentPassword}
                       onChangeText={setCurrentPassword}
                       secureTextEntry
@@ -709,9 +712,9 @@ const ProfileScreen = ({ navigation }) => {
                   </View>
 
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>{t('profile.newEmail')}</Text>
+                    <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('profile.newEmail')}</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[styles.input, { textAlign }]}
                       value={newEmail}
                       onChangeText={setNewEmail}
                       placeholder={t('profile.enterNewEmail')}
@@ -731,7 +734,7 @@ const ProfileScreen = ({ navigation }) => {
                     {loading ? (
                       <ActivityIndicator color={colors.text.primary} size="small" />
                     ) : (
-                      <Text style={styles.actionButtonText}>{t('profile.saveNewEmail')}</Text>
+                      <Text style={[styles.actionButtonText, { writingDirection, textAlign }]}>{t('profile.saveNewEmail')}</Text>
                     )}
                   </TouchableOpacity>
                 </View>
@@ -743,11 +746,11 @@ const ProfileScreen = ({ navigation }) => {
           <AnimatedCard index={userRole === 'admin' ? 5 : 4} delay={300} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <TouchableOpacity
-                style={styles.sectionHeaderButton}
+                style={[styles.sectionHeaderButton, { flexDirection: rowDirection }]}
                 onPress={() => toggleSection(setShowDeleteSection)}
                 activeOpacity={0.7}
               >
-                <View style={styles.titleWithIcon}>
+                <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="trash-alt" size={20} color={colors.status.error} solid />
                   <Text style={[styles.cardTitle, { color: colors.status.error }]}>{t('profile.deleteAccount')}</Text>
                 </View>
@@ -766,9 +769,9 @@ const ProfileScreen = ({ navigation }) => {
 
                 <View style={styles.formSection}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>{t('profile.passwordForConfirm')}</Text>
+                    <Text style={[styles.inputLabel, { writingDirection, textAlign }]}>{t('profile.passwordForConfirm')}</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[styles.input, { textAlign }]}
                       value={deletePassword}
                       onChangeText={setDeletePassword}
                       secureTextEntry
@@ -802,9 +805,9 @@ const ProfileScreen = ({ navigation }) => {
           {/* Language Switcher */}
           <AnimatedCard index={userRole === 'admin' ? 6 : 5} delay={350} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
-              <View style={styles.titleWithIcon}>
+              <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="globe" size={22} color={colors.primary.light} solid />
-                <Text style={styles.cardTitle}>{t('language.title')}</Text>
+                <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('language.title')}</Text>
               </View>
             </View>
             <View style={{ paddingHorizontal: spacing.lg, paddingBottom: spacing.lg }}>
@@ -815,9 +818,9 @@ const ProfileScreen = ({ navigation }) => {
           {/* Security Note */}
           <View style={styles.securityNote}>
             <FontAwesome5 name="shield-alt" size={22} color={colors.status.success} solid style={styles.securityNoteIcon} />
-            <Text style={styles.securityNoteText}>
+            <RTLText style={styles.securityNoteText}>
               {t('profile.securityNote')}
-            </Text>
+            </RTLText>
           </View>
 
           {/* Bottom spacing */}

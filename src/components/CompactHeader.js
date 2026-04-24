@@ -142,17 +142,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
-    // Compact height
     paddingTop: spacing.md,
     paddingBottom: spacing.md,
     paddingHorizontal: spacing.base,
+    // Subtle top highlight for depth
+    borderTopWidth: 0,
   },
   content: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    // Minimum height for accessibility (44dp)
-    minHeight: 44,
+    minHeight: 48,
   },
   userSection: {
     flexDirection: 'row',
@@ -161,31 +161,35 @@ const styles = StyleSheet.create({
     marginEnd: spacing.sm,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: borderRadius.xl,
+    width: 44,
+    height: 44,
+    borderRadius: borderRadius.xxl,
     alignItems: 'center',
     justifyContent: 'center',
     marginEnd: spacing.md,
     borderWidth: 2,
-    borderColor: colors.border.light,
+    borderColor: colors.border.medium,
+    ...shadows.sm,
   },
   avatarLoading: {
     backgroundColor: colors.background.tertiary,
+    borderColor: colors.border.light,
   },
   avatarText: {
-    fontSize: typography.size.base,
+    fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
+    letterSpacing: 0.5,
   },
   userInfo: {
     flex: 1,
     justifyContent: 'center',
   },
   welcomeText: {
-    fontSize: typography.size.lg,
+    fontSize: typography.size.md,
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
-    lineHeight: typography.size.lg * 1.4,
+    lineHeight: typography.size.md * 1.4,
+    letterSpacing: 0.2,
   },
   actionButtons: {
     flexDirection: 'row',
@@ -193,14 +197,17 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    borderRadius: borderRadius.sm,
-    backgroundColor: colors.background.tertiary,
+    paddingVertical: spacing.xs + 2,
+    borderRadius: borderRadius.md,
+    backgroundColor: colors.surface.elevated,
+    borderWidth: 1,
+    borderColor: colors.border.medium,
   },
   logoutText: {
-    color: colors.text.primary,
+    color: colors.text.secondary,
     fontSize: typography.size.sm,
-    fontWeight: typography.weight.bold,
+    fontWeight: typography.weight.semibold,
+    letterSpacing: 0.3,
   },
 });
 

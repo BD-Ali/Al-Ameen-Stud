@@ -37,7 +37,7 @@ const AnimatedCard = ({ children, index = 0, delay = 0, style, ...props }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.lg,
     overflow: 'hidden',
     ...shadows.md,
     borderWidth: 1,
@@ -48,8 +48,10 @@ const styles = StyleSheet.create({
     top: 0,
     start: 0,
     end: 0,
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    height: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderTopLeftRadius: borderRadius.lg,
+    borderTopRightRadius: borderRadius.lg,
   },
 });
 

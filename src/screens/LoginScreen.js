@@ -23,6 +23,8 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import { useFadeIn, useSlideInFromBottom, useScaleIn, createPressAnimation } from '../utils/animations';
 import { useTranslation } from '../i18n/LanguageContext';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 
 /**
  * LoginScreen provides authentication with sign in and sign up functionality.
@@ -38,6 +40,7 @@ const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const { t } = useTranslation();
+  const { textAlign, writingDirection } = useRTL();
 
   // Animation values
   const fadeAnim = useFadeIn(800);
@@ -109,9 +112,9 @@ const LoginScreen = ({ navigation }) => {
               />
             </View>
             <Text style={styles.title}>{t('auth.brandName')}</Text>
-            <Text style={styles.subtitle}>
+            <RTLText style={styles.subtitle}>
               {isSignUp ? t('auth.createClientAccount') : t('auth.welcomeBack')}
-            </Text>
+            </RTLText>
             <LanguageSwitcher style={styles.langSwitcher} />
           </View>
 
@@ -120,11 +123,11 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.cardReflection} />
             {isSignUp && (
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>{t('auth.fullName')}</Text>
+                <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.fullName')}</Text>
                 <View style={styles.inputWrapper}>
                   <FontAwesome5 name="user" size={18} color={colors.text.muted} solid style={styles.inputIcon} />
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { textAlign }]}
                     placeholder={t('auth.enterFullName')}
                     placeholderTextColor={colors.text.muted}
                     value={name}
@@ -137,11 +140,11 @@ const LoginScreen = ({ navigation }) => {
             )}
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('auth.email')}</Text>
+              <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.email')}</Text>
               <View style={styles.inputWrapper}>
                 <FontAwesome5 name="envelope" size={16} color={colors.text.muted} solid style={styles.inputIcon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { textAlign }]}
                   placeholder="your@email.com"
                   placeholderTextColor={colors.text.muted}
                   value={email}
@@ -154,11 +157,11 @@ const LoginScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>{t('auth.password')}</Text>
+              <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.password')}</Text>
               <View style={styles.inputWrapper}>
                 <FontAwesome5 name="lock" size={18} color={colors.text.muted} solid style={styles.inputIcon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { textAlign }]}
                   placeholder="••••••••"
                   placeholderTextColor={colors.text.muted}
                   value={password}

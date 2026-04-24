@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+﻿import React, { useState, useContext, useRef } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -26,6 +27,8 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import { uploadImageToCloudinary, getOptimizedImageUrl } from '../config/cloudinaryConfig';
 import AnimatedCard from '../components/AnimatedCard';
 import AnimatedButton from '../components/AnimatedButton';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 
@@ -34,6 +37,7 @@ import { useTranslation } from '../i18n/LanguageContext';
  */
 const Toast = ({ visible, message, type, onHide }) => {
   const translateY = useRef(new Animated.Value(-100)).current;
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   React.useEffect(() => {
     if (visible) {
@@ -66,14 +70,14 @@ const Toast = ({ visible, message, type, onHide }) => {
         { backgroundColor: bgColor, transform: [{ translateY }] },
       ]}
     >
-      <View style={styles.toastContent}>
+      <View style={[styles.toastContent, { flexDirection: rowDirection }]}>
         <FontAwesome5
           name={type === 'success' ? 'check-circle' : 'times-circle'}
           size={16}
           color="#fff"
           solid
         />
-        <Text style={styles.toastText}>{message}</Text>
+        <Text style={[styles.toastText, { writingDirection, textAlign }]}>{message}</Text>
       </View>
     </Animated.View>
   );
@@ -87,6 +91,7 @@ const AnnouncementsScreen = () => {
   const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useContext(DataContext);
   const { user } = useContext(AuthContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -111,7 +116,13 @@ const AnnouncementsScreen = () => {
     sendNotification: true,
   });
 
-  const tags = ['Update', 'Promo', 'Alert', 'Event', 'Info'];
+  const tags = [
+    { value: 'Update', label: t('announcements.tagUpdate') },
+    { value: 'Promo',  label: t('announcements.tagPromo') },
+    { value: 'Alert',  label: t('announcements.tagAlert') },
+    { value: 'Event',  label: t('announcements.tagEvent') },
+    { value: 'Info',   label: t('announcements.tagInfo') },
+  ];
   const audiences = [
     { value: 'all', label: t('announcements.everyone') },
     { value: 'clients', label: t('announcements.clientsOnly') },
@@ -383,14 +394,14 @@ const AnnouncementsScreen = () => {
     return (
       <AnimatedCard index={index} delay={80} style={styles.card}>
         {item.isPinned && (
-          <View style={styles.pinnedBadge}>
+          <View style={[styles.pinnedBadge, { flexDirection: rowDirection }]}>
             <FontAwesome5 name="thumbtack" size={12} color="#F39C12" solid />
-            <Text style={styles.pinnedText}>{t('common.pinned')}</Text>
+            <Text style={[styles.pinnedText, { writingDirection, textAlign }]}>{t('common.pinned')}</Text>
           </View>
         )}
 
-        <View style={styles.cardHeader}>
-          <View style={styles.cardTitleRow}>
+        <View style={[styles.cardHeader, { flexDirection: rowDirection }]}>
+          <View style={[styles.cardTitleRow, { flexDirection: rowDirection }]}>
             <FontAwesome5
               name={getTagIcon(item.tag).name}
               size={16}
@@ -398,56 +409,56 @@ const AnnouncementsScreen = () => {
               solid
               style={styles.cardTagIcon}
             />
-            <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
+            <RTLText style={styles.cardTitle} numberOfLines={2}>{item.title}</RTLText>
           </View>
           <View style={[styles.statusBadge, { backgroundColor: statusInfo.color + '20' }]}>
-            <Text style={[styles.statusText, { color: statusInfo.color }]}>
+            <Text style={[styles.statusText, { color: statusInfo.color }, { writingDirection, textAlign }]}>
               {statusInfo.label}
             </Text>
           </View>
         </View>
 
-        <Text style={styles.cardContent} numberOfLines={3}>{item.content}</Text>
+        <RTLText style={styles.cardContent} numberOfLines={3}>{item.content}</RTLText>
 
-        <View style={styles.cardMeta}>
-          <View style={styles.metaRow}>
+        <View style={[styles.cardMeta, { flexDirection: rowDirection }]}>
+          <View style={[styles.metaRow, { flexDirection: rowDirection }]}>
             <FontAwesome5 name="users" size={12} color={colors.text.tertiary} solid />
-            <Text style={styles.metaText}>{audienceLabel}</Text>
+            <Text style={[styles.metaText, { writingDirection, textAlign }]}>{audienceLabel}</Text>
           </View>
-          <Text style={styles.metaText}>
+          <Text style={[styles.metaText, { writingDirection, textAlign }]}>
             {item.createdAt ? formatDate(item.createdAt.toDate?.() || item.createdAt) : ''}
           </Text>
         </View>
 
         {item.scheduledDate && (
-          <Text style={styles.scheduledText}>
+          <Text style={[styles.scheduledText, { writingDirection, textAlign }]}>
             {t('announcements.scheduledAt', { date: formatDate(item.scheduledDate) })}
           </Text>
         )}
 
         {item.expiryDate && (
-          <Text style={styles.expiryText}>
+          <Text style={[styles.expiryText, { writingDirection, textAlign }]}>
             {t('announcements.expiresAt', { date: formatDate(item.expiryDate) })}
           </Text>
         )}
 
         {/* Notification Status */}
         {item.notificationSentAt && (
-          <View style={styles.notificationStatus}>
-            <Text style={styles.notificationText}>
+          <View style={[styles.notificationStatus, { flexDirection: rowDirection }]}>
+            <Text style={[styles.notificationText, { writingDirection, textAlign }]}>
               {t('announcements.notificationSent', { count: item.notificationSentCount || 0 })}
             </Text>
           </View>
         )}
 
-        <View style={styles.cardActions}>
+        <View style={[styles.cardActions, { flexDirection: rowDirection }]}>
           <TouchableOpacity
             style={[styles.actionButton, styles.editButton]}
             onPress={() => openEditModal(item)}
             accessibilityLabel={t('announcements.editAnnouncementAccessibility')}
             accessibilityRole="button"
           >
-            <Text style={styles.actionButtonText}>{t('announcements.editAction')}</Text>
+            <Text style={[styles.actionButtonText, { writingDirection, textAlign }]}>{t('announcements.editAction')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.actionButton, styles.deleteButton]}
@@ -455,12 +466,12 @@ const AnnouncementsScreen = () => {
             accessibilityLabel={t('announcements.deleteAnnouncementAccessibility')}
             accessibilityRole="button"
           >
-            <Text style={styles.actionButtonText}>{t('announcements.deleteAction')}</Text>
+            <Text style={[styles.actionButtonText, { writingDirection, textAlign }]}>{t('announcements.deleteAction')}</Text>
           </TouchableOpacity>
         </View>
 
         {item.lastEditedBy && (
-          <Text style={styles.editInfo}>
+          <Text style={[styles.editInfo, { writingDirection, textAlign }]}>
             {t('announcements.lastEditedBy', { name: item.lastEditedBy })}
           </Text>
         )}
@@ -479,18 +490,18 @@ const AnnouncementsScreen = () => {
       />
 
       {/* Header Stats */}
-      <View style={styles.statsRow}>
+      <View style={[styles.statsRow, { flexDirection: rowDirection }]}>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{announcements?.filter(a => a.status === 'published').length || 0}</Text>
-          <Text style={styles.statLabel}>{t('announcements.published')}</Text>
+          <Text style={[styles.statNumber, { writingDirection, textAlign }]}>{announcements?.filter(a => a.status === 'published').length || 0}</Text>
+          <Text style={[styles.statLabel, { writingDirection, textAlign }]}>{t('announcements.published')}</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{announcements?.filter(a => a.status === 'draft').length || 0}</Text>
-          <Text style={styles.statLabel}>{t('announcements.draft')}</Text>
+          <Text style={[styles.statNumber, { writingDirection, textAlign }]}>{announcements?.filter(a => a.status === 'draft').length || 0}</Text>
+          <Text style={[styles.statLabel, { writingDirection, textAlign }]}>{t('announcements.draft')}</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statNumber}>{announcements?.filter(a => a.isPinned).length || 0}</Text>
-          <Text style={styles.statLabel}>{t('common.pinned')}</Text>
+          <Text style={[styles.statNumber, { writingDirection, textAlign }]}>{announcements?.filter(a => a.isPinned).length || 0}</Text>
+          <Text style={[styles.statLabel, { writingDirection, textAlign }]}>{t('common.pinned')}</Text>
         </View>
       </View>
 
@@ -501,8 +512,8 @@ const AnnouncementsScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <FontAwesome5 name="bullhorn" size={64} color="#95A5A6" solid />
-            <Text style={styles.emptyText}>{t('announcements.noAnnouncementsYet')}</Text>
-            <Text style={styles.emptySubtext}>{t('announcements.startCreating')}</Text>
+            <RTLText style={styles.emptyText}>{t('announcements.noAnnouncementsYet')}</RTLText>
+            <RTLText style={styles.emptySubtext}>{t('announcements.startCreating')}</RTLText>
           </View>
         }
         contentContainerStyle={[
@@ -532,14 +543,16 @@ const AnnouncementsScreen = () => {
           }
         }}
       >
-        <SafeAreaView style={styles.modalContainer} edges={['top', 'bottom']}>
+        <SafeAreaProvider>
+        <SafeAreaView style={styles.modalContainer}>
           <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={styles.keyboardAvoid}
             keyboardVerticalOffset={0}
+            enabled={Platform.OS === 'ios'}
           >
             {/* Modal Header with Safe Area */}
-            <View style={styles.modalHeader}>
+            <View style={[styles.modalHeader, { flexDirection: rowDirection }]}>
               <TouchableOpacity
                 onPress={() => !isSubmitting && setModalVisible(false)}
                 style={styles.closeButtonContainer}
@@ -554,7 +567,7 @@ const AnnouncementsScreen = () => {
                   solid
                 />
               </TouchableOpacity>
-              <Text style={styles.modalTitle}>
+              <Text style={[styles.modalTitle, { writingDirection, textAlign }]}>
                 {previewMode ? t('announcements.preview') : editingId ? t('announcements.editAnnouncement') : t('announcements.newAnnouncement')}
               </Text>
               <TouchableOpacity
@@ -578,12 +591,12 @@ const AnnouncementsScreen = () => {
                 <View style={styles.previewContainer}>
                   <View style={styles.previewCard}>
                     {formData.isPinned && (
-                      <View style={styles.pinnedBadge}>
+                      <View style={[styles.pinnedBadge, { flexDirection: rowDirection }]}>
                         <FontAwesome5 name="thumbtack" size={12} color="#F39C12" solid />
-                        <Text style={styles.pinnedText}>{t('common.pinned')}</Text>
+                        <Text style={[styles.pinnedText, { writingDirection, textAlign }]}>{t('common.pinned')}</Text>
                       </View>
                     )}
-                    <View style={styles.previewHeader}>
+                    <View style={[styles.previewHeader, { flexDirection: rowDirection }]}>
                       <FontAwesome5
                         name={getTagIcon(formData.tag).name}
                         size={18}
@@ -591,7 +604,7 @@ const AnnouncementsScreen = () => {
                         solid
                         style={styles.previewTagIcon}
                       />
-                      <Text style={styles.previewTitle}>{formData.title || t('announcements.announcementTitle')}</Text>
+                      <Text style={[styles.previewTitle, { writingDirection, textAlign }]}>{formData.title || t('announcements.announcementTitle')}</Text>
                     </View>
                     {formData.imageUri && (
                       <Image
@@ -600,10 +613,10 @@ const AnnouncementsScreen = () => {
                         resizeMode="cover"
                       />
                     )}
-                    <Text style={styles.previewContent}>{formData.content || t('announcements.announcementContent')}</Text>
+                    <Text style={[styles.previewContent, { writingDirection, textAlign }]}>{formData.content || t('announcements.announcementContent')}</Text>
                     {formData.linkUrl && (
                       <TouchableOpacity style={styles.previewLink}>
-                        <Text style={styles.previewLinkText}>
+                        <Text style={[styles.previewLinkText, { writingDirection, textAlign }]}>
                           {formData.linkText || t('announcements.linkTextPlaceholder')} <FontAwesome5 name="external-link-alt" size={12} color={colors.primary.main} />
                         </Text>
                       </TouchableOpacity>
@@ -613,9 +626,9 @@ const AnnouncementsScreen = () => {
               ) : (
                 <>
                   {/* Title */}
-                  <Text style={styles.label}>{t('announcements.titleLabel')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.titleLabel')}</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { textAlign }]}
                     value={formData.title}
                     onChangeText={(text) => setFormData({ ...formData, title: text })}
                     placeholder={t('announcements.titlePlaceholder')}
@@ -626,9 +639,9 @@ const AnnouncementsScreen = () => {
                   />
 
                   {/* Content */}
-                  <Text style={styles.label}>{t('announcements.contentLabel')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.contentLabel')}</Text>
                   <TextInput
-                    style={[styles.input, styles.textArea]}
+                    style={[styles.input, styles.textArea, { textAlign }]}
                     value={formData.content}
                     onChangeText={(text) => setFormData({ ...formData, content: text })}
                     placeholder={t('announcements.contentPlaceholder')}
@@ -641,7 +654,7 @@ const AnnouncementsScreen = () => {
                   />
 
                   {/* Image Upload */}
-                  <Text style={styles.label}>{t('announcements.uploadImage')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.uploadImage')}</Text>
                   {formData.imageUri ? (
                     <View style={styles.imagePreviewContainer}>
                       <Image
@@ -650,12 +663,12 @@ const AnnouncementsScreen = () => {
                         resizeMode="cover"
                       />
                       <TouchableOpacity
-                        style={styles.removeImageButton}
+                        style={[styles.removeImageButton, { flexDirection: rowDirection }]}
                         onPress={removeImage}
                         disabled={isSubmitting}
                       >
                         <FontAwesome5 name="trash-alt" size={12} color="#E74C3C" solid />
-                        <Text style={styles.removeImageText}> {t('announcements.removeImage')}</Text>
+                        <Text style={[styles.removeImageText, { writingDirection, textAlign }]}> {t('announcements.removeImage')}</Text>
                       </TouchableOpacity>
                     </View>
                   ) : (
@@ -667,15 +680,15 @@ const AnnouncementsScreen = () => {
                       {uploadingImage ? (
                         <ActivityIndicator size="small" color={colors.primary.main} />
                       ) : (
-                        <Text style={styles.imageUploadText}>{t('announcements.chooseImage')}</Text>
+                        <Text style={[styles.imageUploadText, { writingDirection, textAlign }]}>{t('announcements.chooseImage')}</Text>
                       )}
                     </TouchableOpacity>
                   )}
 
                   {/* Link */}
-                  <Text style={styles.label}>{t('announcements.linkLabel')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.linkLabel')}</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { textAlign }]}
                     value={formData.linkUrl}
                     onChangeText={(text) => setFormData({ ...formData, linkUrl: text })}
                     placeholder={t('announcements.linkPlaceholder')}
@@ -685,9 +698,9 @@ const AnnouncementsScreen = () => {
 
                   {formData.linkUrl && (
                     <>
-                      <Text style={styles.label}>{t('announcements.linkTextLabel')}</Text>
+                      <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.linkTextLabel')}</Text>
                       <TextInput
-                        style={styles.input}
+                        style={[styles.input, { textAlign }]}
                         value={formData.linkText}
                         onChangeText={(text) => setFormData({ ...formData, linkText: text })}
                         placeholder={t('announcements.linkTextPlaceholder')}
@@ -698,30 +711,31 @@ const AnnouncementsScreen = () => {
                   )}
 
                   {/* Tag */}
-                  <Text style={styles.label}>{t('announcements.tagLabel')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.tagLabel')}</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagScroll}>
                     {tags.map((tag) => (
                       <TouchableOpacity
-                        key={tag}
+                        key={tag.value}
                         style={[
                           styles.tagChip,
-                          formData.tag === tag && styles.tagChipActive,
+                          formData.tag === tag.value && styles.tagChipActive,
                         ]}
-                        onPress={() => setFormData({ ...formData, tag })}
+                        onPress={() => setFormData({ ...formData, tag: tag.value })}
                         disabled={isSubmitting}
                       >
-                        <View style={styles.tagChipContent}>
+                        <View style={[styles.tagChipContent, { flexDirection: rowDirection }]}>
                           <FontAwesome5
-                            name={getTagIcon(tag).name}
+                            name={getTagIcon(tag.value).name}
                             size={14}
-                            color={formData.tag === tag ? colors.primary.main : getTagIcon(tag).color}
+                            color={formData.tag === tag.value ? colors.primary.main : getTagIcon(tag.value).color}
                             solid
                           />
                           <Text style={[
                             styles.tagChipText,
-                            formData.tag === tag && styles.tagChipTextActive,
+                            formData.tag === tag.value && styles.tagChipTextActive,
+                            { writingDirection, textAlign },
                           ]}>
-                            {tag}
+                            {tag.label}
                           </Text>
                         </View>
                       </TouchableOpacity>
@@ -729,7 +743,7 @@ const AnnouncementsScreen = () => {
                   </ScrollView>
 
                   {/* Target Audience */}
-                  <Text style={styles.label}>{t('announcements.targetAudience')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.targetAudience')}</Text>
                   <View style={styles.audienceGrid}>
                     {audiences.map((aud) => (
                       <TouchableOpacity
@@ -744,6 +758,7 @@ const AnnouncementsScreen = () => {
                         <Text style={[
                           styles.audienceChipText,
                           formData.targetAudience === aud.value && styles.audienceChipTextActive,
+                          { writingDirection, textAlign },
                         ]}>
                           {aud.label}
                         </Text>
@@ -752,7 +767,7 @@ const AnnouncementsScreen = () => {
                   </View>
 
                   {/* Status */}
-                  <Text style={styles.label}>{t('announcements.statusLabel')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.statusLabel')}</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagScroll}>
                     {statusOptions.map((status) => (
                       <TouchableOpacity
@@ -767,6 +782,7 @@ const AnnouncementsScreen = () => {
                         <Text style={[
                           styles.statusChipText,
                           formData.status === status.value && { color: status.color },
+                          { writingDirection, textAlign },
                         ]}>
                           {status.label}
                         </Text>
@@ -775,7 +791,7 @@ const AnnouncementsScreen = () => {
                   </ScrollView>
 
                   {/* Pin Toggle */}
-                  <View style={styles.switchRow}>
+                  <View style={[styles.switchRow, { flexDirection: rowDirection }]}>
                     <Switch
                       value={formData.isPinned}
                       onValueChange={(value) => setFormData({ ...formData, isPinned: value })}
@@ -783,17 +799,17 @@ const AnnouncementsScreen = () => {
                       thumbColor={formData.isPinned ? colors.primary.main : colors.text.muted}
                       disabled={isSubmitting}
                     />
-                    <Text style={styles.switchLabel}>{t('announcements.pinAnnouncement')}</Text>
+                    <Text style={[styles.switchLabel, { writingDirection, textAlign }]}>{t('announcements.pinAnnouncement')}</Text>
                   </View>
 
                   {/* Scheduled Date */}
-                  <Text style={styles.label}>{t('announcements.scheduleDateLabel')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.scheduleDateLabel')}</Text>
                   <TouchableOpacity
                     style={styles.dateButton}
                     onPress={() => setShowStartPicker(true)}
                     disabled={isSubmitting}
                   >
-                    <Text style={styles.dateButtonText}>
+                    <Text style={[styles.dateButtonText, { writingDirection, textAlign }]}>
                       {formData.scheduledDate ? formatDate(formData.scheduledDate) : t('announcements.publishNow')}
                     </Text>
                   </TouchableOpacity>
@@ -802,7 +818,7 @@ const AnnouncementsScreen = () => {
                       onPress={() => setFormData({ ...formData, scheduledDate: null })}
                       disabled={isSubmitting}
                     >
-                      <Text style={styles.clearDate}>{t('announcements.clearDate')}</Text>
+                      <Text style={[styles.clearDate, { writingDirection, textAlign }]}>{t('announcements.clearDate')}</Text>
                     </TouchableOpacity>
                   )}
 
@@ -821,13 +837,13 @@ const AnnouncementsScreen = () => {
                   )}
 
                   {/* Expiry Date */}
-                  <Text style={styles.label}>{t('announcements.expiryDateLabel')}</Text>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('announcements.expiryDateLabel')}</Text>
                   <TouchableOpacity
                     style={styles.dateButton}
                     onPress={() => setShowEndPicker(true)}
                     disabled={isSubmitting}
                   >
-                    <Text style={styles.dateButtonText}>
+                    <Text style={[styles.dateButtonText, { writingDirection, textAlign }]}>
                       {formData.expiryDate ? formatDate(formData.expiryDate) : t('announcements.noExpiryDate')}
                     </Text>
                   </TouchableOpacity>
@@ -836,7 +852,7 @@ const AnnouncementsScreen = () => {
                       onPress={() => setFormData({ ...formData, expiryDate: null })}
                       disabled={isSubmitting}
                     >
-                      <Text style={styles.clearDate}>{t('announcements.clearDate')}</Text>
+                      <Text style={[styles.clearDate, { writingDirection, textAlign }]}>{t('announcements.clearDate')}</Text>
                     </TouchableOpacity>
                   )}
 
@@ -856,7 +872,7 @@ const AnnouncementsScreen = () => {
                   )}
 
                   {/* Notification Toggle */}
-                  <View style={styles.switchRow}>
+                  <View style={[styles.switchRow, { flexDirection: rowDirection }]}>
                     <Switch
                       value={formData.sendNotification}
                       onValueChange={(value) => setFormData({ ...formData, sendNotification: value })}
@@ -864,7 +880,7 @@ const AnnouncementsScreen = () => {
                       thumbColor={formData.sendNotification ? colors.primary.main : colors.text.muted}
                       disabled={isSubmitting}
                     />
-                    <Text style={styles.switchLabel}>{t('announcements.sendNotification')}</Text>
+                    <Text style={[styles.switchLabel, { writingDirection, textAlign }]}>{t('announcements.sendNotification')}</Text>
                   </View>
 
                   {/* Extra padding for keyboard */}
@@ -875,7 +891,7 @@ const AnnouncementsScreen = () => {
 
             {/* Fixed Footer with Safe Area */}
             {!previewMode && (
-              <View style={styles.modalFooter}>
+              <View style={[styles.modalFooter, { flexDirection: rowDirection }]}>
                 <TouchableOpacity
                   style={[styles.saveButton, isSubmitting && styles.disabledButton]}
                   onPress={handleSave}
@@ -886,14 +902,14 @@ const AnnouncementsScreen = () => {
                   {isSubmitting ? (
                     <ActivityIndicator size="small" color={colors.text.primary} />
                   ) : (
-                    <View style={styles.saveButtonContent}>
+                    <View style={[styles.saveButtonContent, { flexDirection: rowDirection }]}>
                       <FontAwesome5
                         name={editingId ? 'check' : 'paper-plane'}
                         size={14}
                         color={colors.text.primary}
                         solid
                       />
-                      <Text style={styles.saveButtonText}>
+                      <Text style={[styles.saveButtonText, { writingDirection, textAlign }]}>
                         {editingId ? t('common.update') : t('common.publish')}
                       </Text>
                     </View>
@@ -903,6 +919,7 @@ const AnnouncementsScreen = () => {
             )}
           </KeyboardAvoidingView>
         </SafeAreaView>
+        </SafeAreaProvider>
       </Modal>
     </View>
   );
@@ -1413,7 +1430,6 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.sm,
   },
   removeImageButton: {
-    flexDirection: 'row',
     alignItems: 'center',
     position: 'absolute',
     top: 8,

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+﻿import React, { useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Linking, Image, ScrollView, Animated, I18nManager, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
@@ -7,6 +7,8 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import CompactHeader from '../components/CompactHeader';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { useFadeIn, usePulse } from '../utils/animations';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -20,6 +22,7 @@ const ClientHomeScreen = ({ navigation }) => {
   const { clients, horses, workers, getScheduledLessons } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   // Animations
   const fadeAnim = useFadeIn(600);
@@ -134,10 +137,10 @@ const ClientHomeScreen = ({ navigation }) => {
               {/* Subscription Card - Only show if client has subscription */}
               {selectedClient.hasSubscription && (
                 <AnimatedCard index={0} delay={100} style={styles.subscriptionCard}>
-                  <View style={styles.subscriptionHeader}>
-                    <View style={styles.subscriptionTitleContainer}>
+                  <View style={[styles.subscriptionHeader, { flexDirection: rowDirection }]}>
+                    <View style={[styles.subscriptionTitleContainer, { flexDirection: rowDirection }]}>
                       <FontAwesome5 name="ticket-alt" size={18} color="#9B59B6" solid />
-                      <Text style={styles.subscriptionTitle}>{t('clientHome.clinicSubscription')}</Text>
+                      <RTLText style={styles.subscriptionTitle}>{t('clientHome.clinicSubscription')}</RTLText>
                     </View>
                     <View style={[styles.subscriptionStatusBadge, selectedClient.subscriptionActive && styles.subscriptionActiveBadge]}>
                       <FontAwesome5
@@ -146,34 +149,34 @@ const ClientHomeScreen = ({ navigation }) => {
                         color="#fff"
                         solid
                       />
-                      <Text style={styles.subscriptionStatusText}>
+                      <Text style={[styles.subscriptionStatusText, { writingDirection, textAlign }]}>
                         {selectedClient.subscriptionActive ? ` ${t('clientHome.active')}` : ` ${t('clientHome.expired')}`}
                       </Text>
                     </View>
                   </View>
                   <View style={styles.subscriptionStats}>
                     <View style={styles.subscriptionStatItem}>
-                      <Text style={styles.subscriptionStatLabel}>{t('clientHome.remainingLessons')}</Text>
-                      <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionLessons || 0}</Text>
+                      <Text style={[styles.subscriptionStatLabel, { writingDirection, textAlign }]}>{t('clientHome.remainingLessons')}</Text>
+                      <Text style={[styles.subscriptionStatValue, { writingDirection, textAlign }]}>{selectedClient.subscriptionLessons || 0}</Text>
                     </View>
                     <View style={styles.subscriptionDivider} />
                     <View style={styles.subscriptionStatItem}>
-                      <Text style={styles.subscriptionStatLabel}>{t('clientHome.usedLessons')}</Text>
-                      <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionUsedLessons || 0}</Text>
+                      <Text style={[styles.subscriptionStatLabel, { writingDirection, textAlign }]}>{t('clientHome.usedLessons')}</Text>
+                      <Text style={[styles.subscriptionStatValue, { writingDirection, textAlign }]}>{selectedClient.subscriptionUsedLessons || 0}</Text>
                     </View>
                     <View style={styles.subscriptionDivider} />
                     <View style={styles.subscriptionStatItem}>
-                      <Text style={styles.subscriptionStatLabel}>{t('clientHome.totalLessons')}</Text>
-                      <Text style={styles.subscriptionStatValue}>{selectedClient.subscriptionTotalLessons || 0}</Text>
+                      <Text style={[styles.subscriptionStatLabel, { writingDirection, textAlign }]}>{t('clientHome.totalLessons')}</Text>
+                      <Text style={[styles.subscriptionStatValue, { writingDirection, textAlign }]}>{selectedClient.subscriptionTotalLessons || 0}</Text>
                     </View>
                   </View>
                   {selectedClient.subscriptionStartDate && (
                     <View style={styles.subscriptionFooter}>
-                      <View style={styles.subscriptionDateRow}>
+                      <View style={[styles.subscriptionDateRow, { flexDirection: rowDirection }]}>
                         <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                        <Text style={styles.subscriptionDate}>
+                        <RTLText style={[styles.subscriptionDate, { writingDirection, textAlign }]}>
                           {t('clientHome.startDate')} {formatDate(selectedClient.subscriptionStartDate)}
-                        </Text>
+                        </RTLText>
                       </View>
                     </View>
                   )}
@@ -183,13 +186,13 @@ const ClientHomeScreen = ({ navigation }) => {
               {/* Horses Gallery Section */}
               {horses && horses.length > 0 && (
                 <>
-                  <View style={styles.horsesHeader}>
-                    <View style={styles.sectionTitleRow}>
+                  <View style={[styles.horsesHeader, { flexDirection: rowDirection }]}>
+                    <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
                       <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
-                      <Text style={styles.sectionTitle}>{t('workerHome.ourHorses')}</Text>
+                      <RTLText style={styles.sectionTitle}>{t('workerHome.ourHorses')}</RTLText>
                     </View>
                     <View style={styles.horsesBadge}>
-                      <Text style={styles.horsesBadgeText}>{horses.length}</Text>
+                      <Text style={[styles.horsesBadgeText, { writingDirection, textAlign }]}>{horses.length}</Text>
                     </View>
                   </View>
                   <ScrollView
@@ -212,8 +215,8 @@ const ClientHomeScreen = ({ navigation }) => {
                           </View>
                         )}
                         <View style={styles.horseCardCompactInfo}>
-                          <Text style={styles.horseCardCompactName}>{horse.name}</Text>
-                          <Text style={styles.horseCardCompactBreed}>{horse.breed}</Text>
+                          <RTLText style={styles.horseCardCompactName}>{horse.name}</RTLText>
+                          <RTLText style={styles.horseCardCompactBreed}>{horse.breed}</RTLText>
                         </View>
                       </AnimatedCard>
                     ))}
@@ -222,13 +225,13 @@ const ClientHomeScreen = ({ navigation }) => {
               )}
 
               {/* Upcoming Lessons Section */}
-              <View style={styles.lessonsHeader}>
-                <View style={styles.sectionTitleRow}>
+              <View style={[styles.lessonsHeader, { flexDirection: rowDirection }]}>
+                <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="calendar-check" size={22} color="#9B59B6" solid />
-                  <Text style={styles.sectionTitle}>{t('clientHome.upcomingLessons')}</Text>
+                  <RTLText style={styles.sectionTitle}>{t('clientHome.upcomingLessons')}</RTLText>
                 </View>
                 <View style={styles.lessonsBadge}>
-                  <Text style={styles.lessonsBadgeText}>{upcomingLessons.length}</Text>
+                  <Text style={[styles.lessonsBadgeText, { writingDirection, textAlign }]}>{upcomingLessons.length}</Text>
                 </View>
               </View>
             </>
@@ -241,28 +244,28 @@ const ClientHomeScreen = ({ navigation }) => {
             >
               <View style={styles.lessonHeader}>
                 <View style={styles.lessonDateContainer}>
-                  <View style={styles.lessonDateRow}>
+                  <View style={[styles.lessonDateRow, { flexDirection: rowDirection }]}>
                     <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
-                    <Text style={styles.lessonDate}>{formatDate(item.date)}</Text>
+                    <Text style={[styles.lessonDate, { writingDirection, textAlign }]}>{formatDate(item.date)}</Text>
                   </View>
                   <View style={styles.scheduledBadge}>
                     <FontAwesome5 name="hourglass-half" size={12} color="#F39C12" solid />
-                    <Text style={styles.scheduledBadgeText}> {t('clientHome.scheduled')}</Text>
+                    <Text style={[styles.scheduledBadgeText, { writingDirection, textAlign }]}> {t('clientHome.scheduled')}</Text>
                   </View>
                 </View>
-                <View style={styles.lessonTimeRow}>
+                <View style={[styles.lessonTimeRow, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
-                  <Text style={styles.lessonTime}>{item.time}</Text>
+                  <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
                 </View>
               </View>
               <View style={styles.lessonDetails}>
-                <View style={styles.lessonDetail}>
+                <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
                   <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
-                  <Text style={styles.lessonDetailText}>{getHorseName(item.horseId)}</Text>
+                  <Text style={[styles.lessonDetailText, { writingDirection, textAlign }]}>{getHorseName(item.horseId)}</Text>
                 </View>
-                <View style={styles.lessonDetail}>
+                <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
                   <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
-                  <Text style={styles.lessonDetailText}>{getWorkerName(item.instructorId)}</Text>
+                  <Text style={[styles.lessonDetailText, { writingDirection, textAlign }]}>{getWorkerName(item.instructorId)}</Text>
                 </View>
               </View>
             </AnimatedCard>
@@ -270,8 +273,8 @@ const ClientHomeScreen = ({ navigation }) => {
           ListEmptyComponent={
             <View style={styles.emptyState}>
               <FontAwesome5 name="calendar-times" size={48} color="#95A5A6" solid />
-              <Text style={styles.emptyText}>{t('clientHome.noScheduledLessons')}</Text>
-              <Text style={styles.emptySubtext}>{t('clientHome.contactToBook')}</Text>
+              <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('clientHome.noScheduledLessons')}</RTLText>
+              <RTLText style={[styles.emptySubtext, { writingDirection, textAlign }]}>{t('clientHome.contactToBook')}</RTLText>
             </View>
           }
           contentContainerStyle={styles.content}
@@ -279,7 +282,7 @@ const ClientHomeScreen = ({ navigation }) => {
       ) : (
         <View style={styles.loadingContainer}>
           <FontAwesome5 name="spinner" size={48} color="#3B82F6" />
-          <Text style={styles.loadingText}>{t('clientHome.loadingInfo')}</Text>
+          <Text style={[styles.loadingText, { writingDirection, textAlign }]}>{t('clientHome.loadingInfo')}</Text>
         </View>
       )}
 

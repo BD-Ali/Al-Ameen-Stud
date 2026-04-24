@@ -3,6 +3,8 @@ import { View, Text, FlatList, StyleSheet, Platform } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 
@@ -12,6 +14,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 const FeedScreen = () => {
   const { horses } = useContext(DataContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   return (
     <View style={styles.container}>
@@ -19,10 +22,10 @@ const FeedScreen = () => {
         data={horses}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={
-          <View style={styles.headerSection}>
-            <View style={styles.titleRow}>
+          <View style={[styles.headerSection, { flexDirection: rowDirection }]}>
+            <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
               <FontAwesome5 name="carrot" size={24} color="#FF9800" solid />
-              <Text style={styles.pageTitle}>{t('feed.title')}</Text>
+              <RTLText style={styles.pageTitle}>{t('feed.title')}</RTLText>
             </View>
             <View style={styles.countBadge}>
               <Text style={styles.countText}>{horses.length}</Text>
@@ -31,18 +34,18 @@ const FeedScreen = () => {
         }
         renderItem={({ item, index }) => (
           <AnimatedCard index={index} delay={80} style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.horseName}>{item.name}</Text>
+            <View style={[styles.cardHeader, { flexDirection: rowDirection }]}>
+              <RTLText style={styles.horseName}>{item.name}</RTLText>
               <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
             </View>
             <View style={styles.scheduleContainer}>
-              <View style={styles.scheduleLabelRow}>
+              <View style={[styles.scheduleLabelRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="clipboard-list" size={14} color="#64748b" solid />
-                <Text style={styles.scheduleLabel}>{t('feed.feedTimes')}</Text>
+                <Text style={[styles.scheduleLabel, { writingDirection, textAlign }]}>{t('feed.feedTimes')}</Text>
               </View>
-              <Text style={styles.scheduleValue}>
+              <RTLText style={styles.scheduleValue}>
                 {item.feedSchedule || t('feed.noScheduleSet')}
-              </Text>
+              </RTLText>
             </View>
           </AnimatedCard>
         )}
@@ -50,8 +53,8 @@ const FeedScreen = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <FontAwesome5 name="carrot" size={48} color="#FF9800" solid />
-            <Text style={styles.emptyText}>{t('feed.noFeedSchedules')}</Text>
-            <Text style={styles.emptySubtext}>{t('feed.addHorsesForFeed')}</Text>
+            <RTLText style={styles.emptyText}>{t('feed.noFeedSchedules')}</RTLText>
+            <RTLText style={styles.emptySubtext}>{t('feed.addHorsesForFeed')}</RTLText>
           </View>
         }
       />

@@ -6,10 +6,10 @@
 export const colors = {
   // Background colors - Deep, rich tones for professional look
   background: {
-    primary: '#0a0e1a',      // Very deep navy - main background
-    secondary: '#141b2d',    // Deep slate blue - cards and sections
-    tertiary: '#1f2937',     // Charcoal gray - subtle highlights
-    overlay: 'rgba(10, 14, 26, 0.95)', // For modals
+    primary: '#080c18',      // Very deep navy - main background
+    secondary: '#111827',    // Deep slate - cards and sections
+    tertiary: '#1a2234',     // Charcoal - subtle highlights
+    overlay: 'rgba(8, 12, 24, 0.97)', // For modals
   },
 
   // Text colors - High contrast for readability
@@ -48,16 +48,18 @@ export const colors = {
 
   // Border colors - Subtle and refined
   border: {
-    light: '#1f2937',        // Subtle border
-    medium: '#374151',       // Medium border
+    light: '#1e2d42',        // Subtle border
+    medium: '#2d3f57',       // Medium border
     focus: '#3b82f6',        // Focus state
+    highlight: 'rgba(255, 255, 255, 0.07)', // Top card highlight
   },
 
   // Semantic colors for specific uses
   surface: {
-    elevated: '#1a2332',     // Elevated cards
-    hover: '#222d3f',        // Hover states
-    pressed: '#1a2433',      // Pressed states
+    elevated: '#16213a',     // Elevated cards
+    hover: '#1e2d42',        // Hover states
+    pressed: '#0e1a2e',      // Pressed states
+    glass: 'rgba(255, 255, 255, 0.04)', // Frosted glass overlay
   },
 
   // Icon colors for semantic differentiation across the app
@@ -74,7 +76,7 @@ export const colors = {
     feed: '#FF9800',         // Feed / carrot icons
     breed: '#E67E22',        // Breed / chart icons
     task: '#3B82F6',         // Task / clipboard icons
-    muted: '#95A5A6',        // Empty state icons
+    muted: '#64748b',        // Empty state icons
     onWhite: '#ffffff',      // Icons on colored backgrounds
   },
 };
@@ -129,23 +131,46 @@ export const shadows = {
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 3,
   },
   md: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 6,
   },
   lg: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.45,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  xl: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.5,
+    shadowRadius: 28,
+    elevation: 16,
+  },
+  // Blue-tinted shadow for primary action elements
+  primary: {
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  // Success-tinted shadow for positive elements
+  success: {
+    shadowColor: '#10b981',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
   },
 };
 

@@ -9,6 +9,7 @@ import {
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
+import useRTL from '../hooks/useRTL';
 
 /**
  * InAppNotificationBanner - Shows notification banner when user is active in app
@@ -24,6 +25,7 @@ const InAppNotificationBanner = ({
   type = 'announcement'
 }) => {
   const { t } = useTranslation();
+  const { writingDirection, textAlign } = useRTL();
   const slideAnim = useRef(new Animated.Value(-100)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const dismissTimer = useRef(null);
@@ -125,10 +127,10 @@ const InAppNotificationBanner = ({
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.title} numberOfLines={1}>
+          <Text style={[styles.title, { writingDirection, textAlign }]} numberOfLines={1}>
             {title}
           </Text>
-          <Text style={styles.body} numberOfLines={2}>
+          <Text style={[styles.body, { writingDirection, textAlign }]} numberOfLines={2}>
             {body}
           </Text>
         </View>
@@ -160,26 +162,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface.elevated,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 16,
+    elevation: 12,
     borderStartWidth: 4,
     borderStartColor: colors.primary.main,
+    borderWidth: 1,
+    borderColor: colors.border.light,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
+    width: 42,
+    height: 42,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.primary.main + '20',
+    backgroundColor: colors.primary.main + '25',
     justifyContent: 'center',
     alignItems: 'center',
-    marginEnd: spacing.sm,
+    marginEnd: spacing.md,
   },
-
   content: {
     flex: 1,
     marginEnd: spacing.sm,
@@ -190,6 +193,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
     marginBottom: spacing.xs,
     lineHeight: typography.size.md * 1.4,
+    letterSpacing: 0.2,
   },
   body: {
     fontSize: typography.size.sm,
@@ -197,14 +201,13 @@ const styles = StyleSheet.create({
     lineHeight: typography.size.sm * 1.5,
   },
   dismissButton: {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
     borderRadius: borderRadius.full,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.text.muted + '20',
+    backgroundColor: colors.border.light,
   },
-
 });
 
 export default InAppNotificationBanner;

@@ -1,10 +1,13 @@
-import React, { useContext } from 'react';
+﻿import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated, I18nManager, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLText from '../components/RTLText';
+import RTLRow from '../components/RTLRow';
+import useRTL from '../hooks/useRTL';
 import { useFadeIn, useScaleIn, usePulse } from '../utils/animations';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -18,6 +21,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 const VisitorHomeScreen = () => {
   const { horses } = useContext(DataContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   // Animations
   const fadeAnim = useFadeIn(700);
@@ -77,8 +81,8 @@ const VisitorHomeScreen = () => {
             />
             <View style={styles.logoReflection} />
           </View>
-          <Text style={styles.heading}>{t('visitorHome.welcomeMessage')}</Text>
-          <Text style={styles.paragraph}>
+          <Text style={[styles.heading, { writingDirection, textAlign }]}>{t('visitorHome.welcomeMessage')}</Text>
+          <Text style={[styles.paragraph, { writingDirection, textAlign }]}>
             {t('visitorHome.description')}
           </Text>
         </Animated.View>
@@ -86,9 +90,9 @@ const VisitorHomeScreen = () => {
         {/* Announcements Feed */}
         <AnnouncementsFeed userRole="visitor" />
 
-        <View style={styles.subheadingRow}>
+        <View style={[styles.subheadingRow, { flexDirection: rowDirection }]}>
           <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
-          <Text style={styles.subheading}>{t('visitorHome.ourHorses')}</Text>
+          <RTLText style={styles.subheading}>{t('visitorHome.ourHorses')}</RTLText>
         </View>
 
         {/* Render horses directly instead of using FlatList */}
@@ -103,21 +107,26 @@ const VisitorHomeScreen = () => {
                 />
               )}
               <View style={styles.horseInfo}>
-                <View style={styles.horseNameRow}>
+                <View style={[styles.horseNameRow, { flexDirection: rowDirection }]}>
                   <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
-                  <Text style={styles.horseName}>{item.name}</Text>
+                  <RTLText style={styles.horseName}>{item.name}</RTLText>
                 </View>
-                <View style={styles.breedRow}>
-                  <MaterialCommunityIcons name="horse" size={14} color="#E67E22" />
-                  <Text style={styles.breedLabel}>{t('horses.breed')} <Text style={styles.breedValue}>{item.breed}</Text></Text>
-                </View>
+                <RTLRow
+                  icon={<MaterialCommunityIcons name="horse" size={14} color="#E67E22" />}
+                  label={t('horses.breed')}
+                  value={item.breed}
+                  showColon={false}
+                  labelStyle={styles.breedLabel}
+                  valueStyle={styles.breedValue}
+                  style={styles.breedRow}
+                />
               </View>
             </AnimatedCard>
           ))
         ) : (
           <View style={styles.emptyState}>
             <MaterialCommunityIcons name="horse-variant" size={64} color="#F39C12" />
-            <Text style={styles.emptyText}>{t('visitorHome.noHorses')}</Text>
+            <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('visitorHome.noHorses')}</RTLText>
           </View>
         )}
       </ScrollView>
@@ -241,7 +250,6 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   breedRow: {
-    flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
   },

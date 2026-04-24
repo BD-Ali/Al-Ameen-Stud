@@ -1,13 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react';
+﻿import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, ScrollView, Platform } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
 
 const MissionsScreen = () => {
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
   const { reminders, updateReminder } = useContext(DataContext);
   const [todayMissions, setTodayMissions] = useState([]);
   const [completedMissions, setCompletedMissions] = useState([]);
@@ -92,20 +95,20 @@ const MissionsScreen = () => {
 
   const renderMission = ({ item, index, showMarkAsDone = true }) => (
     <AnimatedCard index={index} delay={80} style={[styles.missionCard, item.completed && styles.completedCard]}>
-      <View style={styles.missionHeader}>
-        <View style={styles.missionTitleContainer}>
+      <View style={[styles.missionHeader, { flexDirection: rowDirection }]}>
+        <View style={[styles.missionTitleContainer, { flexDirection: rowDirection }]}>
           <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
-          <Text style={styles.horseName}>{item.horseName}</Text>
+          <RTLText style={styles.horseName}>{item.horseName}</RTLText>
         </View>
-        <View style={styles.timeRow}>
+        <View style={[styles.timeRow, { flexDirection: rowDirection }]}>
           <FontAwesome5 name="clock" size={12} color="#5DADE2" solid />
-          <Text style={styles.missionTime}>{item.time}</Text>
+          <Text style={[styles.missionTime, { writingDirection, textAlign }]}>{item.time}</Text>
         </View>
       </View>
 
-      <Text style={[styles.missionNote, item.completed && styles.completedText]}>
+      <RTLText style={[styles.missionNote, item.completed && styles.completedText]}>
         {item.note}
-      </Text>
+      </RTLText>
 
       {showMarkAsDone ? (
         <TouchableOpacity
@@ -113,7 +116,7 @@ const MissionsScreen = () => {
           onPress={() => handleMarkAsDone(item)}
         >
           <FontAwesome5 name="check" size={14} color="#fff" solid />
-          <Text style={styles.doneButtonText}>{t('missions.markAsDone')}</Text>
+          <Text style={[styles.doneButtonText, { writingDirection, textAlign }]}>{t('missions.markAsDone')}</Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
@@ -121,7 +124,7 @@ const MissionsScreen = () => {
           onPress={() => handleMarkAsUndone(item)}
         >
           <FontAwesome5 name="undo" size={14} color="#fff" solid />
-          <Text style={styles.undoneButtonText}>{t('missions.undoCompletion')}</Text>
+          <Text style={[styles.undoneButtonText, { writingDirection, textAlign }]}>{t('missions.undoCompletion')}</Text>
         </TouchableOpacity>
       )}
     </AnimatedCard>
@@ -129,21 +132,21 @@ const MissionsScreen = () => {
 
   const renderUpcomingMission = ({ item, index }) => (
     <AnimatedCard index={index} delay={80} style={styles.upcomingCard}>
-      <View style={styles.missionHeader}>
-        <View style={styles.missionTitleContainer}>
+      <View style={[styles.missionHeader, { flexDirection: rowDirection }]}>
+        <View style={[styles.missionTitleContainer, { flexDirection: rowDirection }]}>
           <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
-          <Text style={styles.horseName}>{item.horseName}</Text>
+          <RTLText style={styles.horseName}>{item.horseName}</RTLText>
         </View>
-        <View style={styles.dateRow}>
+        <View style={[styles.dateRow, { flexDirection: rowDirection }]}>
           <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
-          <Text style={styles.upcomingDate}>{item.date}</Text>
+          <Text style={[styles.upcomingDate, { writingDirection, textAlign }]}>{item.date}</Text>
         </View>
       </View>
 
-      <Text style={styles.missionNote}>{item.note}</Text>
-      <View style={styles.timeRow}>
+      <RTLText style={styles.missionNote}>{item.note}</RTLText>
+      <View style={[styles.timeRow, { flexDirection: rowDirection }]}>
         <FontAwesome5 name="clock" size={12} color="#F39C12" solid />
-        <Text style={styles.upcomingTime}>{item.time}</Text>
+        <Text style={[styles.upcomingTime, { writingDirection, textAlign }]}>{item.time}</Text>
       </View>
     </AnimatedCard>
   );
@@ -152,20 +155,20 @@ const MissionsScreen = () => {
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       {/* Today's Missions */}
       <View style={styles.section}>
-        <View style={styles.sectionHeader}>
-          <View style={styles.sectionTitleRow}>
+        <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+          <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
             <FontAwesome5 name="clipboard-list" size={20} color="#9B59B6" solid />
-            <Text style={styles.sectionTitle}>{t('missions.todayMissions')}</Text>
+            <RTLText style={styles.sectionTitle}>{t('missions.todayMissions')}</RTLText>
           </View>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>{todayMissions.length}</Text>
+            <Text style={[styles.badgeText, { writingDirection, textAlign }]}>{todayMissions.length}</Text>
           </View>
         </View>
 
         {todayMissions.length === 0 ? (
           <View style={styles.emptyState}>
             <FontAwesome5 name="check-circle" size={48} color="#27AE60" solid />
-            <Text style={styles.emptyText}>{t('missions.noTasksRemaining')}</Text>
+            <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('missions.noTasksRemaining')}</RTLText>
           </View>
         ) : (
           <FlatList
@@ -180,13 +183,13 @@ const MissionsScreen = () => {
       {/* Completed Missions */}
       {completedMissions.length > 0 && (
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8 }}>
               <FontAwesome5 name="check-double" size={20} color="#27AE60" solid />
-              <Text style={styles.sectionTitle}>{t('missions.completedToday')}</Text>
+              <RTLText style={styles.sectionTitle}>{t('missions.completedToday')}</RTLText>
             </View>
             <View style={[styles.badge, styles.completedBadge]}>
-              <Text style={styles.badgeText}>{completedMissions.length}</Text>
+              <Text style={[styles.badgeText, { writingDirection, textAlign }]}>{completedMissions.length}</Text>
             </View>
           </View>
 
@@ -202,13 +205,13 @@ const MissionsScreen = () => {
       {/* Upcoming Missions */}
       {upcomingMissions.length > 0 && (
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+            <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8 }}>
               <FontAwesome5 name="calendar-alt" size={20} color="#5DADE2" solid />
-              <Text style={styles.sectionTitle}>{t('missions.upcomingMissions')}</Text>
+              <RTLText style={styles.sectionTitle}>{t('missions.upcomingMissions')}</RTLText>
             </View>
             <View style={[styles.badge, styles.upcomingBadge]}>
-              <Text style={styles.badgeText}>{upcomingMissions.length}</Text>
+              <Text style={[styles.badgeText, { writingDirection, textAlign }]}>{upcomingMissions.length}</Text>
             </View>
           </View>
 

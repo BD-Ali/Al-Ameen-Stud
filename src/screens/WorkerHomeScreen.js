@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+﻿import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Alert, FlatList, TouchableOpacity, Linking, Image, ScrollView, Animated, I18nManager, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
@@ -6,6 +6,8 @@ import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
 import CompactHeader from '../components/CompactHeader';
+import RTLText from '../components/RTLText';
+import useRTL from '../hooks/useRTL';
 import { useFadeIn, usePulse } from '../utils/animations';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -17,6 +19,7 @@ const WorkerHomeScreen = ({ navigation }) => {
   const { schedules, horses, workers, weeklySchedules, loading } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
+  const { rowDirection, textAlign, writingDirection } = useRTL();
 
   // Animations
   const fadeAnim = useFadeIn(600);
@@ -191,13 +194,13 @@ const WorkerHomeScreen = ({ navigation }) => {
       case 'horses':
         return horses && horses.length > 0 ? (
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionTitleRow}>
+            <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+              <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
                 <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
-                <Text style={styles.sectionTitle}>{t('workerHome.ourHorses')}</Text>
+                <RTLText style={styles.sectionTitle}>{t('workerHome.ourHorses')}</RTLText>
               </View>
               <View style={styles.horsesBadge}>
-                <Text style={styles.horsesBadgeText}>{horses.length}</Text>
+                <Text style={[styles.horsesBadgeText, { writingDirection, textAlign }]}>{horses.length}</Text>
               </View>
             </View>
             <ScrollView
@@ -220,8 +223,8 @@ const WorkerHomeScreen = ({ navigation }) => {
                     </View>
                   )}
                   <View style={styles.horseCardCompactInfo}>
-                    <Text style={styles.horseCardCompactName}>{horse.name}</Text>
-                    <Text style={styles.horseCardCompactBreed}>{horse.breed}</Text>
+                    <RTLText style={styles.horseCardCompactName}>{horse.name}</RTLText>
+                    <RTLText style={styles.horseCardCompactBreed}>{horse.breed}</RTLText>
                   </View>
                 </View>
               ))}
@@ -232,10 +235,10 @@ const WorkerHomeScreen = ({ navigation }) => {
       case 'schedule':
         return (
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <View style={styles.sectionTitleRow}>
+            <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
+              <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
                 <FontAwesome5 name="calendar-alt" size={24} color="#5DADE2" solid />
-                <Text style={styles.sectionTitle}>{t('workerHome.todaySchedule')}</Text>
+                <RTLText style={styles.sectionTitle}>{t('workerHome.todaySchedule')}</RTLText>
               </View>
             </View>
 
@@ -244,18 +247,18 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {/* Current Tasks */}
                 {currentTasks.length > 0 && (
                   <View style={styles.taskGroup}>
-                    <View style={styles.taskGroupTitleRow}>
+                    <View style={[styles.taskGroupTitleRow, { flexDirection: rowDirection }]}>
                       <FontAwesome5 name="clock" size={16} color="#27AE60" solid />
-                      <Text style={styles.taskGroupTitle}>{t('workerHome.currentTask')}</Text>
+                      <RTLText style={styles.taskGroupTitle}>{t('workerHome.currentTask')}</RTLText>
                     </View>
                     {currentTasks.map((schedule) => (
                       <View key={schedule.id} style={[styles.scheduleCard, styles.currentTaskCard]}>
                         <View style={styles.scheduleHeader}>
                           <View style={[styles.timeBadge, styles.currentTimeBadge]}>
-                            <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                            <Text style={[styles.timeBadgeText, { writingDirection, textAlign }]}>{formatTime(schedule.timeSlot)}</Text>
                           </View>
                         </View>
-                        <Text style={styles.scheduleDescription}>{schedule.description}</Text>
+                        <Text style={[styles.scheduleDescription, { writingDirection, textAlign }]}>{schedule.description}</Text>
                       </View>
                     ))}
                   </View>
@@ -264,18 +267,18 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {/* Upcoming Tasks */}
                 {upcomingTasks.length > 0 && (
                   <View style={styles.taskGroup}>
-                    <View style={styles.taskGroupTitleRow}>
+                    <View style={[styles.taskGroupTitleRow, { flexDirection: rowDirection }]}>
                       <FontAwesome5 name="clipboard-list" size={16} color="#3B82F6" solid />
-                      <Text style={styles.taskGroupTitle}>{t('workerHome.upcomingTasks')} ({upcomingTasks.length})</Text>
+                      <RTLText style={styles.taskGroupTitle}>{t('workerHome.upcomingTasks')} ({upcomingTasks.length})</RTLText>
                     </View>
                     {upcomingTasks.map((schedule) => (
                       <View key={schedule.id} style={styles.scheduleCard}>
                         <View style={styles.scheduleHeader}>
                           <View style={styles.timeBadge}>
-                            <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                            <Text style={[styles.timeBadgeText, { writingDirection, textAlign }]}>{formatTime(schedule.timeSlot)}</Text>
                           </View>
                         </View>
-                        <Text style={styles.scheduleDescription}>{schedule.description}</Text>
+                        <Text style={[styles.scheduleDescription, { writingDirection, textAlign }]}>{schedule.description}</Text>
                       </View>
                     ))}
                   </View>
@@ -284,15 +287,15 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {/* Past Tasks */}
                 {pastTasks.length > 0 && (
                   <View style={styles.taskGroup}>
-                    <View style={styles.taskGroupTitleRow}>
+                    <View style={[styles.taskGroupTitleRow, { flexDirection: rowDirection }]}>
                       <FontAwesome5 name="check-circle" size={16} color="#27AE60" solid />
-                      <Text style={styles.taskGroupTitle}>{t('workerHome.completedTasks')} ({pastTasks.length})</Text>
+                      <RTLText style={styles.taskGroupTitle}>{t('workerHome.completedTasks')} ({pastTasks.length})</RTLText>
                     </View>
                     {pastTasks.map((schedule) => (
                       <View key={schedule.id} style={[styles.scheduleCard, styles.pastTaskCard]}>
                         <View style={styles.scheduleHeader}>
                           <View style={[styles.timeBadge, styles.pastTimeBadge]}>
-                            <Text style={styles.timeBadgeText}>{formatTime(schedule.timeSlot)}</Text>
+                            <Text style={[styles.timeBadgeText, { writingDirection, textAlign }]}>{formatTime(schedule.timeSlot)}</Text>
                           </View>
                         </View>
                         <Text style={[styles.scheduleDescription, styles.pastTaskText]}>{schedule.description}</Text>
@@ -304,7 +307,7 @@ const WorkerHomeScreen = ({ navigation }) => {
             ) : (
               <View style={styles.emptyState}>
                 <FontAwesome5 name="clipboard-list" size={48} color="#4A90E2" solid />
-                <Text style={styles.emptyText}>{t('workerHome.noTasksToday')}</Text>
+                <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('workerHome.noTasksToday')}</RTLText>
               </View>
             )}
           </View>
