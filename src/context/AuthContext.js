@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  const signUp = async (email, password, name, role = 'client') => {
+  const signUp = async (email, password, name, phone, role = 'client') => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
       await setDoc(doc(db, 'users', user.uid), {
         email,
         name,
+        phone,
         role,
         createdAt: new Date().toISOString(),
       });
@@ -52,6 +53,7 @@ export const AuthProvider = ({ children }) => {
         await setDoc(doc(db, 'clients', user.uid), {
           name,
           email,
+          phone,
           amountPaid: 0,
           amountDue: 0,
           createdAt: new Date().toISOString(),

@@ -37,6 +37,7 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
 
   const { t } = useTranslation();
@@ -63,14 +64,24 @@ const LoginScreen = ({ navigation }) => {
       return;
     }
 
+    if (isSignUp && !phone.trim()) {
+      Alert.alert(t('common.error'), t('auth.enterPhoneRequired'));
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isSignUp) {
         // Only allow client signups - admins must be added via Firebase
-        const result = await signUp(email, password, name, 'client');
+        const result = await signUp(email, password, name, phone, 'client');
         if (result.success) {
           Alert.alert(t('common.success'), t('auth.accountCreated'));
+          setName('');
+          setPhone('');
+          setEmail('');
+          setPassword('');
+          setIsSignUp(false);
         } else {
           Alert.alert(t('common.error'), result.error);
         }
@@ -122,21 +133,38 @@ const LoginScreen = ({ navigation }) => {
           <Animated.View style={[styles.formCard, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
             <View style={styles.cardReflection} />
             {isSignUp && (
-              <View style={styles.inputContainer}>
-                <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.fullName')}</Text>
-                <View style={styles.inputWrapper}>
-                  <FontAwesome5 name="user" size={18} color={colors.text.muted} solid style={styles.inputIcon} />
-                  <TextInput
-                    style={[styles.input, { textAlign }]}
-                    placeholder={t('auth.enterFullName')}
-                    placeholderTextColor={colors.text.muted}
-                    value={name}
-                    onChangeText={setName}
-                    autoCapitalize="words"
-                    returnKeyType="next"
-                  />
+              <>
+                <View style={styles.inputContainer}>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.fullName')}</Text>
+                  <View style={styles.inputWrapper}>
+                    <FontAwesome5 name="user" size={18} color={colors.text.muted} solid style={styles.inputIcon} />
+                    <TextInput
+                      style={[styles.input, { textAlign }]}
+                      placeholder={t('auth.enterFullName')}
+                      placeholderTextColor={colors.text.muted}
+                      value={name}
+                      onChangeText={setName}
+                      autoCapitalize="words"
+                      returnKeyType="next"
+                    />
+                  </View>
                 </View>
-              </View>
+                <View style={styles.inputContainer}>
+                  <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.phoneNumber')}</Text>
+                  <View style={styles.inputWrapper}>
+                    <FontAwesome5 name="phone" size={16} color={colors.text.muted} solid style={styles.inputIcon} />
+                    <TextInput
+                      style={[styles.input, { textAlign }]}
+                      placeholder={t('auth.enterPhoneNumber')}
+                      placeholderTextColor={colors.text.muted}
+                      value={phone}
+                      onChangeText={setPhone}
+                      keyboardType="phone-pad"
+                      returnKeyType="next"
+                    />
+                  </View>
+                </View>
+              </>
             )}
 
             <View style={styles.inputContainer}>
