@@ -8,7 +8,7 @@ import CompactHeader from '../components/CompactHeader';
 import AnimatedCard from '../components/AnimatedCard';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -100,7 +100,7 @@ const ClientHistoryScreen = ({ navigation }) => {
       return (
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
           <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="book-open" size={20} color="#9B59B6" solid />
+            <AppIcon name="book-outline" size={20} />
             <RTLText style={styles.sectionTitle}>{t('clientHome.lessonHistory')}</RTLText>
           </View>
           {lessonHistory.length > 0 && (
@@ -116,7 +116,7 @@ const ClientHistoryScreen = ({ navigation }) => {
       return (
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
           <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="money-bill-wave" size={20} color="#27AE60" solid />
+            <AppIcon name="cash-outline" size={20} />
             <RTLText style={styles.sectionTitle}>{t('clientHome.paymentHistory')}</RTLText>
           </View>
           {clientPayments.length > 0 && (
@@ -137,7 +137,7 @@ const ClientHistoryScreen = ({ navigation }) => {
       return (
         <AnimatedCard index={0} delay={100} style={styles.paymentSummaryCard}>
           <View style={[styles.paymentHeader, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="wallet" size={20} color="#5DADE2" solid />
+            <AppIcon name="wallet-outline" size={20} />
             <RTLText style={styles.paymentHeaderTitle}> {t('clientHome.paymentStatus')}</RTLText>
           </View>
           <View style={[styles.paymentRow, { flexDirection: rowDirection }]}>
@@ -159,7 +159,7 @@ const ClientHistoryScreen = ({ navigation }) => {
     if (item === 'empty_lessons') {
       return (
         <View style={styles.emptyState}>
-          <FontAwesome5 name="book-open" size={36} color="#95A5A6" solid />
+          <AppIcon name="book-outline" size={36} />
           <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('clientHome.noLessonHistory')}</RTLText>
         </View>
       );
@@ -167,7 +167,7 @@ const ClientHistoryScreen = ({ navigation }) => {
     if (item === 'empty_payments') {
       return (
         <View style={styles.emptyState}>
-          <FontAwesome5 name="receipt" size={36} color="#95A5A6" solid />
+          <AppIcon name="receipt-outline" size={36} />
           <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('clientHome.noPayments')}</RTLText>
         </View>
       );
@@ -191,30 +191,30 @@ const ClientHistoryScreen = ({ navigation }) => {
           <View style={[styles.lessonHeader, { flexDirection: rowDirection }]}>
             <View style={styles.lessonLeftCol}>
               <View style={[styles.lessonDateRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                <AppIcon name="calendar-outline" size={14} />
                 <Text style={[styles.lessonDate, { writingDirection, textAlign }]}>{formatDate(item.date)}</Text>
               </View>
               <View style={[styles.lessonTimeRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="clock" size={13} color="#F39C12" solid />
+                <AppIcon name="time-outline" size={13} />
                 <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
               </View>
             </View>
             <View style={[{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }]}>
               {item.isClinicLesson && (
                 <View style={[styles.clinicBadge, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="ticket-alt" size={10} color="#fff" solid />
+                  <AppIcon name="ticket-outline" size={10} />
                   <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('lessons.clinicBadge')}</Text>
                 </View>
               )}
               {isConfirmed && (
                 <View style={[styles.completedBadge, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="check-circle" size={12} color="#fff" solid />
+                  <AppIcon name="checkmark-circle-outline" size={12} />
                   <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('clientHome.completed')}</Text>
                 </View>
               )}
               {isCancelled && (
                 <View style={[styles.cancelledBadge, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="times-circle" size={12} color="#fff" solid />
+                  <AppIcon name="close-circle-outline" size={12} />
                   <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}> {t('clientHome.cancelled')}</Text>
                 </View>
               )}
@@ -222,11 +222,11 @@ const ClientHistoryScreen = ({ navigation }) => {
           </View>
           <View style={styles.lessonDetails}>
             <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
-              <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+              <AppIcon name="paw-outline" size={16} />
               <Text style={[styles.lessonDetailText, { writingDirection, textAlign }]}>{getHorseName(item.horseId)}</Text>
             </View>
             <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="chalkboard-teacher" size={13} color="#3498DB" solid />
+              <AppIcon name="school-outline" size={13} />
               <Text style={[styles.lessonDetailText, { writingDirection, textAlign }]}>{getWorkerName(item.instructorId)}</Text>
             </View>
           </View>
@@ -240,16 +240,16 @@ const ClientHistoryScreen = ({ navigation }) => {
         <AnimatedCard index={index + 1} delay={60} style={styles.paymentCard}>
           <View style={[styles.paymentCardRow, { flexDirection: rowDirection }]}>
             <View style={styles.paymentIconContainer}>
-              <FontAwesome5 name="shekel-sign" size={16} color="#27AE60" solid />
+              <AppIcon name="cash-outline" size={16} />
             </View>
             <View style={styles.paymentCardInfo}>
               <Text style={[styles.paymentCardAmount, { writingDirection, textAlign }]}>₪{item.amount || 0}</Text>
               <View style={[styles.paymentCardDateRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
+                <AppIcon name="calendar-outline" size={12} />
                 <Text style={[styles.paymentCardDate, { writingDirection, textAlign }]}>{formatDate(item.date)}</Text>
                 {item.time ? (
                   <>
-                    <FontAwesome5 name="clock" size={12} color="#F39C12" solid />
+                    <AppIcon name="time-outline" size={12} />
                     <Text style={[styles.paymentCardDate, { writingDirection, textAlign }]}>{item.time}</Text>
                   </>
                 ) : null}
@@ -290,7 +290,7 @@ const ClientHistoryScreen = ({ navigation }) => {
         />
       ) : (
         <View style={styles.loadingContainer}>
-          <FontAwesome5 name="spinner" size={48} color="#3B82F6" />
+          <AppIcon name="sync-outline" size={48} />
           <Text style={[styles.loadingText, { writingDirection, textAlign }]}>{t('clientHome.loadingInfo')}</Text>
         </View>
       )}

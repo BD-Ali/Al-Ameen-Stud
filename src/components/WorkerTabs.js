@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+﻿import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { StyleSheet, Platform } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import AppIcon from './AppIcon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from '../i18n/LanguageContext';
 import { colors, typography, spacing } from '../styles/theme';
@@ -41,7 +41,7 @@ const WorkerTabs = () => {
         options={{
           tabBarLabel: t('nav.workerHome'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="home" size={20} color={focused ? colors.primary.main : colors.text.tertiary} solid />
+            <AppIcon name="home-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />
@@ -51,7 +51,7 @@ const WorkerTabs = () => {
         options={{
           tabBarLabel: t('nav.workerLessons'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="book-open" size={20} color={focused ? colors.accent.purple : colors.text.tertiary} solid />
+            <AppIcon name="book-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />

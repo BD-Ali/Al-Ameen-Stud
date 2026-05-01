@@ -9,7 +9,7 @@ import CompactHeader from '../components/CompactHeader';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import { useFadeIn, usePulse } from '../utils/animations';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -196,7 +196,7 @@ const WorkerHomeScreen = ({ navigation }) => {
           <View style={styles.section}>
             <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
               <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
-                <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
+                <AppIcon name="paw-outline" size={24} />
                 <RTLText style={styles.sectionTitle}>{t('workerHome.ourHorses')}</RTLText>
               </View>
               <View style={styles.horsesBadge}>
@@ -219,7 +219,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                     />
                   ) : (
                     <View style={styles.horseImagePlaceholder}>
-                      <MaterialCommunityIcons name="horse-variant" size={40} color="#F39C12" />
+                      <AppIcon name="paw-outline" size={40} />
                     </View>
                   )}
                   <View style={styles.horseCardCompactInfo}>
@@ -237,7 +237,7 @@ const WorkerHomeScreen = ({ navigation }) => {
           <View style={styles.section}>
             <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
               <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="calendar-alt" size={24} color="#5DADE2" solid />
+                <AppIcon name="calendar-outline" size={24} />
                 <RTLText style={styles.sectionTitle}>{t('workerHome.todaySchedule')}</RTLText>
               </View>
             </View>
@@ -248,7 +248,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {currentTasks.length > 0 && (
                   <View style={styles.taskGroup}>
                     <View style={[styles.taskGroupTitleRow, { flexDirection: rowDirection }]}>
-                      <FontAwesome5 name="clock" size={16} color="#27AE60" solid />
+                      <AppIcon name="time-outline" size={16} />
                       <RTLText style={styles.taskGroupTitle}>{t('workerHome.currentTask')}</RTLText>
                     </View>
                     {currentTasks.map((schedule) => (
@@ -268,7 +268,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {upcomingTasks.length > 0 && (
                   <View style={styles.taskGroup}>
                     <View style={[styles.taskGroupTitleRow, { flexDirection: rowDirection }]}>
-                      <FontAwesome5 name="clipboard-list" size={16} color="#3B82F6" solid />
+                      <AppIcon name="clipboard-outline" size={16} />
                       <RTLText style={styles.taskGroupTitle}>{t('workerHome.upcomingTasks')} ({upcomingTasks.length})</RTLText>
                     </View>
                     {upcomingTasks.map((schedule) => (
@@ -288,7 +288,7 @@ const WorkerHomeScreen = ({ navigation }) => {
                 {pastTasks.length > 0 && (
                   <View style={styles.taskGroup}>
                     <View style={[styles.taskGroupTitleRow, { flexDirection: rowDirection }]}>
-                      <FontAwesome5 name="check-circle" size={16} color="#27AE60" solid />
+                      <AppIcon name="checkmark-circle-outline" size={16} />
                       <RTLText style={styles.taskGroupTitle}>{t('workerHome.completedTasks')} ({pastTasks.length})</RTLText>
                     </View>
                     {pastTasks.map((schedule) => (
@@ -306,7 +306,7 @@ const WorkerHomeScreen = ({ navigation }) => {
               </View>
             ) : (
               <View style={styles.emptyState}>
-                <FontAwesome5 name="clipboard-list" size={48} color="#4A90E2" solid />
+                <AppIcon name="clipboard-outline" size={48} />
                 <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('workerHome.noTasksToday')}</RTLText>
               </View>
             )}
@@ -344,7 +344,7 @@ const WorkerHomeScreen = ({ navigation }) => {
         activeOpacity={0.8}
       >
         <Animated.View style={{ transform: [{ scale: pulseAnim }, { scaleX: I18nManager.isRTL ? -1 : 1 }] }}>
-          <FontAwesome5 name="phone" size={20} color="#fff" solid />
+          <AppIcon name="call-outline" size={20} />
         </Animated.View>
       </TouchableOpacity>
     </SafeAreaView>

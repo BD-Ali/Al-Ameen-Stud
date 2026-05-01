@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+﻿import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Text, StyleSheet, Alert, View, Image, Platform } from 'react-native';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from './AppIcon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -97,7 +97,7 @@ const AdminTabs = () => {
           title: t('nav.announcements'),
           tabBarLabel: t('nav.announcements'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="bullhorn" size={20} color={focused ? colors.status.error : colors.text.tertiary} solid />
+            <AppIcon name="megaphone-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />
@@ -108,7 +108,7 @@ const AdminTabs = () => {
           title: t('nav.missions'),
           tabBarLabel: t('nav.missions'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="tasks" size={20} color={focused ? colors.accent.teal : colors.text.tertiary} solid />
+            <AppIcon name="checkbox-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />
@@ -119,7 +119,7 @@ const AdminTabs = () => {
           title: t('nav.schedule'),
           tabBarLabel: t('nav.schedule'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="calendar-alt" size={20} color={focused ? colors.primary.light : colors.text.tertiary} solid />
+            <AppIcon name="calendar-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />
@@ -130,7 +130,7 @@ const AdminTabs = () => {
           title: t('nav.horses'),
           tabBarLabel: t('nav.horses'),
           tabBarIcon: ({ focused }) => (
-            <MaterialCommunityIcons name="horse-variant" size={24} color={focused ? colors.accent.amber : colors.text.tertiary} />
+            <AppIcon name="paw-outline" size={24} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />
@@ -141,7 +141,7 @@ const AdminTabs = () => {
           title: t('nav.feed'),
           tabBarLabel: t('nav.feed'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="carrot" size={20} color={focused ? colors.status.warning : colors.text.tertiary} solid />
+            <AppIcon name="nutrition-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />
@@ -152,7 +152,7 @@ const AdminTabs = () => {
           title: t('nav.lessons'),
           tabBarLabel: t('nav.lessons'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="book-open" size={20} color={focused ? colors.accent.purple : colors.text.tertiary} solid />
+            <AppIcon name="book-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />
@@ -163,7 +163,7 @@ const AdminTabs = () => {
           title: t('nav.users'),
           tabBarLabel: t('nav.users'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="users" size={20} color={focused ? colors.status.info : colors.text.tertiary} solid />
+            <AppIcon name="people-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />

@@ -1,124 +1,148 @@
-/**
- * Animation utilities for consistent, smooth animations across the app
- * Provides fade-in, slide-in, scale, and reflection effects
+﻿/**
+ * Animation utilities â€” smooth, premium feel throughout the app.
+ * All hooks follow the pattern: call at component top-level, use returned value in Animated props.
  */
 
 import { useRef, useEffect } from 'react';
 import { Animated, Easing } from 'react-native';
 
-/**
- * Fade in animation hook
- * @param {number} duration - Animation duration in ms
- * @param {number} delay - Delay before animation starts
- * @returns {Animated.Value} Animated opacity value
- */
-export const useFadeIn = (duration = 600, delay = 0) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+// â”€â”€ Shared easing curves â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+const EASE_OUT_EXPO   = Easing.bezier(0.16, 1, 0.3, 1);
+const EASE_OUT_BACK   = Easing.bezier(0.34, 1.56, 0.64, 1);   // slight overshoot
+const EASE_IN_OUT     = Easing.bezier(0.4, 0, 0.2, 1);
+
+// â”€â”€ Entrance animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+/**
+ * Smooth fade-in from transparent.
+ */
+export const useFadeIn = (duration = 500, delay = 0) => {
+  const value = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    Animated.timing(fadeAnim, {
+    Animated.timing(value, {
+      toValue: 1, duration, delay,
+      useNativeDriver: true,
+      easing: EASE_OUT_EXPO,
+    }).start();
+  }, [value, duration, delay]);
+  return value;
+};
+
+/**
+ * Slide up from below â€” primary screen entrance.
+ */
+export const useSlideInFromBottom = (duration = 480, delay = 0) => {
+  const value = useRef(new Animated.Value(40)).current;
+  useEffect(() => {
+    Animated.timing(value, {
+      toValue: 0, duration, delay,
+      useNativeDriver: true,
+      easing: EASE_OUT_EXPO,
+    }).start();
+  }, [value, duration, delay]);
+  return value;
+};
+
+/**
+ * Slide in from the right (LTR) / left (RTL).
+ */
+export const useSlideInFromRight = (duration = 480, delay = 0) => {
+  const value = useRef(new Animated.Value(60)).current;
+  useEffect(() => {
+    Animated.timing(value, {
+      toValue: 0, duration, delay,
+      useNativeDriver: true,
+      easing: EASE_OUT_EXPO,
+    }).start();
+  }, [value, duration, delay]);
+  return value;
+};
+
+/**
+ * Slide in from the left (LTR) / right (RTL).
+ */
+export const useSlideInFromLeft = (duration = 480, delay = 0) => {
+  const value = useRef(new Animated.Value(-60)).current;
+  useEffect(() => {
+    Animated.timing(value, {
+      toValue: 0, duration, delay,
+      useNativeDriver: true,
+      easing: EASE_OUT_EXPO,
+    }).start();
+  }, [value, duration, delay]);
+  return value;
+};
+
+/**
+ * Scale from slightly small to full size â€” use for modals / cards.
+ */
+export const useScaleIn = (duration = 380, delay = 0) => {
+  const value = useRef(new Animated.Value(0.88)).current;
+  useEffect(() => {
+    Animated.spring(value, {
       toValue: 1,
-      duration,
+      tension: 80,
+      friction: 9,
       delay,
       useNativeDriver: true,
-      easing: Easing.out(Easing.cubic),
     }).start();
-  }, [fadeAnim, duration, delay]);
-
-  return fadeAnim;
+  }, [value, delay]);
+  return value;
 };
 
 /**
- * Slide in from bottom animation hook
- * @param {number} duration - Animation duration in ms
- * @param {number} delay - Delay before animation starts
- * @returns {Animated.Value} Animated translateY value
+ * Combined fade + slide-up entrance â€” for screens and large sections.
+ * Returns { opacity, translateY } to spread onto Animated.View style.
  */
-export const useSlideInFromBottom = (duration = 500, delay = 0) => {
-  const slideAnim = useRef(new Animated.Value(50)).current;
-
-  useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration,
-      delay,
-      useNativeDriver: true,
-      easing: Easing.out(Easing.cubic),
-    }).start();
-  }, [slideAnim, duration, delay]);
-
-  return slideAnim;
+export const useEntrance = (duration = 500, delay = 0) => {
+  const opacity    = useFadeIn(duration, delay);
+  const translateY = useSlideInFromBottom(duration, delay);
+  return { opacity, translateY };
 };
 
 /**
- * Slide in from right animation hook (for RTL)
- * @param {number} duration - Animation duration in ms
- * @param {number} delay - Delay before animation starts
- * @returns {Animated.Value} Animated translateX value
+ * Bouncy pop-in with overshoot â€” for attention-grabbing elements.
  */
-export const useSlideInFromRight = (duration = 500, delay = 0) => {
-  const slideAnim = useRef(new Animated.Value(100)).current;
-
+export const useBounceIn = (delay = 0) => {
+  const value = useRef(new Animated.Value(0)).current;
   useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration,
-      delay,
-      useNativeDriver: true,
-      easing: Easing.out(Easing.cubic),
-    }).start();
-  }, [slideAnim, duration, delay]);
-
-  return slideAnim;
-};
-
-/**
- * Scale animation hook - starts small and grows
- * @param {number} duration - Animation duration in ms
- * @param {number} delay - Delay before animation starts
- * @returns {Animated.Value} Animated scale value
- */
-export const useScaleIn = (duration = 400, delay = 0) => {
-  const scaleAnim = useRef(new Animated.Value(0.8)).current;
-
-  useEffect(() => {
-    Animated.spring(scaleAnim, {
+    Animated.spring(value, {
       toValue: 1,
-      tension: 50,
-      friction: 7,
+      tension: 65,
+      friction: 5,
       delay,
       useNativeDriver: true,
     }).start();
-  }, [scaleAnim, delay]);
-
-  return scaleAnim;
+  }, [value, delay]);
+  return value;
 };
 
+// â”€â”€ List / stagger animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 /**
- * Staggered animation for list items
- * @param {number} index - Item index in list
- * @param {number} staggerDelay - Delay between each item
- * @returns {Object} Object with opacity and translateY animations
+ * Staggered entrance for list items.
+ * Use with index to offset each item.
  */
-export const useStaggeredAnimation = (index, staggerDelay = 100) => {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(20)).current;
+export const useStaggeredAnimation = (index, staggerDelay = 60) => {
+  const opacity    = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(16)).current;
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 400,
+        duration: 380,
         delay: index * staggerDelay,
         useNativeDriver: true,
-        easing: Easing.out(Easing.ease),
+        easing: EASE_OUT_EXPO,
       }),
       Animated.timing(translateY, {
         toValue: 0,
-        duration: 400,
+        duration: 380,
         delay: index * staggerDelay,
         useNativeDriver: true,
-        easing: Easing.out(Easing.cubic),
+        easing: EASE_OUT_EXPO,
       }),
     ]).start();
   }, [opacity, translateY, index, staggerDelay]);
@@ -126,146 +150,86 @@ export const useStaggeredAnimation = (index, staggerDelay = 100) => {
   return { opacity, translateY };
 };
 
+// â”€â”€ Looping animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
 /**
- * Pulse animation for attention-grabbing elements
- * @returns {Animated.Value} Animated scale value that pulses
+ * Subtle breathing pulse â€” for badges, live indicators.
  */
 export const usePulse = () => {
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-
+  const value = useRef(new Animated.Value(1)).current;
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.1,
-          duration: 1000,
+        Animated.timing(value, {
+          toValue: 1.06,
+          duration: 900,
           useNativeDriver: true,
-          easing: Easing.inOut(Easing.ease),
+          easing: EASE_IN_OUT,
         }),
-        Animated.timing(pulseAnim, {
+        Animated.timing(value, {
           toValue: 1,
-          duration: 1000,
+          duration: 900,
           useNativeDriver: true,
-          easing: Easing.inOut(Easing.ease),
+          easing: EASE_IN_OUT,
         }),
       ])
     ).start();
-  }, [pulseAnim]);
-
-  return pulseAnim;
+  }, [value]);
+  return value;
 };
 
 /**
- * Create a combined fade and slide animation
- * @param {number} duration - Animation duration
- * @param {number} delay - Delay before animation
- * @returns {Object} Combined animation values
- */
-export const useFadeSlide = (duration = 500, delay = 0) => {
-  const opacity = useFadeIn(duration, delay);
-  const translateY = useSlideInFromBottom(duration, delay);
-
-  return { opacity, translateY };
-};
-
-/**
- * Create a shimmer/loading animation
- * @returns {Animated.Value} Shimmer animation value
+ * Skeleton shimmer â€” for loading placeholders.
  */
 export const useShimmer = () => {
-  const shimmerAnim = useRef(new Animated.Value(0)).current;
-
+  const value = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
-        Animated.timing(shimmerAnim, {
-          toValue: 1,
-          duration: 1500,
+        Animated.timing(value, {
+          toValue: 1, duration: 1200,
           useNativeDriver: true,
           easing: Easing.linear,
         }),
-        Animated.timing(shimmerAnim, {
-          toValue: 0,
-          duration: 1500,
+        Animated.timing(value, {
+          toValue: 0, duration: 1200,
           useNativeDriver: true,
           easing: Easing.linear,
         }),
       ])
     ).start();
-  }, [shimmerAnim]);
-
-  return shimmerAnim;
+  }, [value]);
+  return value;
 };
 
-/**
- * Bouncy entrance animation
- * @param {number} delay - Delay before animation
- * @returns {Animated.Value} Bounce animation value
- */
-export const useBounceIn = (delay = 0) => {
-  const bounceAnim = useRef(new Animated.Value(0)).current;
+// â”€â”€ Interaction animations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-  useEffect(() => {
-    Animated.spring(bounceAnim, {
-      toValue: 1,
-      friction: 4,
-      tension: 40,
-      delay,
+/**
+ * Press-in/out scale animation for interactive elements.
+ * Returns { onPressIn, onPressOut } handlers to spread onto TouchableOpacity.
+ */
+export const createPressAnimation = (animValue) => ({
+  onPressIn: () =>
+    Animated.spring(animValue, {
+      toValue: 0.94,
+      tension: 200,
+      friction: 10,
       useNativeDriver: true,
-    }).start();
-  }, [bounceAnim, delay]);
-
-  return bounceAnim;
-};
-
-/**
- * Animated gradient background effect helper
- * Creates interpolated colors for smooth transitions
- */
-export const createGradientAnimation = () => {
-  const animValue = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(animValue, {
-          toValue: 1,
-          duration: 3000,
-          useNativeDriver: false, // Color animations can't use native driver
-          easing: Easing.inOut(Easing.ease),
-        }),
-        Animated.timing(animValue, {
-          toValue: 0,
-          duration: 3000,
-          useNativeDriver: false,
-          easing: Easing.inOut(Easing.ease),
-        }),
-      ])
-    ).start();
-  }, [animValue]);
-
-  return animValue;
-};
+    }).start(),
+  onPressOut: () =>
+    Animated.spring(animValue, {
+      toValue: 1,
+      tension: 120,
+      friction: 8,
+      useNativeDriver: true,
+    }).start(),
+});
 
 /**
- * Press animation that scales down and back
- * @param {Animated.Value} animValue - Animated value to control
+ * Combined fade + slide convenience hook (legacy compat).
  */
-export const createPressAnimation = (animValue) => {
-  return {
-    onPressIn: () => {
-      Animated.spring(animValue, {
-        toValue: 0.95,
-        useNativeDriver: true,
-      }).start();
-    },
-    onPressOut: () => {
-      Animated.spring(animValue, {
-        toValue: 1,
-        useNativeDriver: true,
-        friction: 4,
-      }).start();
-    },
-  };
+export const useFadeSlide = (duration = 500, delay = 0) => {
+  const opacity    = useFadeIn(duration, delay);
+  const translateY = useSlideInFromBottom(duration, delay);
+  return { opacity, translateY };
 };
-

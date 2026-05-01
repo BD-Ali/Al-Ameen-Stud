@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+﻿import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import notificationService from '../services/notificationService';
 import { getOptimizedImageUrl } from '../config/cloudinaryConfig';
-import { FontAwesome5 } from '@expo/vector-icons';
+import AppIcon from './AppIcon';
 
 /**
  * AnnouncementsFeed - Displays announcements to users based on their role
@@ -70,13 +70,13 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
   const getTagIcon = (tag) => {
     const icons = {
-      'Update': { name: 'bullhorn', color: '#3498DB' },
-      'Promo': { name: 'gift', color: '#E91E63' },
-      'Alert': { name: 'exclamation-triangle', color: '#E74C3C' },
-      'Event': { name: 'calendar-check', color: '#9C27B0' },
-      'Info': { name: 'info-circle', color: '#2196F3' },
+      'Update': 'megaphone-outline',
+      'Promo': 'gift-outline',
+      'Alert': 'warning-outline',
+      'Event': 'calendar-outline',
+      'Info': 'information-circle-outline',
     };
-    return icons[tag] || { name: 'thumbtack', color: '#F39C12' };
+    return icons[tag] || 'pin-outline';
   };
 
   const getTagColor = (tag) => {
@@ -185,7 +185,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
       {/* Header */}
       {visibleAnnouncements.length > 0 && (
         <View style={styles.header}>
-          <FontAwesome5 name="bullhorn" size={20} color="#3498DB" solid />
+          <AppIcon name="megaphone-outline" size={20} />
           <Text style={styles.headerTitle}>{t('announcements.headerTitle')}</Text>
         </View>
       )}
@@ -206,14 +206,14 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                 >
                   {item.isPinned && (
                     <View style={styles.pinnedBadge}>
-                      <FontAwesome5 name="thumbtack" size={10} color="#F39C12" solid />
+                      <AppIcon name="pin-outline" size={10} />
                       <Text style={styles.pinnedText}>{t('common.pinned')}</Text>
                     </View>
                   )}
 
                   <View style={styles.cardHeader}>
                     <View style={[styles.tagBadge, { backgroundColor: tagColor + '20' }]}>
-                      <FontAwesome5 name={getTagIcon(item.tag).name} size={12} color={tagColor} solid />
+                      <AppIcon name={getTagIcon(item.tag)} size={12} color={tagColor} />
                       <Text style={[styles.tagText, { color: tagColor }]}>{item.tag}</Text>
                     </View>
                   </View>
@@ -236,7 +236,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 
                   <View style={styles.cardFooter}>
                     <Text style={styles.dateText}>{formatDate(item.createdAt)}</Text>
-                    <Text style={styles.readMore}>{t('announcements.readMore')} <FontAwesome5 name={I18nManager.isRTL ? 'arrow-left' : 'arrow-right'} size={12} color={colors.primary.main} /></Text>
+                    <Text style={styles.readMore}>{t('announcements.readMore')} <AppIcon name={I18nManager.isRTL ? 'arrow-back-outline' : 'arrow-forward-outline'} size={12} color={colors.primary.main} /></Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -251,14 +251,14 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <Text style={styles.loadMoreText}>{t('announcements.loadMore')}</Text>
-                <FontAwesome5 name="chevron-down" size={12} color={colors.primary.main} />
+                <AppIcon name="chevron-down-outline" size={12} color={colors.primary.main} />
               </View>
             </TouchableOpacity>
           )}
         </>
       ) : (
         <View style={styles.emptyState}>
-          <FontAwesome5 name="bullhorn" size={64} color="#95A5A6" solid />
+          <AppIcon name="megaphone-outline" size={64} />
           <Text style={styles.emptyText}>{t('announcements.noAnnouncementsNow')}</Text>
           <Text style={styles.emptySubtext}>{t('announcements.willNotifyUpdates')}</Text>
         </View>
@@ -278,7 +278,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                 onPress={() => setDetailModalVisible(false)}
                 style={styles.closeButton}
               >
-                <FontAwesome5 name="times" size={18} color={colors.text.secondary} />
+                <AppIcon name="close-outline" size={18} color={colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
@@ -287,7 +287,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                 <>
                   {selectedAnnouncement.isPinned && (
                     <View style={[styles.pinnedBadge, { marginBottom: spacing.md }]}>
-                      <FontAwesome5 name="thumbtack" size={10} color="#F39C12" solid />
+                      <AppIcon name="pin-outline" size={10} />
                       <Text style={styles.pinnedText}>{t('common.pinned')}</Text>
                     </View>
                   )}
@@ -296,7 +296,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                     styles.tagBadge,
                     { backgroundColor: getTagColor(selectedAnnouncement.tag) + '20', alignSelf: 'flex-start' }
                   ]}>
-                    <FontAwesome5 name={getTagIcon(selectedAnnouncement.tag).name} size={12} color={getTagColor(selectedAnnouncement.tag)} solid />
+                    <AppIcon name={getTagIcon(selectedAnnouncement.tag)} size={12} color={getTagColor(selectedAnnouncement.tag)} />
                     <Text style={[styles.tagText, { color: getTagColor(selectedAnnouncement.tag) }]}>
                       {selectedAnnouncement.tag}
                     </Text>
@@ -320,14 +320,14 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
                       onPress={() => handleLinkPress(selectedAnnouncement.linkUrl)}
                     >
                       <Text style={styles.actionButtonText}>
-                        {selectedAnnouncement.linkText || t('announcements.clickHere')} <FontAwesome5 name="external-link-alt" size={12} color={colors.text.primary} />
+                        {selectedAnnouncement.linkText || t('announcements.clickHere')} <AppIcon name="open-outline" size={12} color={colors.text.primary} />
                       </Text>
                     </TouchableOpacity>
                   )}
 
                   <View style={styles.modalFooter}>
                     <View style={styles.footerDateRow}>
-                      <FontAwesome5 name="calendar-alt" size={12} color="#64748b" solid />
+                      <AppIcon name="calendar-outline" size={12} />
                       <Text style={styles.footerText}>
                         {formatDate(selectedAnnouncement.createdAt)}
                       </Text>

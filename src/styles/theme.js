@@ -1,128 +1,118 @@
-/**
- * Centralized theme for consistent styling across the app
- * Professional color palette with enhanced quality and fewer colors
+﻿/**
+ * Al-Ameen Stud - Centralized design system
+ * Dark navy + black theme. White text. Single blue brand color.
+ * Status colors for alerts only. No category color-coding.
  */
 
 export const colors = {
-  // Background colors - Deep, rich tones for professional look
+  // Backgrounds: black -> dark navy
   background: {
-    primary: '#080c18',      // Very deep navy - main background
-    secondary: '#111827',    // Deep slate - cards and sections
-    tertiary: '#1a2234',     // Charcoal - subtle highlights
-    overlay: 'rgba(8, 12, 24, 0.97)', // For modals
+    primary:   '#0A0F1E',
+    secondary: '#0F172A',
+    tertiary:  '#1E293B',
+    overlay:   'rgba(5, 8, 20, 0.92)',
   },
 
-  // Text colors - High contrast for readability
+  // Text: white scale
   text: {
-    primary: '#f8fafc',      // Pure white - main text
-    secondary: '#e2e8f0',    // Light gray - secondary text
-    tertiary: '#94a3b8',     // Medium gray - labels
-    muted: '#64748b',        // Muted gray - placeholders
-    inverse: '#0a0e1a',      // For text on light backgrounds
+    primary:   '#F8FAFC',
+    secondary: '#94A3B8',
+    tertiary:  '#475569',
+    muted:     '#1E293B',
+    inverse:   '#0F172A',
   },
 
-  // Primary brand color - Single vibrant blue
+  // Primary brand: vivid blue
   primary: {
-    main: '#3b82f6',         // Vibrant blue
-    light: '#60a5fa',        // Light blue for accents
-    dark: '#2563eb',         // Dark blue for pressed states
-    subtle: 'rgba(59, 130, 246, 0.1)', // Subtle background
+    main:   '#2563EB',
+    light:  '#60A5FA',
+    dark:   '#1E3A8A',
+    subtle: 'rgba(37, 99, 235, 0.15)',
   },
 
-  // Status colors - Refined and professional
+  // Status: system alerts only. Never decorative.
   status: {
-    success: '#10b981',      // Emerald green
-    warning: '#f59e0b',      // Warm amber
-    error: '#ef4444',        // Clear red
-    info: '#06b6d4',         // Cyan
+    success: '#22C55E',
+    warning: '#F59E0B',
+    error:   '#EF4444',
+    info:    '#60A5FA',
   },
 
-  // Accent colors - Reduced to 4 carefully chosen colors
+  // Accent: all resolve to primary blue. No category color-coding.
   accent: {
-    purple: '#8b5cf6',       // For lessons and special features
-    teal: '#14b8a6',         // For fresh, active elements
-    amber: '#f59e0b',        // For attention items
-    pink: '#ec4899',         // For workers/people
-    yellow: '#fbbf24',       // For add icons and highlights
+    purple: '#2563EB',
+    teal:   '#2563EB',
+    amber:  '#2563EB',
+    pink:   '#2563EB',
+    yellow: '#2563EB',
   },
 
-  // Border colors - Subtle and refined
+  // Borders
   border: {
-    light: '#1e2d42',        // Subtle border
-    medium: '#2d3f57',       // Medium border
-    focus: '#3b82f6',        // Focus state
-    highlight: 'rgba(255, 255, 255, 0.07)', // Top card highlight
+    light:     '#1E293B',
+    medium:    '#334155',
+    focus:     '#2563EB',
+    highlight: 'rgba(37, 99, 235, 0.20)',
   },
 
-  // Semantic colors for specific uses
+  // Surfaces
   surface: {
-    elevated: '#16213a',     // Elevated cards
-    hover: '#1e2d42',        // Hover states
-    pressed: '#0e1a2e',      // Pressed states
-    glass: 'rgba(255, 255, 255, 0.04)', // Frosted glass overlay
+    elevated: '#0F172A',
+    hover:    '#1E293B',
+    pressed:  '#0A0F1E',
+    glass:    'rgba(15, 23, 42, 0.80)',
   },
 
-  // Icon colors for semantic differentiation across the app
+  // Icons: white on dark bg
   icon: {
-    horse: '#F39C12',        // Horse-related icons
-    calendar: '#5DADE2',     // Calendar / schedule icons
-    user: '#1ABC9C',         // User / people icons
-    lesson: '#9B59B6',       // Lesson / book icons
-    money: '#27AE60',        // Payment / success icons
-    alert: '#E74C3C',        // Alert / danger icons
-    info: '#3498DB',         // Information icons
-    promo: '#E91E63',        // Promotional icons
-    event: '#9C27B0',        // Event icons
-    feed: '#FF9800',         // Feed / carrot icons
-    breed: '#E67E22',        // Breed / chart icons
-    task: '#3B82F6',         // Task / clipboard icons
-    muted: '#64748b',        // Empty state icons
-    onWhite: '#ffffff',      // Icons on colored backgrounds
+    primary:   '#F8FAFC',
+    secondary: '#94A3B8',
+    muted:     '#475569',
+    accent:    '#60A5FA',
+    onDark:    '#F8FAFC',
   },
 };
 
 export const typography = {
-  // Reduced font sizes for better readability
   size: {
-    xs: 10,
-    sm: 12,
-    base: 14,
-    md: 16,
-    lg: 18,
-    xl: 20,
-    xxl: 24,
-    xxxl: 28,
+    xs:      10,
+    sm:      12,
+    base:    14,
+    md:      16,
+    lg:      18,
+    xl:      20,
+    xxl:     24,
+    xxxl:    28,
     display: 36,
-    hero: 48,
-    jumbo: 64,
+    hero:    48,
+    jumbo:   64,
   },
-
   weight: {
-    normal: '400',
-    medium: '500',
+    normal:   '400',
+    medium:   '500',
     semibold: '600',
-    bold: '700',
+    bold:     '700',
   },
 };
 
 export const spacing = {
-  xxs: 2,
-  xs: 4,
-  sm: 8,
-  md: 12,
+  xxs:  2,
+  xs:   4,
+  sm:   8,
+  md:   12,
   base: 16,
-  lg: 20,
-  xl: 24,
-  xxl: 32,
+  lg:   20,
+  xl:   24,
+  xxl:  32,
   xxxl: 40,
 };
 
 export const borderRadius = {
-  sm: 8,
-  md: 12,
-  lg: 16,
-  xl: 20,
-  xxl: 24,
+  sm:   8,
+  md:   12,
+  lg:   16,
+  xl:   20,
+  xxl:  24,
   xxxl: 28,
   full: 9999,
 };
@@ -130,53 +120,58 @@ export const borderRadius = {
 export const shadows = {
   sm: {
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  lg: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.5,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+  xl: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.55,
+    shadowRadius: 28,
+    elevation: 14,
+  },
+  primary: {
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  success: {
+    shadowColor: '#22C55E',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
     elevation: 3,
   },
-  md: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  lg: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.45,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  xl: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.5,
-    shadowRadius: 28,
-    elevation: 16,
-  },
-  // Blue-tinted shadow for primary action elements
-  primary: {
-    shadowColor: '#3b82f6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
+  glow: {
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
     shadowRadius: 12,
-    elevation: 6,
-  },
-  // Success-tinted shadow for positive elements
-  success: {
-    shadowColor: '#10b981',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 6,
+    elevation: 4,
   },
 };
 
 export const layout = {
   headerHeight: 60,
-  tabBarHeight: 60,
-  inputHeight: 48,
+  tabBarHeight: 64,
+  inputHeight:  48,
   buttonHeight: 48,
 };

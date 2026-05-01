@@ -19,7 +19,7 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import AnimatedCard from '../components/AnimatedCard';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useNavigation } from '@react-navigation/native';
 
@@ -415,9 +415,6 @@ const UsersScreen = () => {
         <TouchableOpacity onPress={() => toggleExpand(item.id)} activeOpacity={0.7}>
           <View style={[styles.cardHeader, { flexDirection: rowDirection }]}>
             <View style={[styles.userHeaderLeft, { flexDirection: rowDirection }]}>
-              <View style={[styles.avatarCircle, isClient && styles.avatarClient]}>
-                <Text style={styles.avatarText}>{item.name?.charAt(0) || '?'}</Text>
-              </View>
               <View style={styles.userHeaderInfo}>
                 <RTLText style={styles.userName}>{item.name}</RTLText>
                 <View style={[styles.userMetaRow, { flexDirection: rowDirection }]}>
@@ -427,7 +424,7 @@ const UsersScreen = () => {
                       onPress={() => handlePhoneCall(item.phoneNumber)}
                       activeOpacity={0.7}
                     >
-                      <FontAwesome5 name="phone-alt" size={12} color={colors.primary.main} solid />
+                      <AppIcon name="call-outline" size={12} color={colors.primary.main} />
                       <Text style={[styles.userMetaText, styles.phoneLink, { writingDirection, textAlign }]}>{item.phoneNumber}</Text>
                     </TouchableOpacity>
                   )}
@@ -439,7 +436,7 @@ const UsersScreen = () => {
                 </View>
               </View>
             </View>
-            <FontAwesome5 name={isExpanded ? 'chevron-down' : (I18nManager.isRTL ? 'chevron-left' : 'chevron-right')} size={14} color={colors.text.tertiary} solid />
+            <AppIcon name={isExpanded ? 'chevron-down-outline' : (I18nManager.isRTL ? 'chevron-back-outline' : 'chevron-forward-outline')} size={14} color={colors.text.tertiary} />
           </View>
         </TouchableOpacity>
 
@@ -449,14 +446,14 @@ const UsersScreen = () => {
             {/* Details Card */}
             <View style={styles.detailsCard}>
               <View style={[styles.detailsTitleRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="clipboard-list" size={16} color={colors.primary.main} solid />
+                <AppIcon name="clipboard-outline" size={16} color={colors.primary.main} />
                 <RTLText style={styles.detailsTitle}>{t('users.basicInfo')}</RTLText>
               </View>
 
               {item.email && (
                 <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="envelope" size={14} color="#3B82F6" solid />
+                    <AppIcon name="mail-outline" size={14} />
                     <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.email')}</Text>
                   </View>
                   <Text style={[styles.detailValue, { writingDirection, textAlign }]}>{item.email}</Text>
@@ -466,7 +463,7 @@ const UsersScreen = () => {
               {item.phoneNumber && (
                 <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
+                    <AppIcon name="call-outline" size={14} />
                     <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.phoneNumber')}</Text>
                   </View>
                   <TouchableOpacity onPress={() => handlePhoneCall(item.phoneNumber)}>
@@ -481,7 +478,7 @@ const UsersScreen = () => {
                     <>
                       <View style={styles.quickPaymentSection}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="plus-circle" size={14} color="#27AE60" solid />
+                          <AppIcon name="add-circle-outline" size={14} />
                           <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.addPayment')}</Text>
                         </View>
                         <TextInput
@@ -496,7 +493,7 @@ const UsersScreen = () => {
 
                       <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
+                          <AppIcon name="cash-outline" size={14} />
                           <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.amountPaidCurrency')}</Text>
                         </View>
                         <TextInput
@@ -511,7 +508,7 @@ const UsersScreen = () => {
 
                       <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="file-invoice-dollar" size={14} color="#F39C12" solid />
+                          <AppIcon name="document-text-outline" size={14} />
                           <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.amountDueCurrency')}</Text>
                         </View>
                         <TextInput
@@ -526,7 +523,7 @@ const UsersScreen = () => {
 
                       <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="book-open" size={14} color="#9B59B6" solid />
+                          <AppIcon name="book-outline" size={14} />
                           <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.lessonCount')}</Text>
                         </View>
                         <TextInput
@@ -549,11 +546,11 @@ const UsersScreen = () => {
                           <View style={[styles.checkboxContainer, { flexDirection: rowDirection }]}>
                             <View style={[styles.checkbox, editFormData.hasSubscription && styles.checkboxChecked]}>
                               {editFormData.hasSubscription && (
-                                <FontAwesome5 name="check" size={14} color="#27AE60" solid />
+                                <AppIcon name="checkmark-outline" size={14} />
                               )}
                             </View>
                             <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                              <FontAwesome5 name="ticket-alt" size={14} color="#9B59B6" solid />
+                              <AppIcon name="ticket-outline" size={14} />
                               <Text style={[styles.checkboxLabel, { writingDirection, textAlign }]}>{t('users.hasSubscription')}</Text>
                             </View>
                           </View>
@@ -569,7 +566,7 @@ const UsersScreen = () => {
                               <View style={[styles.checkboxContainer, { flexDirection: rowDirection }]}>
                                 <View style={[styles.checkbox, editFormData.subscriptionActive && styles.checkboxChecked]}>
                                   {editFormData.subscriptionActive && (
-                                    <FontAwesome5 name="check" size={14} color="#27AE60" solid />
+                                    <AppIcon name="checkmark-outline" size={14} />
                                   )}
                                 </View>
                                 <Text style={[styles.checkboxLabel, { writingDirection, textAlign }]}>{t('clientHome.active')}</Text>
@@ -578,7 +575,7 @@ const UsersScreen = () => {
 
                             <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                                <FontAwesome5 name="layer-group" size={13} color="#E67E22" solid />
+                                <AppIcon name="layers-outline" size={13} />
                                 <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.remaining')}</Text>
                               </View>
                               <TextInput
@@ -593,7 +590,7 @@ const UsersScreen = () => {
 
                             <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                                <FontAwesome5 name="check-double" size={13} color="#27AE60" solid />
+                                <AppIcon name="checkmark-done-outline" size={13} />
                                 <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.used')}</Text>
                               </View>
                               <TextInput
@@ -608,7 +605,7 @@ const UsersScreen = () => {
 
                             <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                                <FontAwesome5 name="list-ol" size={13} color="#3498DB" solid />
+                                <AppIcon name="list-outline" size={13} />
                                 <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.total')}</Text>
                               </View>
                               <Text style={[styles.detailValue, { writingDirection, textAlign }]}>
@@ -624,14 +621,14 @@ const UsersScreen = () => {
                           style={[styles.editButton, styles.saveButton]}
                           onPress={() => saveUserDetails(item.id)}
                         >
-                          <FontAwesome5 name="save" size={14} color="#fff" solid />
+                          <AppIcon name="save-outline" size={14} />
                           <Text style={[styles.editButtonText, { writingDirection, textAlign }]}>{t('common.save')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                           style={[styles.editButton, styles.cancelButton]}
                           onPress={cancelEditing}
                         >
-                          <FontAwesome5 name="times" size={14} color="#fff" solid />
+                          <AppIcon name="close-outline" size={14} />
                           <Text style={[styles.editButtonText, { writingDirection, textAlign }]}>{t('common.cancel')}</Text>
                         </TouchableOpacity>
                       </View>
@@ -640,7 +637,7 @@ const UsersScreen = () => {
                     <>
                       <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="money-bill-wave" size={14} color="#27AE60" solid />
+                          <AppIcon name="cash-outline" size={14} />
                           <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.amountPaid')}</Text>
                         </View>
                         <Text style={[styles.detailValue, styles.paidText, { writingDirection, textAlign }]}>₪{item.amountPaid || 0}</Text>
@@ -648,7 +645,7 @@ const UsersScreen = () => {
 
                       <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="file-invoice-dollar" size={14} color="#F39C12" solid />
+                          <AppIcon name="document-text-outline" size={14} />
                           <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.amountDue')}</Text>
                         </View>
                         <Text style={[styles.detailValue, styles.dueText, { writingDirection, textAlign }]}>₪{item.amountDue || 0}</Text>
@@ -656,7 +653,7 @@ const UsersScreen = () => {
 
                       <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="book-open" size={14} color="#9B59B6" solid />
+                          <AppIcon name="book-outline" size={14} />
                           <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.lessonCount')}</Text>
                         </View>
                         <Text style={[styles.detailValue, { writingDirection, textAlign }]}>{item.lessonCount || 0}</Text>
@@ -667,7 +664,7 @@ const UsersScreen = () => {
                         <View style={styles.subscriptionInfoCard}>
                           <View style={[styles.subscriptionInfoHeader, { flexDirection: rowDirection }]}>
                             <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                              <FontAwesome5 name="ticket-alt" size={14} color="#9B59B6" solid />
+                              <AppIcon name="ticket-outline" size={14} />
                               <Text style={[styles.subscriptionInfoTitle, { writingDirection, textAlign }]}>{t('users.subscription')}</Text>
                             </View>
                             <View style={[styles.subscriptionStatusBadge, item.subscriptionActive && styles.subscriptionActiveBadge]}>
@@ -704,7 +701,7 @@ const UsersScreen = () => {
                         style={styles.editDetailsButton}
                         onPress={() => startEditing(item)}
                       >
-                        <FontAwesome5 name="edit" size={14} color="#fff" solid />
+                        <AppIcon name="create-outline" size={14} />
                         <Text style={[styles.editDetailsButtonText, { writingDirection, textAlign }]}>{t('users.editDetails')}</Text>
                       </TouchableOpacity>
                     </>
@@ -714,7 +711,7 @@ const UsersScreen = () => {
                 <>  
                   <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                     <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                      <FontAwesome5 name="briefcase" size={14} color="#3B82F6" solid />
+                      <AppIcon name="briefcase-outline" size={14} />
                       <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.job')}</Text>
                     </View>
                     <Text style={[styles.detailValue, { writingDirection, textAlign }]}>{item.role || t('roles.worker')}</Text>
@@ -727,15 +724,15 @@ const UsersScreen = () => {
             {isClient && nextLesson && (
               <View style={styles.nextLessonCard}>
                 <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="bullseye" size={16} color="#E74C3C" solid />
+                  <AppIcon name="locate-outline" size={16} />
                   <Text style={[styles.sectionTitle, { writingDirection, textAlign }]}>{t('users.nextLesson')}</Text>
                 </View>
                 <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                  <AppIcon name="calendar-outline" size={14} />
                   <Text style={[styles.lessonInfoText, { writingDirection, textAlign }]}>{formatDate(nextLesson.date)} - {nextLesson.time}</Text>
                 </View>
                 <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
-                  <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                  <AppIcon name="paw-outline" size={16} />
                   <Text style={[styles.lessonInfoText, { writingDirection, textAlign }]}>{getHorseName(nextLesson.horseId)}</Text>
                 </View>
               </View>
@@ -747,7 +744,7 @@ const UsersScreen = () => {
                   <View style={styles.lessonGroup}>
                     <View style={[styles.lessonGroupHeader, { flexDirection: rowDirection }]}>
                       <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="calendar-check" size={14} color="#3B82F6" solid />
+                        <AppIcon name="calendar-outline" size={14} />
                         <Text style={[styles.lessonGroupTitle, { writingDirection, textAlign }]}>{t('users.upcomingLessons')}</Text>
                       </View>
                       <View style={styles.countBadgeSmall}>
@@ -757,11 +754,11 @@ const UsersScreen = () => {
                     {upcomingLessons.slice(0, 3).map(lesson => (
                       <View key={lesson.id} style={styles.lessonItem}>
                         <View style={[styles.lessonItemRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
+                          <AppIcon name="calendar-outline" size={12} />
                           <Text style={[styles.lessonItemText, { writingDirection, textAlign }]}>{formatDate(lesson.date)} - {lesson.time}</Text>
                         </View>
                         <View style={[styles.lessonItemRow, { flexDirection: rowDirection }]}>
-                          <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
+                          <AppIcon name="paw-outline" size={14} />
                           <Text style={[styles.lessonItemSubtext, { writingDirection, textAlign }]}>{getHorseName(lesson.horseId)}</Text>
                         </View>
                       </View>
@@ -776,7 +773,7 @@ const UsersScreen = () => {
                   <View style={styles.lessonGroup}>
                     <View style={[styles.lessonGroupHeader, { flexDirection: rowDirection }]}>
                       <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="scroll" size={14} color="#7C3AED" solid />
+                        <AppIcon name="document-outline" size={14} />
                         <Text style={[styles.lessonGroupTitle, { writingDirection, textAlign }]}>{t('users.lessonHistory')}</Text>
                       </View>
                       <View style={[styles.countBadgeSmall, styles.countBadgePast]}>
@@ -786,11 +783,11 @@ const UsersScreen = () => {
                     {pastLessons.slice(0, 3).map(lesson => (
                       <View key={lesson.id} style={[styles.lessonItem, styles.lessonItemPast]}>
                         <View style={[styles.lessonItemRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="check-circle" size={12} color="#27AE60" solid />
+                          <AppIcon name="checkmark-circle-outline" size={12} />
                           <Text style={[styles.lessonItemText, { writingDirection, textAlign }]}>{formatDate(lesson.date)} - {lesson.time}</Text>
                         </View>
                         <View style={[styles.lessonItemRow, { flexDirection: rowDirection }]}>
-                          <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
+                          <AppIcon name="paw-outline" size={14} />
                           <Text style={[styles.lessonItemSubtext, { writingDirection, textAlign }]}>{getHorseName(lesson.horseId)}</Text>
                         </View>
                       </View>
@@ -814,7 +811,7 @@ const UsersScreen = () => {
               activeOpacity={0.7}
             >
               <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
-                <FontAwesome5 name="history" size={14} color="#fff" solid />
+                <AppIcon name="journal-outline" size={14} />
                 <Text style={[styles.historyButtonText, { writingDirection, textAlign }]}>{t('users.viewHistory')}</Text>
               </View>
             </TouchableOpacity>
@@ -825,7 +822,7 @@ const UsersScreen = () => {
               onPress={() => handleRemoveUser(item.id, item.name)}
             >
               <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 6 }}>
-                <FontAwesome5 name="trash-alt" size={14} color="#E74C3C" solid />
+                <AppIcon name="trash-outline" size={14} />
                 <Text style={[styles.removeButtonText, { writingDirection, textAlign }]}>{isClient ? t('users.deleteClient') : t('users.deleteWorker')}</Text>
               </View>
             </TouchableOpacity>
@@ -844,7 +841,7 @@ const UsersScreen = () => {
       {/* Header with Tabs */}
       <View style={styles.header}>
         <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="users" size={24} color="#3B82F6" solid />
+          <AppIcon name="people-outline" size={24} />
           <RTLText style={styles.pageTitle}>{t('users.title')}</RTLText>
         </View>
 
@@ -872,7 +869,7 @@ const UsersScreen = () => {
 
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <FontAwesome5 name="search" size={16} color={colors.text.secondary} solid style={styles.searchIcon} />
+          <AppIcon name="search-outline" size={16} color={colors.text.secondary} style={styles.searchIcon} />
           <TextInput
             style={[styles.searchInput, { textAlign }]}
             placeholder={t('users.searchPlaceholder')}
@@ -882,7 +879,7 @@ const UsersScreen = () => {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-              <FontAwesome5 name="times" size={14} color={colors.text.secondary} solid />
+              <AppIcon name="close-outline" size={14} color={colors.text.secondary} />
             </TouchableOpacity>
           )}
         </View>
@@ -900,12 +897,7 @@ const UsersScreen = () => {
         nestedScrollEnabled={true}
         ListEmptyComponent={
             <View style={styles.emptyState}>
-              <FontAwesome5 
-                name={activeTab === 'clients' ? 'users' : 'hard-hat'} 
-                size={64} 
-                color="#95A5A6" 
-                solid 
-              />
+              <AppIcon name={activeTab === 'clients' ? 'people-outline' : 'construct-outline'} size={64} />
               <RTLText style={styles.emptyText}>
                 {searchQuery ? t('users.noResults') : (activeTab === 'clients' ? t('users.noClientsYet') : t('users.noWorkersYet'))}
               </RTLText>
@@ -919,7 +911,7 @@ const UsersScreen = () => {
               {/* Add New User Form */}
               <View style={styles.newUserForm}>
                 <View style={[styles.formTitleRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
+                  <AppIcon name="add-circle-outline" size={20} />
                   <RTLText style={styles.formTitle}>
                     {activeTab === 'clients' ? t('users.addNewClient') : t('users.addNewWorker')}
                   </RTLText>
@@ -928,7 +920,7 @@ const UsersScreen = () => {
 
                 <View style={styles.inputGroup}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                    <AppIcon name="person-outline" size={14} />
                     <Text style={[styles.label, { writingDirection, textAlign }]}>{t('users.nameLabel')}</Text>
                   </View>
                   <TextInput
@@ -944,7 +936,7 @@ const UsersScreen = () => {
 
                 <View style={styles.inputGroup}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="envelope" size={14} color="#3B82F6" solid />
+                    <AppIcon name="mail-outline" size={14} />
                     <Text style={[styles.label, { writingDirection, textAlign }]}>{t('users.email')}</Text>
                   </View>
                   <TextInput
@@ -962,7 +954,7 @@ const UsersScreen = () => {
 
                 <View style={styles.inputGroup}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="phone-alt" size={14} color="#27AE60" solid />
+                    <AppIcon name="call-outline" size={14} />
                     <Text style={[styles.label, { writingDirection, textAlign }]}>{t('users.phoneNumber')}</Text>
                   </View>
                   <TextInput
@@ -981,7 +973,7 @@ const UsersScreen = () => {
                   <View style={styles.subscriptionSection}>
                     <View style={styles.subscriptionHeader}>
                       <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="ticket-alt" size={16} color="#9B59B6" solid />
+                        <AppIcon name="ticket-outline" size={16} />
                         <Text style={[styles.subscriptionTitle, { writingDirection, textAlign }]}>{t('users.subscription')}</Text>
                       </View>
                     </View>
@@ -998,7 +990,7 @@ const UsersScreen = () => {
                       <View style={[styles.checkboxContainer, { flexDirection: rowDirection }]}>
                         <View style={[styles.checkbox, newUserForm.hasSubscription && styles.checkboxChecked]}>
                           {newUserForm.hasSubscription && (
-                            <FontAwesome5 name="check" size={14} color="#27AE60" solid />
+                            <AppIcon name="checkmark-outline" size={14} />
                           )}
                         </View>
                         <Text style={[styles.checkboxLabel, { writingDirection, textAlign }]}>{t('users.hasSubscription')}</Text>
@@ -1008,7 +1000,7 @@ const UsersScreen = () => {
                     {newUserForm.hasSubscription && (
                       <View style={styles.inputGroup}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                          <FontAwesome5 name="chart-bar" size={14} color="#E67E22" solid />
+                          <AppIcon name="bar-chart-outline" size={14} />
                           <Text style={[styles.label, { writingDirection, textAlign }]}>{t('users.subscriptionLessonsCount')}</Text>
                         </View>
                         <TextInput
@@ -1035,7 +1027,7 @@ const UsersScreen = () => {
                   activeOpacity={0.7}
                 >
                   <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: spacing.sm }}>
-                    <FontAwesome5 name="plus" size={14} color="#fff" solid />
+                    <AppIcon name="add-outline" size={14} />
                     <Text style={[styles.addButtonText, { writingDirection, textAlign }]}>
                       {isAddingUser ? t('users.adding') : (activeTab === 'clients' ? t('users.addClient') : t('users.addWorker'))}
                     </Text>
@@ -1173,23 +1165,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  avatarCircle: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.accent.pink,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginEnd: spacing.md,
-  },
-  avatarClient: {
-    backgroundColor: colors.status.info,
-  },
-  avatarText: {
-    fontSize: typography.size.xl,
-    fontWeight: typography.weight.bold,
-    color: colors.text.primary,
-  },
+
   userHeaderInfo: {
     flex: 1,
   },

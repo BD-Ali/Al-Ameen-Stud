@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+﻿import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { colors, typography, spacing, borderRadius } from '../styles/theme';
-import { FontAwesome5 } from '@expo/vector-icons';
+import AppIcon from './AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 import useRTL from '../hooks/useRTL';
 
@@ -89,16 +89,11 @@ const InAppNotificationBanner = ({
 
   const getIcon = () => {
     switch (type) {
-      case 'announcement':
-        return { name: 'bullhorn', color: '#3498DB' };
-      case 'alert':
-        return { name: 'exclamation-triangle', color: '#F39C12' };
-      case 'success':
-        return { name: 'check-circle', color: '#27AE60' };
-      case 'info':
-        return { name: 'info-circle', color: '#3498DB' };
-      default:
-        return { name: 'bell', color: '#F39C12' };
+      case 'announcement': return 'megaphone-outline';
+      case 'alert':        return 'warning-outline';
+      case 'success':      return 'checkmark-circle-outline';
+      case 'info':         return 'information-circle-outline';
+      default:             return 'notifications-outline';
     }
   };
 
@@ -123,7 +118,7 @@ const InAppNotificationBanner = ({
         activeOpacity={0.9}
       >
         <View style={styles.iconContainer}>
-          <FontAwesome5 name={getIcon().name} size={20} color={getIcon().color} solid />
+          <AppIcon name={getIcon()} size={20} />
         </View>
 
         <View style={styles.content}>
@@ -141,7 +136,7 @@ const InAppNotificationBanner = ({
           accessibilityLabel={t('common.close')}
           accessibilityRole="button"
         >
-          <FontAwesome5 name="times" size={14} color={colors.text.secondary} />
+          <AppIcon name="close-outline" size={14} color={colors.text.secondary} />
         </TouchableOpacity>
       </TouchableOpacity>
     </Animated.View>

@@ -9,7 +9,7 @@ import RTLText from '../components/RTLText';
 import RTLRow from '../components/RTLRow';
 import useRTL from '../hooks/useRTL';
 import { useFadeIn, useScaleIn, usePulse } from '../utils/animations';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -91,7 +91,7 @@ const VisitorHomeScreen = () => {
         <AnnouncementsFeed userRole="visitor" />
 
         <View style={[styles.subheadingRow, { flexDirection: rowDirection }]}>
-          <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
+          <AppIcon name="paw-outline" size={24} />
           <RTLText style={styles.subheading}>{t('visitorHome.ourHorses')}</RTLText>
         </View>
 
@@ -108,11 +108,11 @@ const VisitorHomeScreen = () => {
               )}
               <View style={styles.horseInfo}>
                 <View style={[styles.horseNameRow, { flexDirection: rowDirection }]}>
-                  <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
+                  <AppIcon name="paw-outline" size={20} />
                   <RTLText style={styles.horseName}>{item.name}</RTLText>
                 </View>
                 <RTLRow
-                  icon={<MaterialCommunityIcons name="horse" size={14} color="#E67E22" />}
+                  icon={<AppIcon name="paw-outline" size={14} />}
                   label={t('horses.breed')}
                   value={item.breed}
                   showColon={false}
@@ -125,7 +125,7 @@ const VisitorHomeScreen = () => {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="horse-variant" size={64} color="#F39C12" />
+            <AppIcon name="paw-outline" size={64} />
             <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('visitorHome.noHorses')}</RTLText>
           </View>
         )}
@@ -138,7 +138,7 @@ const VisitorHomeScreen = () => {
         activeOpacity={0.8}
       >
         <Animated.View style={{ transform: [{ scale: pulseAnim }, { scaleX: I18nManager.isRTL ? -1 : 1 }] }}>
-          <FontAwesome5 name="phone" size={20} color="#fff" solid />
+          <AppIcon name="call-outline" size={20} />
         </Animated.View>
       </TouchableOpacity>
     </SafeAreaView>

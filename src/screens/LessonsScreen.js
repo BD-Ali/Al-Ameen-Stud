@@ -7,7 +7,7 @@ import AnimatedCard from '../components/AnimatedCard';
 import RTLRow from '../components/RTLRow';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -157,7 +157,7 @@ const LessonsScreen = () => {
         ListHeaderComponent={
           <View style={[styles.headerSection, { flexDirection: rowDirection }]}>
             <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="book-open" size={24} color="#9B59B6" solid />
+              <AppIcon name="book-outline" size={24} />
               <RTLText style={styles.pageTitle}>{t('lessons.title')}</RTLText>
             </View>
             <View style={styles.countBadge}>
@@ -170,35 +170,35 @@ const LessonsScreen = () => {
             <View style={[styles.cardHeader, { flexDirection: rowDirection }]}>
               <View style={styles.dateTimeContainer}>
                 <View style={[styles.dateTimeRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                  <AppIcon name="calendar-outline" size={14} />
                   <Text style={[styles.lessonDateTime, { writingDirection, textAlign }]}>{item.date}</Text>
                 </View>
                 <View style={[styles.dateTimeRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                  <AppIcon name="time-outline" size={14} />
                   <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
                 </View>
               </View>
               {item.confirmed && (
                 <View style={[styles.confirmedBadge, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="check-circle" size={14} color="#27AE60" solid />
+                  <AppIcon name="checkmark-circle-outline" size={14} />
                   <Text style={[styles.confirmedBadgeText, { writingDirection, textAlign }]}>{t('lessons.completed')}</Text>
                 </View>
               )}
               {item.status === 'cancelled' && (
                 <View style={[styles.cancelledBadge, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="times-circle" size={14} color="#E74C3C" solid />
+                  <AppIcon name="close-circle-outline" size={14} />
                   <Text style={[styles.cancelledBadgeText, { writingDirection, textAlign }]}>{t('lessons.cancelled')}</Text>
                 </View>
               )}
               {item.status === 'scheduled' && !item.confirmed && (
                 <View style={[styles.scheduledBadge, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="hourglass-half" size={14} color="#F39C12" solid />
+                  <AppIcon name="hourglass-outline" size={14} />
                   <Text style={[styles.scheduledBadgeText, { writingDirection, textAlign }]}>{t('lessons.scheduledStatus')}</Text>
                 </View>
               )}
             </View>
             <RTLRow
-              icon={<MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />}
+              icon={<AppIcon name="paw-outline" size={16} />}
               label={t('lessons.horse')}
               value={getHorseName(item.horseId)}
               showColon={false}
@@ -207,7 +207,7 @@ const LessonsScreen = () => {
               style={styles.cardRow}
             />
             <RTLRow
-              icon={<FontAwesome5 name="user" size={14} color="#1ABC9C" solid />}
+              icon={<AppIcon name="person-outline" size={14} />}
               label={t('lessons.client')}
               value={getClientName(item.clientId)}
               showColon={false}
@@ -216,7 +216,7 @@ const LessonsScreen = () => {
               style={styles.cardRow}
             />
             <RTLRow
-              icon={<FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />}
+              icon={<AppIcon name="school-outline" size={14} />}
               label={t('lessons.instructor')}
               value={getWorkerName(item.instructorId)}
               showColon={false}
@@ -228,7 +228,7 @@ const LessonsScreen = () => {
               style={[styles.removeButton, { flexDirection: rowDirection }]}
               onPress={() => handleRemoveLesson(item.id)}
             >
-              <FontAwesome5 name="trash-alt" size={14} color="#E74C3C" solid />
+              <AppIcon name="trash-outline" size={14} />
               <Text style={[styles.removeButtonText, { writingDirection, textAlign }]}>{t('lessons.deleteLesson')}</Text>
             </TouchableOpacity>
           </AnimatedCard>
@@ -236,13 +236,13 @@ const LessonsScreen = () => {
         ListFooterComponent={
           <View style={styles.formSection}>
             <View style={[styles.formTitleRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
+              <AppIcon name="add-circle-outline" size={20} />
               <RTLText style={styles.formTitle}>{t('lessons.scheduleNewLesson')}</RTLText>
             </View>
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                <AppIcon name="calendar-outline" size={14} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectDate')}</Text>
               </View>
               <TouchableOpacity
@@ -252,7 +252,7 @@ const LessonsScreen = () => {
                 <Text style={[styles.pickerButtonText, { writingDirection, textAlign }]}>
                   {formatDate(date)}
                 </Text>
-                <FontAwesome5 name="calendar-alt" size={16} color="#5DADE2" solid />
+                <AppIcon name="calendar-outline" size={16} />
               </TouchableOpacity>
 
               {showDatePicker && (
@@ -278,7 +278,7 @@ const LessonsScreen = () => {
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                <AppIcon name="time-outline" size={14} />
                   <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectTime')}</Text>
               </View>
               <TouchableOpacity
@@ -288,7 +288,7 @@ const LessonsScreen = () => {
                 <Text style={[styles.pickerButtonText, { writingDirection, textAlign }]}>
                   {formatTime(time)}
                 </Text>
-                <FontAwesome5 name="clock" size={16} color="#F39C12" solid />
+                <AppIcon name="time-outline" size={16} />
               </TouchableOpacity>
 
               {showTimePicker && (
@@ -314,7 +314,7 @@ const LessonsScreen = () => {
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                <AppIcon name="paw-outline" size={16} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectHorse')}</Text>
               </View>
               <TouchableOpacity
@@ -331,13 +331,13 @@ const LessonsScreen = () => {
                 <Text style={[styles.pickerButtonText, !horseId && styles.placeholderText]}>
                   {getSelectedHorseName()}
                 </Text>
-                <FontAwesome5 name={showHorsePicker ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text.tertiary} solid />
+                <AppIcon name={showHorsePicker ? 'chevron-up-outline' : 'chevron-down-outline'} size={12} color={colors.text.tertiary} />
               </TouchableOpacity>
 
               {showHorsePicker && horses.length > 0 && (
                 <View style={styles.pickerDropdownContainer}>
                   <View style={[styles.pickerSearchWrapper, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="search" size={13} color={colors.text.muted} solid />
+                    <AppIcon name="search-outline" size={13} color={colors.text.muted} />
                     <TextInput
                       style={[styles.pickerSearchInput, { textAlign }]}
                       placeholder={t('lessons.searchHorse')}
@@ -382,7 +382,7 @@ const LessonsScreen = () => {
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                <AppIcon name="person-outline" size={14} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectClient')}</Text>
               </View>
               <TouchableOpacity
@@ -399,13 +399,13 @@ const LessonsScreen = () => {
                 <Text style={[styles.pickerButtonText, !clientId && styles.placeholderText]}>
                   {getSelectedClientName()}
                 </Text>
-                <FontAwesome5 name={showClientPicker ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text.tertiary} solid />
+                <AppIcon name={showClientPicker ? 'chevron-up-outline' : 'chevron-down-outline'} size={12} color={colors.text.tertiary} />
               </TouchableOpacity>
 
               {showClientPicker && clients.length > 0 && (
                 <View style={styles.pickerDropdownContainer}>
                   <View style={[styles.pickerSearchWrapper, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="search" size={13} color={colors.text.muted} solid />
+                    <AppIcon name="search-outline" size={13} color={colors.text.muted} />
                     <TextInput
                       style={[styles.pickerSearchInput, { textAlign }]}
                       placeholder={t('lessons.searchClient')}
@@ -454,7 +454,7 @@ const LessonsScreen = () => {
               return selectedClient?.hasSubscription && selectedClient?.subscriptionActive;
             })() && (
               <View style={[styles.clinicToggleRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="ticket-alt" size={14} color="#9B59B6" solid />
+                <AppIcon name="ticket-outline" size={14} />
                 <Text style={[styles.clinicToggleLabel, { writingDirection, textAlign, flex: 1 }]}>
                   {t('lessons.markAsClinicLesson')}
                 </Text>
@@ -469,7 +469,7 @@ const LessonsScreen = () => {
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
+                <AppIcon name="school-outline" size={14} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('lessons.selectInstructor')}</Text>
               </View>
               <TouchableOpacity
@@ -486,7 +486,7 @@ const LessonsScreen = () => {
                 <Text style={[styles.pickerButtonText, !instructorId && styles.placeholderText]}>
                   {getSelectedInstructorName()}
                 </Text>
-                <FontAwesome5 name={showInstructorPicker ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text.tertiary} solid />
+                <AppIcon name={showInstructorPicker ? 'chevron-up-outline' : 'chevron-down-outline'} size={12} color={colors.text.tertiary} />
               </TouchableOpacity>
 
               {showInstructorPicker && (
@@ -494,7 +494,7 @@ const LessonsScreen = () => {
                   {workerUsers && workerUsers.length > 0 ? (
                     <>
                       <View style={[styles.pickerSearchWrapper, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="search" size={13} color={colors.text.muted} solid />
+                        <AppIcon name="search-outline" size={13} color={colors.text.muted} />
                         <TextInput
                           style={[styles.pickerSearchInput, { textAlign }]}
                           placeholder={t('lessons.searchInstructor')}
@@ -552,7 +552,7 @@ const LessonsScreen = () => {
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <FontAwesome5 name="book-open" size={64} color="#9B59B6" solid />
+            <AppIcon name="book-outline" size={64} />
             <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('lessons.noScheduledLessons')}</RTLText>
             <RTLText style={[styles.emptySubtext, { writingDirection, textAlign }]}>{t('lessons.scheduleFirstLesson')}</RTLText>
           </View>

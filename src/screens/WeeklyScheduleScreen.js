@@ -15,7 +15,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
@@ -447,7 +447,7 @@ const WeeklyScheduleScreen = () => {
             >
               <View style={[styles.timeSlotHeader, { flexDirection: rowDirection }]}>
                 <View style={[styles.timeSlotTimeRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="clock" size={12} color="#5DADE2" solid />
+                  <AppIcon name="time-outline" size={12} />
                   <Text style={[styles.timeSlotTime, { writingDirection, textAlign }]}>{timeSlot}</Text>
                 </View>
                 {hasAssignments && (
@@ -457,7 +457,7 @@ const WeeklyScheduleScreen = () => {
                 )}
                 {isSelected && (
                   <View style={styles.selectedBadge}>
-                    <FontAwesome5 name="check" size={12} color="#27AE60" solid />
+                    <AppIcon name="checkmark-outline" size={12} />
                   </View>
                 )}
               </View>
@@ -467,7 +467,7 @@ const WeeklyScheduleScreen = () => {
                   {schedules.map((schedule, index) => (
                     <View key={schedule.id} style={[styles.workerAssignment, index > 0 && styles.workerAssignmentDivider]}>
                       <View style={[styles.workerNameRow, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
+                        <AppIcon name="person-outline" size={12} />
                         <Text style={[styles.workerName, { writingDirection, textAlign }]}>
                           {getWorkerName(schedule.workerId)}
                         </Text>
@@ -517,7 +517,7 @@ const WeeklyScheduleScreen = () => {
                 {editMode ? t('weeklySchedule.editTaskTitle') : t('weeklySchedule.assignWork')}
               </Text>
               <TouchableOpacity onPress={closeModal}>
-                <FontAwesome5 name="times" size={20} color={colors.text.secondary} solid />
+                <AppIcon name="close-outline" size={20} color={colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
@@ -554,11 +554,10 @@ const WeeklyScheduleScreen = () => {
                           selectedWorker === worker.id && styles.workerCardSelected,
                         ]}
                       >
-                        <FontAwesome5
-                          name="user-circle"
+                        <AppIcon
+                          name="person-circle-outline"
                           size={24}
-                          color={selectedWorker === worker.id ? '#1ABC9C' : colors.text.tertiary}
-                          solid
+                          color={selectedWorker === worker.id ? colors.primary.main : colors.text.tertiary}
                         />
                         <Text
                           style={[

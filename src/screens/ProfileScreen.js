@@ -14,7 +14,7 @@ import {
   UIManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -108,9 +108,9 @@ const ProfileScreen = ({ navigation }) => {
   // Get role display info
   const getRoleInfo = (role) => {
     const roleMap = {
-      'client': { label: t('roles.client'), color: colors.accent.teal, icon: 'user', iconFamily: 'FontAwesome5', iconColor: '#1ABC9C' },
-      'worker': { label: t('roles.worker'), color: colors.accent.pink, icon: 'hard-hat', iconFamily: 'FontAwesome5', iconColor: '#E91E63' },
-      'admin': { label: t('roles.admin'), color: colors.accent.purple, icon: 'user-shield', iconFamily: 'FontAwesome5', iconColor: '#9B59B6' },
+      'client': { label: t('roles.client'), color: colors.accent.teal, icon: 'person-outline', iconColor: '#1ABC9C' },
+      'worker': { label: t('roles.worker'), color: colors.accent.pink, icon: 'construct-outline', iconColor: '#E91E63' },
+      'admin': { label: t('roles.admin'), color: colors.accent.purple, icon: 'shield-checkmark-outline', iconColor: '#9B59B6' },
     };
     return roleMap[role?.toLowerCase()] || roleMap['client'];
   };
@@ -508,7 +508,7 @@ const ProfileScreen = ({ navigation }) => {
             <Text style={[styles.displayName, { writingDirection, textAlign }]}>{displayName}</Text>
             <Text style={[styles.displayEmail, { writingDirection, textAlign }]}>{displayEmail}</Text>
             <View style={[styles.roleBadgeLarge, { backgroundColor: roleInfo.color + '15', borderColor: roleInfo.color, flexDirection: rowDirection }]}>
-              <FontAwesome5 name={roleInfo.icon} size={16} color={roleInfo.iconColor} solid style={styles.roleIconLarge} />
+              <AppIcon name={roleInfo.icon} size={16} color={roleInfo.iconColor} style={styles.roleIconLarge} />
               <Text style={[styles.roleBadgeText, { color: roleInfo.color }]}>
                 {roleInfo.label}
               </Text>
@@ -519,7 +519,7 @@ const ProfileScreen = ({ navigation }) => {
           <AnimatedCard index={1} delay={150} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="clipboard-list" size={22} color={colors.primary.light} solid />
+                <AppIcon name="clipboard-outline" size={22} color={colors.primary.light} />
                 <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('profile.accountInfo')}</Text>
               </View>
             </View>
@@ -540,7 +540,7 @@ const ProfileScreen = ({ navigation }) => {
               </View>
             </View>
             <View style={styles.infoNote}>
-              <FontAwesome5 name="info-circle" size={18} color={colors.status.info} solid style={styles.infoNoteIcon} />
+              <AppIcon name="information-circle-outline" size={18} color={colors.status.info} style={styles.infoNoteIcon} />
               <Text style={[styles.infoNoteText, { writingDirection, textAlign }]}>
                 {userRole === 'admin'
                   ? t('profile.adminNameChangeNote')
@@ -559,10 +559,10 @@ const ProfileScreen = ({ navigation }) => {
                   activeOpacity={0.7}
                 >
                   <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="user-edit" size={20} color={colors.accent.teal} solid />
+                    <AppIcon name="create-outline" size={20} color={colors.accent.teal} />
                     <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('profile.changeName')}</Text>
                   </View>
-                  <Ionicons name={showNameSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
+                  <AppIcon name={showNameSection ? "chevron-down-outline" : "chevron-forward-outline"} size={22} color={colors.text.tertiary} />
                 </TouchableOpacity>
               </View>
 
@@ -609,10 +609,10 @@ const ProfileScreen = ({ navigation }) => {
                 activeOpacity={0.7}
               >
                 <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="lock" size={22} color={colors.accent.amber} solid />
+                  <AppIcon name="lock-closed-outline" size={22} color={colors.accent.amber} />
                   <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('profile.changePassword')}</Text>
                 </View>
-                <Ionicons name={showPasswordSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
+                <AppIcon name={showPasswordSection ? "chevron-down-outline" : "chevron-forward-outline"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
 
@@ -687,10 +687,10 @@ const ProfileScreen = ({ navigation }) => {
                 activeOpacity={0.7}
               >
                 <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="envelope" size={20} color={colors.status.error} solid />
+                  <AppIcon name="mail-outline" size={20} color={colors.status.error} />
                   <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('profile.changeEmail')}</Text>
                 </View>
-                <Ionicons name={showEmailSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
+                <AppIcon name={showEmailSection ? "chevron-down-outline" : "chevron-forward-outline"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
 
@@ -751,17 +751,17 @@ const ProfileScreen = ({ navigation }) => {
                 activeOpacity={0.7}
               >
                 <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="trash-alt" size={20} color={colors.status.error} solid />
+                  <AppIcon name="trash-outline" size={20} color={colors.status.error} />
                   <Text style={[styles.cardTitle, { color: colors.status.error }]}>{t('profile.deleteAccount')}</Text>
                 </View>
-                <Ionicons name={showDeleteSection ? "chevron-down" : "chevron-forward"} size={22} color={colors.text.tertiary} />
+                <AppIcon name={showDeleteSection ? "chevron-down-outline" : "chevron-forward-outline"} size={22} color={colors.text.tertiary} />
               </TouchableOpacity>
             </View>
 
             {showDeleteSection && (
               <View style={styles.framedContent}>
                 <View style={styles.deleteWarning}>
-                  <FontAwesome5 name="exclamation-triangle" size={24} color={colors.status.error} solid style={styles.warningIcon} />
+                  <AppIcon name="warning-outline" size={24} color={colors.status.error} style={styles.warningIcon} />
                   <Text style={styles.deleteWarningText}>
                     {t('profile.deleteWarning')}
                   </Text>
@@ -792,7 +792,7 @@ const ProfileScreen = ({ navigation }) => {
                       <ActivityIndicator color={colors.text.primary} size="small" />
                     ) : (
                       <>
-                        <FontAwesome5 name="trash-alt" size={16} color={colors.text.primary} solid />
+                        <AppIcon name="trash-outline" size={16} color={colors.text.primary} />
                         <Text style={styles.deleteButtonText}>{t('profile.deletePermanently')}</Text>
                       </>
                     )}
@@ -806,7 +806,7 @@ const ProfileScreen = ({ navigation }) => {
           <AnimatedCard index={userRole === 'admin' ? 6 : 5} delay={350} style={styles.card}>
             <View style={styles.sectionTitleContainer}>
               <View style={[styles.titleWithIcon, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="globe" size={22} color={colors.primary.light} solid />
+                <AppIcon name="globe-outline" size={22} color={colors.primary.light} />
                 <Text style={[styles.cardTitle, { writingDirection, textAlign }]}>{t('language.title')}</Text>
               </View>
             </View>
@@ -817,7 +817,7 @@ const ProfileScreen = ({ navigation }) => {
 
           {/* Security Note */}
           <View style={styles.securityNote}>
-            <FontAwesome5 name="shield-alt" size={22} color={colors.status.success} solid style={styles.securityNoteIcon} />
+            <AppIcon name="shield-outline" size={22} color={colors.status.success} style={styles.securityNoteIcon} />
             <RTLText style={styles.securityNoteText}>
               {t('profile.securityNote')}
             </RTLText>

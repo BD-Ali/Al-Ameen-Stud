@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
+﻿import React, { useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, Platform } from 'react-native';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -24,7 +24,7 @@ const FeedScreen = () => {
         ListHeaderComponent={
           <View style={[styles.headerSection, { flexDirection: rowDirection }]}>
             <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="carrot" size={24} color="#FF9800" solid />
+              <AppIcon name="nutrition-outline" size={24} />
               <RTLText style={styles.pageTitle}>{t('feed.title')}</RTLText>
             </View>
             <View style={styles.countBadge}>
@@ -36,11 +36,11 @@ const FeedScreen = () => {
           <AnimatedCard index={index} delay={80} style={styles.card}>
             <View style={[styles.cardHeader, { flexDirection: rowDirection }]}>
               <RTLText style={styles.horseName}>{item.name}</RTLText>
-              <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
+              <AppIcon name="paw-outline" size={24} />
             </View>
             <View style={styles.scheduleContainer}>
               <View style={[styles.scheduleLabelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="clipboard-list" size={14} color="#64748b" solid />
+                <AppIcon name="clipboard-outline" size={14} />
                 <Text style={[styles.scheduleLabel, { writingDirection, textAlign }]}>{t('feed.feedTimes')}</Text>
               </View>
               <RTLText style={styles.scheduleValue}>
@@ -52,7 +52,7 @@ const FeedScreen = () => {
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <FontAwesome5 name="carrot" size={48} color="#FF9800" solid />
+            <AppIcon name="nutrition-outline" size={48} />
             <RTLText style={styles.emptyText}>{t('feed.noFeedSchedules')}</RTLText>
             <RTLText style={styles.emptySubtext}>{t('feed.addHorsesForFeed')}</RTLText>
           </View>

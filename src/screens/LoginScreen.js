@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+﻿import React, { useState, useContext, useRef } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import {
   I18nManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FontAwesome5 } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { useFadeIn, useSlideInFromBottom, useScaleIn, createPressAnimation } from '../utils/animations';
@@ -137,7 +137,7 @@ const LoginScreen = ({ navigation }) => {
                 <View style={styles.inputContainer}>
                   <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.fullName')}</Text>
                   <View style={styles.inputWrapper}>
-                    <FontAwesome5 name="user" size={18} color={colors.text.muted} solid style={styles.inputIcon} />
+                    <AppIcon name="person-outline" size={18} color={colors.text.muted} style={styles.inputIcon} />
                     <TextInput
                       style={[styles.input, { textAlign }]}
                       placeholder={t('auth.enterFullName')}
@@ -152,7 +152,7 @@ const LoginScreen = ({ navigation }) => {
                 <View style={styles.inputContainer}>
                   <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.phoneNumber')}</Text>
                   <View style={styles.inputWrapper}>
-                    <FontAwesome5 name="phone" size={16} color={colors.text.muted} solid style={styles.inputIcon} />
+                    <AppIcon name="call-outline" size={16} color={colors.text.muted} style={styles.inputIcon} />
                     <TextInput
                       style={[styles.input, { textAlign }]}
                       placeholder={t('auth.enterPhoneNumber')}
@@ -170,7 +170,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.email')}</Text>
               <View style={styles.inputWrapper}>
-                <FontAwesome5 name="envelope" size={16} color={colors.text.muted} solid style={styles.inputIcon} />
+                <AppIcon name="mail-outline" size={16} color={colors.text.muted} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.input, { textAlign }]}
                   placeholder="your@email.com"
@@ -187,7 +187,7 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.inputContainer}>
               <Text style={[styles.label, { writingDirection, textAlign }]}>{t('auth.password')}</Text>
               <View style={styles.inputWrapper}>
-                <FontAwesome5 name="lock" size={18} color={colors.text.muted} solid style={styles.inputIcon} />
+                <AppIcon name="lock-closed-outline" size={18} color={colors.text.muted} style={styles.inputIcon} />
                 <TextInput
                   style={[styles.input, { textAlign }]}
                   placeholder="••••••••"
@@ -217,7 +217,7 @@ const LoginScreen = ({ navigation }) => {
                     <Text style={styles.primaryButtonText}>
                       {isSignUp ? t('auth.createAccount') : t('auth.signIn')}
                     </Text>
-                    <FontAwesome5 name={I18nManager.isRTL ? 'arrow-left' : 'arrow-right'} size={16} color={colors.text.primary} solid />
+                    <AppIcon name={I18nManager.isRTL ? 'arrow-back-outline' : 'arrow-forward-outline'} size={16} color={colors.text.primary} />
                   </>
                 )}
               </Animated.View>
@@ -242,7 +242,7 @@ const LoginScreen = ({ navigation }) => {
 
             {isSignUp && (
               <View style={styles.infoBox}>
-                <FontAwesome5 name="info-circle" size={16} color="#3498DB" solid style={styles.infoIcon} />
+                <AppIcon name="information-circle-outline" size={16} style={styles.infoIcon} />
                 <Text style={styles.infoText}>
                   {t('auth.signUpInfo')}
                 </Text>
@@ -263,7 +263,7 @@ const LoginScreen = ({ navigation }) => {
             >
               <Animated.View style={[styles.visitorButtonContent, { transform: [{ scale: visitorButtonScale }] }]}>
                 <View style={styles.buttonReflection} />
-                <FontAwesome5 name="eye" size={18} color={colors.text.tertiary} solid style={styles.visitorIcon} />
+                <AppIcon name="eye-outline" size={18} color={colors.text.tertiary} style={styles.visitorIcon} />
                 <Text style={styles.visitorButtonText}>{t('auth.continueAsVisitor')}</Text>
               </Animated.View>
             </TouchableOpacity>

@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+﻿import React, { useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { TouchableOpacity, Text, StyleSheet, Alert, View, Image, Platform } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import AppIcon from './AppIcon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthContext } from '../context/AuthContext';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -76,7 +76,7 @@ const ClientTabs = () => {
         options={{
           tabBarLabel: t('nav.clientHome'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="home" size={20} color={focused ? colors.primary.main : colors.text.tertiary} solid />
+            <AppIcon name="home-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />
@@ -86,7 +86,7 @@ const ClientTabs = () => {
         options={{
           tabBarLabel: t('nav.clientHistory'),
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5 name="history" size={20} color={focused ? colors.accent.purple : colors.text.tertiary} solid />
+            <AppIcon name="journal-outline" size={20} color={focused ? colors.primary.main : colors.text.tertiary} />
           ),
         }}
       />

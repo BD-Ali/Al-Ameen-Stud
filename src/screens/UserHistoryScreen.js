@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
@@ -73,9 +73,9 @@ const UserHistoryScreen = ({ route }) => {
 
   // Status colours & icons
   const lessonStatusMeta = (status, confirmed) => {
-    if (confirmed || status === 'completed') return { icon: 'check-circle', color: colors.status.success, label: t('userHistory.completed') };
-    if (status === 'cancelled') return { icon: 'times-circle', color: colors.status.error, label: t('userHistory.cancelled') };
-    return { icon: 'clock', color: colors.status.info, label: t('userHistory.scheduled') };
+    if (confirmed || status === 'completed') return { icon: 'checkmark-circle-outline', color: colors.status.success, label: t('userHistory.completed') };
+    if (status === 'cancelled') return { icon: 'close-circle-outline', color: colors.status.error, label: t('userHistory.cancelled') };
+    return { icon: 'time-outline', color: colors.status.info, label: t('userHistory.scheduled') };
   };
 
   // ── build unified timeline ──────────────────────────────────────────
@@ -265,15 +265,15 @@ const UserHistoryScreen = ({ route }) => {
   // ── filter chips ────────────────────────────────────────────────────
   const filters = useMemo(() => {
     const base = [
-      { key: 'all', label: t('userHistory.all'), count: stats.totalItems, icon: 'list' },
-      { key: 'lesson', label: t('userHistory.lessons'), count: stats.totalLessons, icon: 'book-open' },
+      { key: 'all', label: t('userHistory.all'), count: stats.totalItems, icon: 'list-outline' },
+      { key: 'lesson', label: t('userHistory.lessons'), count: stats.totalLessons, icon: 'book-outline' },
     ];
     if (userType === 'worker') {
-      base.push({ key: 'mission', label: t('userHistory.missions'), count: stats.totalMissions, icon: 'tasks' });
-      base.push({ key: 'schedule', label: t('userHistory.schedules'), count: stats.totalSchedules, icon: 'calendar-alt' });
+      base.push({ key: 'mission', label: t('userHistory.missions'), count: stats.totalMissions, icon: 'checkbox-outline' });
+      base.push({ key: 'schedule', label: t('userHistory.schedules'), count: stats.totalSchedules, icon: 'calendar-outline' });
     }
     if (userType === 'client') {
-      base.push({ key: 'payment', label: t('userHistory.payments'), count: stats.totalPayments, icon: 'money-bill-wave' });
+      base.push({ key: 'payment', label: t('userHistory.payments'), count: stats.totalPayments, icon: 'cash-outline' });
     }
     return base;
   }, [userType, stats]);
@@ -308,16 +308,15 @@ const UserHistoryScreen = ({ route }) => {
         activeOpacity={0.7}
         style={[styles.dateSectionHeader, isOpen && styles.dateSectionHeaderOpen, { flexDirection: rowDirection }]}
       >
-        <FontAwesome5 name="calendar-day" size={14} color={colors.accent.teal} solid />
+        <AppIcon name="today-outline" size={14} color={colors.accent.teal} />
         <Text style={[styles.dateSectionText, { writingDirection, textAlign, flex: 1 }]}>{label}</Text>
         <View style={styles.dateSectionBadge}>
           <Text style={styles.dateSectionBadgeText}>{item.count}</Text>
         </View>
-        <FontAwesome5
-          name={isOpen ? 'chevron-up' : 'chevron-down'}
+        <AppIcon
+          name={isOpen ? 'chevron-up-outline' : 'chevron-down-outline'}
           size={12}
           color={colors.text.tertiary}
-          solid
         />
       </TouchableOpacity>
     );
@@ -340,16 +339,16 @@ const UserHistoryScreen = ({ route }) => {
         {/* Type badge */}
         <View style={styles.typeBadgeRow}>
           <View style={[styles.typeBadge, { backgroundColor: colors.accent.purple }]}>
-            <FontAwesome5 name="book-open" size={10} color={colors.text.primary} solid />
+            <AppIcon name="book-outline" size={10} color={colors.text.primary} />
             <Text style={[styles.typeBadgeText, { writingDirection, textAlign }]}>{t('userHistory.lesson')}</Text>
           </View>
           <View style={[styles.statusBadge, { backgroundColor: meta.color }]}>
-            <FontAwesome5 name={meta.icon} size={10} color={colors.text.primary} solid />
+            <AppIcon name={meta.icon} size={10} color={colors.text.primary} />
             <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{meta.label}</Text>
           </View>
           {item.isClinicLesson && (
             <View style={[styles.statusBadge, { backgroundColor: '#9B59B6' }]}>
-              <FontAwesome5 name="ticket-alt" size={10} color={colors.text.primary} solid />
+              <AppIcon name="ticket-outline" size={10} color={colors.text.primary} />
               <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{t('lessons.clinicBadge')}</Text>
             </View>
           )}
@@ -357,7 +356,7 @@ const UserHistoryScreen = ({ route }) => {
 
         {/* Date + time */}
         <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="calendar-alt" size={14} color={colors.accent.teal} solid />
+          <AppIcon name="calendar-outline" size={14} color={colors.accent.teal} />
           <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>
             {userType === 'worker' ? item.time : `${fmtDate(item.date)}  •  ${item.time}`}
           </Text>
@@ -366,7 +365,7 @@ const UserHistoryScreen = ({ route }) => {
         {/* Horse */}
         {item.horseName ? (
           <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-            <MaterialCommunityIcons name="horse-variant" size={16} color={colors.status.warning} />
+            <AppIcon name="paw-outline" size={16} color={colors.status.warning} />
             <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{item.horseName}</Text>
           </View>
         ) : null}
@@ -374,7 +373,7 @@ const UserHistoryScreen = ({ route }) => {
         {/* Partner (instructor or client) */}
         {item.partnerName ? (
           <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="user" size={13} color={colors.primary.light} solid />
+            <AppIcon name="person-outline" size={13} color={colors.primary.light} />
             <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{item.partnerRole} <Text style={{ fontWeight: typography.weight.bold, color: colors.text.primary }}>{item.partnerName}</Text></Text>
           </View>
         ) : null}
@@ -389,11 +388,11 @@ const UserHistoryScreen = ({ route }) => {
       <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderStartColor: done ? colors.status.success : priorityColor }]}>
         <View style={styles.typeBadgeRow}>
           <View style={[styles.typeBadge, { backgroundColor: colors.accent.amber }]}>
-            <FontAwesome5 name="tasks" size={10} color={colors.text.primary} solid />
+            <AppIcon name="checkbox-outline" size={10} color={colors.text.primary} />
             <Text style={[styles.typeBadgeText, { writingDirection, textAlign }]}>{t('userHistory.mission')}</Text>
           </View>
           <View style={[styles.statusBadge, { backgroundColor: done ? colors.status.success : colors.text.muted }]}>
-            <FontAwesome5 name={done ? 'check-circle' : 'hourglass-half'} size={10} color={colors.text.primary} solid />
+            <AppIcon name={done ? 'checkmark-circle-outline' : 'hourglass-outline'} size={10} color={colors.text.primary} />
             <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{done ? t('userHistory.completed') : t('userHistory.pending')}</Text>
           </View>
         </View>
@@ -402,7 +401,7 @@ const UserHistoryScreen = ({ route }) => {
         {item.description ? <RTLText style={styles.missionDesc}>{item.description}</RTLText> : null}
 
         <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="calendar-alt" size={14} color={colors.accent.teal} solid />
+          <AppIcon name="calendar-outline" size={14} color={colors.accent.teal} />
           <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>
             {userType === 'worker' ? (item.time || '') : `${fmtDate(item.date)}${item.time ? `  •  ${item.time}` : ''}`}
           </Text>
@@ -417,14 +416,14 @@ const UserHistoryScreen = ({ route }) => {
         {/* Type badge */}
         <View style={styles.typeBadgeRow}>
           <View style={[styles.typeBadge, { backgroundColor: colors.status.success }]}>
-            <FontAwesome5 name="money-bill-wave" size={10} color={colors.text.primary} solid />
+            <AppIcon name="cash-outline" size={10} color={colors.text.primary} />
             <Text style={[styles.typeBadgeText, { writingDirection, textAlign }]}>{t('userHistory.payment')}</Text>
           </View>
         </View>
 
         {/* Amount */}
         <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="shekel-sign" size={14} color={colors.status.success} solid />
+          <AppIcon name="cash-outline" size={14} color={colors.status.success} />
           <Text style={[styles.cardRowText, { fontWeight: 'bold', fontSize: typography.size.lg, color: colors.status.success }]}>
             {item.amount} ₪
           </Text>
@@ -433,7 +432,7 @@ const UserHistoryScreen = ({ route }) => {
         {/* Total after payment */}
         {item.totalAfter != null && (
           <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="wallet" size={14} color={colors.primary.light} solid />
+            <AppIcon name="wallet-outline" size={14} color={colors.primary.light} />
             <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{t('userHistory.totalAfterPayment')} <Text style={{ fontWeight: typography.weight.bold }}>{item.totalAfter} ₪</Text></Text>
           </View>
         )}
@@ -441,14 +440,14 @@ const UserHistoryScreen = ({ route }) => {
         {/* Amount due */}
         {item.amountDue != null && (
           <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="file-invoice-dollar" size={14} color={colors.status.warning} solid />
+            <AppIcon name="document-text-outline" size={14} color={colors.status.warning} />
             <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{t('userHistory.amountDue')} <Text style={{ fontWeight: typography.weight.bold }}>{item.amountDue} ₪</Text></Text>
           </View>
         )}
 
         {/* Date + time */}
         <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="calendar-alt" size={14} color={colors.accent.teal} solid />
+          <AppIcon name="calendar-outline" size={14} color={colors.accent.teal} />
           <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{fmtDate(item.date)}{item.time ? `  •  ${item.time}` : ''}</Text>
         </View>
       </AnimatedCard>
@@ -460,7 +459,7 @@ const UserHistoryScreen = ({ route }) => {
       <AnimatedCard index={index} delay={50} style={[styles.timelineCard, { borderStartColor: colors.accent.teal }]}>
         <View style={styles.typeBadgeRow}>
           <View style={[styles.typeBadge, { backgroundColor: colors.accent.teal }]}>
-            <FontAwesome5 name="calendar-alt" size={10} color={colors.text.primary} solid />
+            <AppIcon name="calendar-outline" size={10} color={colors.text.primary} />
             <Text style={[styles.typeBadgeText, { writingDirection, textAlign }]}>{t('userHistory.scheduleTask')}</Text>
           </View>
         </View>
@@ -468,7 +467,7 @@ const UserHistoryScreen = ({ route }) => {
         {item.description ? <RTLText style={styles.missionTitle}>{item.description}</RTLText> : null}
 
         <View style={[styles.cardRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="clock" size={14} color={colors.accent.teal} solid />
+          <AppIcon name="time-outline" size={14} color={colors.accent.teal} />
           <Text style={[styles.cardRowText, { writingDirection, textAlign }]}>{item.timeRange || item.time}</Text>
         </View>
       </AnimatedCard>
@@ -491,19 +490,19 @@ const UserHistoryScreen = ({ route }) => {
             </RTLText>
           </View>
           <View style={styles.statCard}>
-            <FontAwesome5 name="book-open" size={16} color={colors.accent.purple} solid />
+            <AppIcon name="book-outline" size={16} color={colors.accent.purple} />
             <Text style={[styles.statValue, { writingDirection, textAlign }]}>{stats.totalLessons}</Text>
             <Text style={[styles.statLabel, { writingDirection, textAlign }]}>{t('userHistory.lessons')}</Text>
           </View>
           {userType === 'worker' ? (
             <View style={styles.statCard}>
-              <FontAwesome5 name="tasks" size={16} color={colors.accent.amber} solid />
+              <AppIcon name="checkbox-outline" size={16} color={colors.accent.amber} />
               <Text style={[styles.statValue, { writingDirection, textAlign }]}>{stats.totalMissions}</Text>
               <Text style={[styles.statLabel, { writingDirection, textAlign }]}>{t('userHistory.missions')}</Text>
             </View>
           ) : (
             <View style={styles.statCard}>
-              <FontAwesome5 name="money-bill-wave" size={16} color={colors.status.success} solid />
+              <AppIcon name="cash-outline" size={16} color={colors.status.success} />
               <Text style={[styles.statValue, { writingDirection, textAlign }]}>{stats.totalPayments}</Text>
               <Text style={[styles.statLabel, { writingDirection, textAlign }]}>{t('userHistory.payments')}</Text>
             </View>
@@ -519,7 +518,7 @@ const UserHistoryScreen = ({ route }) => {
               onPress={() => setActiveFilter(f.key)}
               activeOpacity={0.7}
             >
-              <FontAwesome5 name={f.icon} size={12} color={activeFilter === f.key ? colors.text.primary : colors.text.tertiary} solid />
+              <AppIcon name={f.icon} size={12} color={activeFilter === f.key ? colors.text.primary : colors.text.tertiary} />
               <Text style={[styles.filterChipText, activeFilter === f.key && styles.filterChipTextActive, { writingDirection, textAlign }]}>
                 {f.label} ({f.count})
               </Text>
@@ -537,7 +536,7 @@ const UserHistoryScreen = ({ route }) => {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <FontAwesome5 name="history" size={56} color={colors.text.muted} />
+            <AppIcon name="journal-outline" size={56} color={colors.text.muted} />
             <RTLText style={styles.emptyText}>{t('userHistory.noHistory')}</RTLText>
             <RTLText style={styles.emptySubtext}>{t('userHistory.noHistoryDesc')}</RTLText>
           </View>

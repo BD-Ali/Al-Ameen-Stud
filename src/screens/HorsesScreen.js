@@ -10,7 +10,7 @@ import AnimatedCard from '../components/AnimatedCard';
 import RTLRow from '../components/RTLRow';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 // Configure notification handler
@@ -359,7 +359,7 @@ const HorsesScreen = () => {
         ListHeaderComponent={
           <View style={[styles.headerSection, { flexDirection: rowDirection }]}>
             <View style={[styles.titleRow, { flexDirection: rowDirection }]}>
-              <MaterialCommunityIcons name="horse-variant" size={28} color="#F39C12" />
+              <AppIcon name="paw-outline" size={28} />
               <Text style={[styles.pageTitle, { writingDirection, textAlign }]}>{t('horses.title')}</Text>
             </View>
             <View style={styles.countBadge}>
@@ -386,7 +386,7 @@ const HorsesScreen = () => {
                         <Text style={styles.reminderBadgeText}>{horseReminders.length}</Text>
                       </View>
                     )}
-                    <FontAwesome5 name={isExpanded ? 'chevron-down' : (I18nManager.isRTL ? 'chevron-left' : 'chevron-right')} size={14} color={colors.primary.main} solid style={styles.expandIcon} />
+                    <AppIcon name={isExpanded ? 'chevron-down-outline' : (I18nManager.isRTL ? 'chevron-back-outline' : 'chevron-forward-outline')} size={14} color={colors.primary.main} style={styles.expandIcon} />
                   </View>
                 </View>
               </TouchableOpacity>
@@ -401,24 +401,24 @@ const HorsesScreen = () => {
                     />
                   )}
                   <View style={[styles.cardRow, { flexDirection: rowDirection, justifyContent: 'flex-start', gap: 8 }]}>
-                    <MaterialCommunityIcons name="horse" size={16} color="#E67E22" />
+                    <AppIcon name="paw-outline" size={16} />
                     <Text style={[styles.cardLabel, { writingDirection, textAlign }]}>{t('horses.breed')} </Text>
                     <Text style={[styles.cardValue, { writingDirection, textAlign }]}>{item.breed || t('common.notSpecified')}</Text>
                   </View>
                   <View style={[styles.cardRow, { flexDirection: rowDirection, justifyContent: 'flex-start', gap: 8 }]}>
-                    <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                    <AppIcon name="person-outline" size={14} />
                     <Text style={[styles.cardLabel, { writingDirection, textAlign }]}>{t('horses.owner')} </Text>
                     <Text style={[styles.cardValue, { writingDirection, textAlign }]}>{item.owner || t('common.notSpecified')}</Text>
                   </View>
                   <View style={[styles.cardRow, { flexDirection: rowDirection, justifyContent: 'flex-start', gap: 8 }]}>
-                    <FontAwesome5 name="carrot" size={14} color="#FF9800" solid />
+                    <AppIcon name="nutrition-outline" size={14} />
                     <Text style={[styles.cardLabel, { writingDirection, textAlign }]}>{t('horses.feedLabel')} </Text>
                     <Text style={[styles.cardValue, { writingDirection, textAlign }]}>{item.feedSchedule || t('common.notSpecified')}</Text>
                   </View>
                   {item.notes && (
                     <View style={styles.notesSection}>
                       <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
+                        <AppIcon name="document-outline" size={14} />
                         <Text style={[styles.notesLabel, { writingDirection, textAlign }]}>{t('horses.notes')}</Text>
                       </View>
                       <RTLText style={styles.notesValue}>{item.notes}</RTLText>
@@ -429,14 +429,14 @@ const HorsesScreen = () => {
                   <View style={styles.remindersSection}>
                     <View style={[styles.remindersSectionHeader, { flexDirection: rowDirection }]}>
                       <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="bell" size={16} color="#F39C12" solid />
+                        <AppIcon name="notifications-outline" size={16} />
                         <Text style={[styles.remindersSectionTitle, { writingDirection, textAlign }]}>{t('horses.reminders')}</Text>
                       </View>
                       <TouchableOpacity
                         style={styles.addReminderButton}
                         onPress={() => openReminderModal(item)}
                       >
-                        <FontAwesome5 name="plus" size={12} color="#fff" solid />
+                        <AppIcon name="add-outline" size={12} />
                         <Text style={styles.addReminderButtonText}>{t('horses.addReminder')}</Text>
                       </TouchableOpacity>
                     </View>
@@ -448,11 +448,11 @@ const HorsesScreen = () => {
                             <View style={styles.reminderInfo}>
                               <RTLText style={styles.reminderNote}>{reminder.note}</RTLText>
                               <View style={[styles.reminderDateRow, { flexDirection: rowDirection }]}>
-                                <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
+                                <AppIcon name="calendar-outline" size={12} />
                                 <Text style={[styles.reminderDate, { writingDirection, textAlign }]}>{formatDate(reminder.date)}</Text>
                               </View>
                               <View style={[styles.reminderDateRow, { flexDirection: rowDirection }]}>
-                                <FontAwesome5 name="clock" size={12} color="#F39C12" solid />
+                                <AppIcon name="time-outline" size={12} />
                                 <Text style={[styles.reminderTime, { writingDirection, textAlign }]}>{formatTime(reminder.time)}</Text>
                               </View>
                             </View>
@@ -460,7 +460,7 @@ const HorsesScreen = () => {
                               onPress={() => handleDeleteReminder(reminder)}
                               style={styles.deleteReminderButton}
                             >
-                              <FontAwesome5 name="trash-alt" size={16} color="#E74C3C" solid />
+                              <AppIcon name="trash-outline" size={16} />
                             </TouchableOpacity>
                           </View>
                         ))}
@@ -471,7 +471,7 @@ const HorsesScreen = () => {
                   </View>
 
                   <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveHorse(item.id)}>
-                    <FontAwesome5 name="trash-alt" size={14} color="#fff" solid />
+                    <AppIcon name="trash-outline" size={14} />
                     <Text style={styles.removeButtonText}>{t('horses.deleteHorse')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -482,13 +482,13 @@ const HorsesScreen = () => {
         ListFooterComponent={
           <View style={styles.formSection}>
             <View style={[styles.formTitleRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="plus-circle" size={20} color="#27AE60" solid />
+              <AppIcon name="add-circle-outline" size={20} />
               <Text style={[styles.formTitle, { writingDirection, textAlign }]}>{t('horses.addNewHorse')}</Text>
             </View>
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                <AppIcon name="paw-outline" size={16} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('horses.horseName')}</Text>
               </View>
               <TextInput
@@ -503,7 +503,7 @@ const HorsesScreen = () => {
             {/* Image Upload Section */}
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="camera" size={14} color="#3498DB" solid />
+                <AppIcon name="camera-outline" size={14} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('horses.horseImage')}</Text>
               </View>
               {imageUri ? (
@@ -517,7 +517,7 @@ const HorsesScreen = () => {
                     style={styles.removeImageButton}
                     onPress={removeImage}
                   >
-                    <FontAwesome5 name="trash-alt" size={12} color="#fff" solid />
+                    <AppIcon name="trash-outline" size={12} />
                     <Text style={styles.removeImageText}> {t('horses.removeImage')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -531,7 +531,7 @@ const HorsesScreen = () => {
                     <ActivityIndicator size="small" color={colors.primary.main} />
                   ) : (
                     <>
-                      <FontAwesome5 name="camera" size={18} color="#3498DB" solid />
+                      <AppIcon name="camera-outline" size={18} />
                       <Text style={styles.imageUploadText}> {t('horses.chooseImage')}</Text>
                     </>
                   )}
@@ -541,7 +541,7 @@ const HorsesScreen = () => {
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <MaterialCommunityIcons name="horse" size={16} color="#E67E22" />
+                <AppIcon name="paw-outline" size={16} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('horses.breedLabel')}</Text>
               </View>
               <TextInput
@@ -555,7 +555,7 @@ const HorsesScreen = () => {
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="user" size={14} color="#1ABC9C" solid />
+                <AppIcon name="person-outline" size={14} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('horses.ownerLabel')}</Text>
               </View>
               <TextInput
@@ -569,7 +569,7 @@ const HorsesScreen = () => {
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="carrot" size={14} color="#FF9800" solid />
+                <AppIcon name="nutrition-outline" size={14} />
                 <Text style={[styles.label, { writingDirection, textAlign }]}>{t('horses.feedScheduleLabel')}</Text>
               </View>
               <TextInput
@@ -584,8 +584,8 @@ const HorsesScreen = () => {
 
             <View style={styles.inputGroup}>
               <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
-                <Text style={[styles.label, { writingDirection, textAlign }]}>{t('horses.notesLabel')}</Text>
+                <AppIcon name="document-outline" size={14} />
+                    <Text style={[styles.label, { writingDirection, textAlign }]}>{t('horses.notesLabel')}</Text>
               </View>
               <TextInput
                 value={notes}
@@ -611,7 +611,7 @@ const HorsesScreen = () => {
                 </View>
               ) : (
                 <>
-                  <FontAwesome5 name="plus" size={14} color="#fff" solid />
+                  <AppIcon name="add-outline" size={14} />
                   <Text style={styles.addButtonText}>{t('horses.addHorse')}</Text>
                 </>
               )}
@@ -621,7 +621,7 @@ const HorsesScreen = () => {
         contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="horse-variant" size={64} color="#F39C12" />
+            <AppIcon name="paw-outline" size={64} />
             <RTLText style={styles.emptyText}>{t('horses.noHorsesYet')}</RTLText>
             <RTLText style={styles.emptySubtext}>{t('horses.addFirstHorse')}</RTLText>
           </View>
@@ -640,7 +640,7 @@ const HorsesScreen = () => {
             <View style={styles.modalContent}>
               <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={[styles.modalTitleRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="bell" size={20} color="#F39C12" solid />
+                  <AppIcon name="notifications-outline" size={20} />
                   <RTLText style={styles.modalTitle}>
                     {t('horses.addReminderFor', { name: selectedHorseForReminder?.name })}
                   </RTLText>
@@ -648,7 +648,7 @@ const HorsesScreen = () => {
 
                 <View style={styles.modalInputGroup}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="sticky-note" size={14} color="#F39C12" solid />
+                    <AppIcon name="document-outline" size={14} />
                     <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.reminderNoteLabel')}</Text>
                   </View>
                   <TextInput
@@ -665,7 +665,7 @@ const HorsesScreen = () => {
 
                 <View style={styles.modalInputGroup}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                    <AppIcon name="calendar-outline" size={14} />
                     <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.date')}</Text>
                   </View>
                   <TouchableOpacity
@@ -675,7 +675,7 @@ const HorsesScreen = () => {
                     <Text style={styles.datePickerText}>
                       {reminderDate.toLocaleDateString('en-US')}
                     </Text>
-                    <FontAwesome5 name="calendar-alt" size={16} color="#5DADE2" solid />
+                    <AppIcon name="calendar-outline" size={16} />
                   </TouchableOpacity>
 
                   {showDatePicker && (
@@ -701,7 +701,7 @@ const HorsesScreen = () => {
 
                 <View style={styles.modalInputGroup}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                    <AppIcon name="time-outline" size={14} />
                     <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.time')}</Text>
                   </View>
                   <TouchableOpacity
@@ -711,7 +711,7 @@ const HorsesScreen = () => {
                     <Text style={styles.datePickerText}>
                       {`${String(reminderTime.getHours()).padStart(2, '0')}:${String(reminderTime.getMinutes()).padStart(2, '0')}`}
                     </Text>
-                    <FontAwesome5 name="clock" size={16} color="#F39C12" solid />
+                    <AppIcon name="time-outline" size={16} />
                   </TouchableOpacity>
 
                   {showTimePicker && (
@@ -740,14 +740,14 @@ const HorsesScreen = () => {
                     style={styles.modalCancelButton}
                     onPress={() => setReminderModalVisible(false)}
                   >
-                    <FontAwesome5 name="times" size={14} color="#fff" solid />
+                    <AppIcon name="close-outline" size={14} />
                     <Text style={styles.modalCancelButtonText}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.modalSaveButton}
                     onPress={handleAddReminder}
                   >
-                    <FontAwesome5 name="check" size={14} color="#fff" solid />
+                    <AppIcon name="checkmark-outline" size={14} />
                     <Text style={styles.modalSaveButtonText}>{t('horses.saveReminder')}</Text>
                   </TouchableOpacity>
                 </View>

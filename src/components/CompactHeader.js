@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
-import { FontAwesome5 } from '@expo/vector-icons';
+import AppIcon from './AppIcon';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { useTranslation } from '../i18n/LanguageContext';
 
@@ -36,9 +36,9 @@ const CompactHeader = ({
   // Get role display info
   const getRoleInfo = (role) => {
     const roleMap = {
-      'client': { label: t('roles.client'), color: colors.accent.teal, icon: 'user', iconFamily: 'FontAwesome5', iconColor: '#1ABC9C' },
-      'worker': { label: t('roles.worker'), color: colors.accent.pink, icon: 'hard-hat', iconFamily: 'FontAwesome5', iconColor: '#E91E63' },
-      'admin': { label: t('roles.admin'), color: colors.accent.purple, icon: 'user-shield', iconFamily: 'FontAwesome5', iconColor: '#9B59B6' },
+      'client': { label: t('roles.client'), color: colors.accent.teal },
+      'worker': { label: t('roles.worker'), color: colors.accent.pink },
+      'admin': { label: t('roles.admin'), color: colors.accent.purple },
     };
     return roleMap[role.toLowerCase()] || roleMap['client'];
   };
@@ -91,7 +91,7 @@ const CompactHeader = ({
         >
           {loading ? (
             <View style={[styles.avatar, styles.avatarLoading]}>
-              <FontAwesome5 name="hourglass-half" size={18} color={colors.text.secondary} />
+              <AppIcon name="hourglass-outline" size={18} color={colors.text.secondary} />
             </View>
           ) : (
             <Animated.View
@@ -106,7 +106,7 @@ const CompactHeader = ({
                   {getInitials(userName)}
                 </Text>
               ) : (
-                <FontAwesome5 name="user" size={18} color={roleInfo.color} solid />
+                <AppIcon name="person-outline" size={18} color={roleInfo.color} />
               )}
             </Animated.View>
           )}

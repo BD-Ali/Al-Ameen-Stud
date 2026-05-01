@@ -5,7 +5,7 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import AnimatedCard from '../components/AnimatedCard';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 const MissionsScreen = () => {
@@ -97,11 +97,11 @@ const MissionsScreen = () => {
     <AnimatedCard index={index} delay={80} style={[styles.missionCard, item.completed && styles.completedCard]}>
       <View style={[styles.missionHeader, { flexDirection: rowDirection }]}>
         <View style={[styles.missionTitleContainer, { flexDirection: rowDirection }]}>
-          <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
+          <AppIcon name="paw-outline" size={20} />
           <RTLText style={styles.horseName}>{item.horseName}</RTLText>
         </View>
         <View style={[styles.timeRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="clock" size={12} color="#5DADE2" solid />
+          <AppIcon name="time-outline" size={12} />
           <Text style={[styles.missionTime, { writingDirection, textAlign }]}>{item.time}</Text>
         </View>
       </View>
@@ -115,7 +115,7 @@ const MissionsScreen = () => {
           style={styles.doneButton}
           onPress={() => handleMarkAsDone(item)}
         >
-          <FontAwesome5 name="check" size={14} color="#fff" solid />
+          <AppIcon name="checkmark-outline" size={14} />
           <Text style={[styles.doneButtonText, { writingDirection, textAlign }]}>{t('missions.markAsDone')}</Text>
         </TouchableOpacity>
       ) : (
@@ -123,7 +123,7 @@ const MissionsScreen = () => {
           style={styles.undoneButton}
           onPress={() => handleMarkAsUndone(item)}
         >
-          <FontAwesome5 name="undo" size={14} color="#fff" solid />
+          <AppIcon name="arrow-undo-outline" size={14} />
           <Text style={[styles.undoneButtonText, { writingDirection, textAlign }]}>{t('missions.undoCompletion')}</Text>
         </TouchableOpacity>
       )}
@@ -134,18 +134,18 @@ const MissionsScreen = () => {
     <AnimatedCard index={index} delay={80} style={styles.upcomingCard}>
       <View style={[styles.missionHeader, { flexDirection: rowDirection }]}>
         <View style={[styles.missionTitleContainer, { flexDirection: rowDirection }]}>
-          <MaterialCommunityIcons name="horse-variant" size={20} color="#F39C12" />
+          <AppIcon name="paw-outline" size={20} />
           <RTLText style={styles.horseName}>{item.horseName}</RTLText>
         </View>
         <View style={[styles.dateRow, { flexDirection: rowDirection }]}>
-          <FontAwesome5 name="calendar-alt" size={12} color="#5DADE2" solid />
+          <AppIcon name="calendar-outline" size={12} />
           <Text style={[styles.upcomingDate, { writingDirection, textAlign }]}>{item.date}</Text>
         </View>
       </View>
 
       <RTLText style={styles.missionNote}>{item.note}</RTLText>
       <View style={[styles.timeRow, { flexDirection: rowDirection }]}>
-        <FontAwesome5 name="clock" size={12} color="#F39C12" solid />
+        <AppIcon name="time-outline" size={12} />
         <Text style={[styles.upcomingTime, { writingDirection, textAlign }]}>{item.time}</Text>
       </View>
     </AnimatedCard>
@@ -157,7 +157,7 @@ const MissionsScreen = () => {
       <View style={styles.section}>
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
           <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="clipboard-list" size={20} color="#9B59B6" solid />
+            <AppIcon name="clipboard-outline" size={20} />
             <RTLText style={styles.sectionTitle}>{t('missions.todayMissions')}</RTLText>
           </View>
           <View style={styles.badge}>
@@ -167,7 +167,7 @@ const MissionsScreen = () => {
 
         {todayMissions.length === 0 ? (
           <View style={styles.emptyState}>
-            <FontAwesome5 name="check-circle" size={48} color="#27AE60" solid />
+            <AppIcon name="checkmark-circle-outline" size={48} />
             <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('missions.noTasksRemaining')}</RTLText>
           </View>
         ) : (
@@ -185,7 +185,7 @@ const MissionsScreen = () => {
         <View style={styles.section}>
           <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
             <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8 }}>
-              <FontAwesome5 name="check-double" size={20} color="#27AE60" solid />
+              <AppIcon name="checkmark-done-outline" size={20} />
               <RTLText style={styles.sectionTitle}>{t('missions.completedToday')}</RTLText>
             </View>
             <View style={[styles.badge, styles.completedBadge]}>
@@ -207,7 +207,7 @@ const MissionsScreen = () => {
         <View style={styles.section}>
           <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>
             <View style={{ flexDirection: rowDirection, alignItems: 'center', gap: 8 }}>
-              <FontAwesome5 name="calendar-alt" size={20} color="#5DADE2" solid />
+              <AppIcon name="calendar-outline" size={20} />
               <RTLText style={styles.sectionTitle}>{t('missions.upcomingMissions')}</RTLText>
             </View>
             <View style={[styles.badge, styles.upcomingBadge]}>

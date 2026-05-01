@@ -29,7 +29,7 @@ import AnimatedCard from '../components/AnimatedCard';
 import AnimatedButton from '../components/AnimatedButton';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
-import { FontAwesome5 } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -71,11 +71,10 @@ const Toast = ({ visible, message, type, onHide }) => {
       ]}
     >
       <View style={[styles.toastContent, { flexDirection: rowDirection }]}>
-        <FontAwesome5
-          name={type === 'success' ? 'check-circle' : 'times-circle'}
+        <AppIcon
+          name={type === 'success' ? 'checkmark-circle-outline' : 'close-circle-outline'}
           size={16}
           color="#fff"
-          solid
         />
         <Text style={[styles.toastText, { writingDirection, textAlign }]}>{message}</Text>
       </View>
@@ -377,13 +376,13 @@ const AnnouncementsScreen = () => {
 
   const getTagIcon = (tag) => {
     const icons = {
-      'Update': { name: 'bullhorn', color: '#3498DB' },
-      'Promo': { name: 'gift', color: '#E91E63' },
-      'Alert': { name: 'exclamation-triangle', color: '#E74C3C' },
-      'Event': { name: 'calendar-check', color: '#9C27B0' },
-      'Info': { name: 'info-circle', color: '#2196F3' },
+      'Update': 'megaphone-outline',
+      'Promo': 'gift-outline',
+      'Alert': 'warning-outline',
+      'Event': 'calendar-outline',
+      'Info': 'information-circle-outline',
     };
-    return icons[tag] || { name: 'thumbtack', color: '#F39C12' };
+    return icons[tag] || 'pin-outline';
   };
 
 
@@ -395,18 +394,16 @@ const AnnouncementsScreen = () => {
       <AnimatedCard index={index} delay={80} style={styles.card}>
         {item.isPinned && (
           <View style={[styles.pinnedBadge, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="thumbtack" size={12} color="#F39C12" solid />
+            <AppIcon name="pin-outline" size={12} />
             <Text style={[styles.pinnedText, { writingDirection, textAlign }]}>{t('common.pinned')}</Text>
           </View>
         )}
 
         <View style={[styles.cardHeader, { flexDirection: rowDirection }]}>
           <View style={[styles.cardTitleRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5
-              name={getTagIcon(item.tag).name}
+            <AppIcon
+              name={getTagIcon(item.tag)}
               size={16}
-              color={getTagIcon(item.tag).color}
-              solid
               style={styles.cardTagIcon}
             />
             <RTLText style={styles.cardTitle} numberOfLines={2}>{item.title}</RTLText>
@@ -422,7 +419,7 @@ const AnnouncementsScreen = () => {
 
         <View style={[styles.cardMeta, { flexDirection: rowDirection }]}>
           <View style={[styles.metaRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name="users" size={12} color={colors.text.tertiary} solid />
+            <AppIcon name="people-outline" size={12} color={colors.text.tertiary} />
             <Text style={[styles.metaText, { writingDirection, textAlign }]}>{audienceLabel}</Text>
           </View>
           <Text style={[styles.metaText, { writingDirection, textAlign }]}>
@@ -511,7 +508,7 @@ const AnnouncementsScreen = () => {
         renderItem={renderAnnouncementCard}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <FontAwesome5 name="bullhorn" size={64} color="#95A5A6" solid />
+            <AppIcon name="megaphone-outline" size={64} />
             <RTLText style={styles.emptyText}>{t('announcements.noAnnouncementsYet')}</RTLText>
             <RTLText style={styles.emptySubtext}>{t('announcements.startCreating')}</RTLText>
           </View>
@@ -529,7 +526,7 @@ const AnnouncementsScreen = () => {
         accessibilityLabel={t('announcements.createNew')}
         accessibilityRole="button"
       >
-        <FontAwesome5 name="plus" size={20} color="#fff" solid />
+        <AppIcon name="add-outline" size={20} />
       </TouchableOpacity>
 
       {/* Create/Edit Modal */}
@@ -560,11 +557,10 @@ const AnnouncementsScreen = () => {
                 accessibilityRole="button"
                 disabled={isSubmitting}
               >
-                <FontAwesome5
-                  name="times"
+                <AppIcon
+                  name="close-outline"
                   size={20}
                   color={isSubmitting ? colors.text.disabled : colors.text.secondary}
-                  solid
                 />
               </TouchableOpacity>
               <Text style={[styles.modalTitle, { writingDirection, textAlign }]}>
@@ -576,7 +572,7 @@ const AnnouncementsScreen = () => {
                 accessibilityRole="button"
               >
                 <Text style={styles.previewButton}>
-                  <FontAwesome5 name={previewMode ? 'edit' : 'eye'} size={18} color={colors.primary.main} solid />
+                  <AppIcon name={previewMode ? 'create-outline' : 'eye-outline'} size={18} color={colors.primary.main} />
                 </Text>
               </TouchableOpacity>
             </View>
@@ -592,16 +588,14 @@ const AnnouncementsScreen = () => {
                   <View style={styles.previewCard}>
                     {formData.isPinned && (
                       <View style={[styles.pinnedBadge, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="thumbtack" size={12} color="#F39C12" solid />
+                        <AppIcon name="pin-outline" size={12} />
                         <Text style={[styles.pinnedText, { writingDirection, textAlign }]}>{t('common.pinned')}</Text>
                       </View>
                     )}
                     <View style={[styles.previewHeader, { flexDirection: rowDirection }]}>
-                      <FontAwesome5
-                        name={getTagIcon(formData.tag).name}
+                      <AppIcon
+                        name={getTagIcon(formData.tag)}
                         size={18}
-                        color={getTagIcon(formData.tag).color}
-                        solid
                         style={styles.previewTagIcon}
                       />
                       <Text style={[styles.previewTitle, { writingDirection, textAlign }]}>{formData.title || t('announcements.announcementTitle')}</Text>
@@ -617,7 +611,7 @@ const AnnouncementsScreen = () => {
                     {formData.linkUrl && (
                       <TouchableOpacity style={styles.previewLink}>
                         <Text style={[styles.previewLinkText, { writingDirection, textAlign }]}>
-                          {formData.linkText || t('announcements.linkTextPlaceholder')} <FontAwesome5 name="external-link-alt" size={12} color={colors.primary.main} />
+                          {formData.linkText || t('announcements.linkTextPlaceholder')} <AppIcon name="open-outline" size={12} color={colors.primary.main} />
                         </Text>
                       </TouchableOpacity>
                     )}
@@ -667,7 +661,7 @@ const AnnouncementsScreen = () => {
                         onPress={removeImage}
                         disabled={isSubmitting}
                       >
-                        <FontAwesome5 name="trash-alt" size={12} color="#E74C3C" solid />
+                        <AppIcon name="trash-outline" size={12} />
                         <Text style={[styles.removeImageText, { writingDirection, textAlign }]}> {t('announcements.removeImage')}</Text>
                       </TouchableOpacity>
                     </View>
@@ -724,11 +718,10 @@ const AnnouncementsScreen = () => {
                         disabled={isSubmitting}
                       >
                         <View style={[styles.tagChipContent, { flexDirection: rowDirection }]}>
-                          <FontAwesome5
-                            name={getTagIcon(tag.value).name}
+                          <AppIcon
+                            name={getTagIcon(tag.value)}
                             size={14}
-                            color={formData.tag === tag.value ? colors.primary.main : getTagIcon(tag.value).color}
-                            solid
+                            color={formData.tag === tag.value ? colors.primary.main : undefined}
                           />
                           <Text style={[
                             styles.tagChipText,
@@ -903,11 +896,10 @@ const AnnouncementsScreen = () => {
                     <ActivityIndicator size="small" color={colors.text.primary} />
                   ) : (
                     <View style={[styles.saveButtonContent, { flexDirection: rowDirection }]}>
-                      <FontAwesome5
-                        name={editingId ? 'check' : 'paper-plane'}
+                      <AppIcon
+                        name={editingId ? 'checkmark-outline' : 'send-outline'}
                         size={14}
                         color={colors.text.primary}
-                        solid
                       />
                       <Text style={[styles.saveButtonText, { writingDirection, textAlign }]}>
                         {editingId ? t('common.update') : t('common.publish')}

@@ -7,7 +7,7 @@ import { colors, typography, spacing, borderRadius, shadows } from '../styles/th
 import CompactHeader from '../components/CompactHeader';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -101,7 +101,7 @@ const WorkerLessonsScreen = ({ navigation }) => {
     const items = [];
 
     // Today header
-    items.push({ id: 'header-today', type: 'header', title: t('workerHome.todayLessons'), icon: 'calendar-day', iconColor: '#5DADE2', count: todayLessons.length });
+    items.push({ id: 'header-today', type: 'header', title: t('workerHome.todayLessons'), icon: 'today-outline', iconColor: '#5DADE2', count: todayLessons.length });
 
     if (todayLessons.length > 0) {
       todayLessons.forEach((l) => items.push({ ...l, type: 'today-lesson' }));
@@ -110,7 +110,7 @@ const WorkerLessonsScreen = ({ navigation }) => {
     }
 
     // Upcoming header
-    items.push({ id: 'header-upcoming', type: 'header', title: t('clientHome.upcomingLessons'), icon: 'calendar-alt', iconColor: '#9B59B6', count: upcomingLessons.length });
+    items.push({ id: 'header-upcoming', type: 'header', title: t('clientHome.upcomingLessons'), icon: 'calendar-outline', iconColor: '#9B59B6', count: upcomingLessons.length });
 
     if (upcomingLessons.length > 0) {
       upcomingLessons.forEach((l) => items.push({ ...l, type: 'upcoming-lesson' }));
@@ -127,7 +127,7 @@ const WorkerLessonsScreen = ({ navigation }) => {
       return (
         <View style={[styles.sectionHeader, index > 0 && styles.sectionHeaderSpaced, { flexDirection: rowDirection }]}>
           <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
-            <FontAwesome5 name={item.icon} size={22} color={item.iconColor} solid />
+            <AppIcon name={item.icon} size={22} color={item.iconColor} />
             <RTLText style={styles.sectionTitle}>{item.title}</RTLText>
           </View>
           <View style={styles.badge}>
@@ -141,7 +141,7 @@ const WorkerLessonsScreen = ({ navigation }) => {
     if (item.type === 'empty') {
       return (
         <View style={styles.emptyState}>
-          <FontAwesome5 name="book-open" size={36} color="#95A5A6" solid />
+          <AppIcon name="book-outline" size={36} />
           <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{item.message}</RTLText>
         </View>
       );
@@ -153,32 +153,32 @@ const WorkerLessonsScreen = ({ navigation }) => {
         <View style={styles.lessonCard}>
           <View style={styles.lessonHeader}>
             <View style={[styles.lessonTimeRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+              <AppIcon name="time-outline" size={14} />
               <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
             </View>
             {item.confirmed && (
               <View style={[styles.completedBadge, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="check" size={10} color="#fff" solid />
+                <AppIcon name="checkmark-outline" size={10} />
                 <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{t('clientHome.completed')}</Text>
               </View>
             )}
             {item.status === 'cancelled' && (
               <View style={[styles.cancelledBadge, { flexDirection: rowDirection }]}>
-                <FontAwesome5 name="times" size={10} color="#fff" solid />
+                <AppIcon name="close-outline" size={10} />
                 <Text style={[styles.statusBadgeText, { writingDirection, textAlign }]}>{t('clientHome.cancelled')}</Text>
               </View>
             )}
           </View>
           <View style={styles.lessonDetails}>
             <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
+              <AppIcon name="person-outline" size={12} />
               <Text style={[styles.lessonLabel, { writingDirection, textAlign }]}>
                 {t('lessons.client')}{' '}
                 <Text style={[styles.lessonValue, { writingDirection, textAlign }]}>{getClientName(item.clientId)}</Text>
               </Text>
             </View>
             <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
-              <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
+              <AppIcon name="paw-outline" size={14} />
               <Text style={[styles.lessonLabel, { writingDirection, textAlign }]}>
                 {t('lessons.horse')}{' '}
                 <Text style={[styles.lessonValue, { writingDirection, textAlign }]}>{getHorseName(item.horseId)}</Text>
@@ -188,11 +188,11 @@ const WorkerLessonsScreen = ({ navigation }) => {
           {!item.confirmed && item.status !== 'cancelled' && (
             <View style={[styles.lessonActions, { flexDirection: rowDirection }]}>
               <TouchableOpacity style={styles.confirmButton} onPress={() => handleConfirmLesson(item.id)}>
-                <FontAwesome5 name="check" size={12} color="#fff" solid />
+                <AppIcon name="checkmark-outline" size={12} />
                 <Text style={styles.actionButtonText}>{t('workerHome.confirmCompletion')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.cancelButton} onPress={() => handleCancelLesson(item.id)}>
-                <FontAwesome5 name="times" size={12} color="#fff" solid />
+                <AppIcon name="close-outline" size={12} />
                 <Text style={styles.actionButtonText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
             </View>
@@ -207,24 +207,24 @@ const WorkerLessonsScreen = ({ navigation }) => {
         <View style={[styles.lessonCard, styles.upcomingCard]}>
           <View style={styles.lessonHeader}>
             <View style={[styles.lessonDateRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+              <AppIcon name="calendar-outline" size={14} />
               <Text style={[styles.lessonDate, { writingDirection, textAlign }]}>{formatDate(item.date)}</Text>
             </View>
             <View style={[styles.lessonTimeRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+              <AppIcon name="time-outline" size={14} />
               <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
             </View>
           </View>
           <View style={styles.lessonDetails}>
             <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
-              <FontAwesome5 name="user" size={12} color="#1ABC9C" solid />
+              <AppIcon name="person-outline" size={12} />
               <Text style={[styles.lessonLabel, { writingDirection, textAlign }]}>
                 {t('lessons.client')}{' '}
                 <Text style={[styles.lessonValue, { writingDirection, textAlign }]}>{getClientName(item.clientId)}</Text>
               </Text>
             </View>
             <View style={[styles.lessonInfoRow, { flexDirection: rowDirection }]}>
-              <MaterialCommunityIcons name="horse-variant" size={14} color="#F39C12" />
+              <AppIcon name="paw-outline" size={14} />
               <Text style={[styles.lessonLabel, { writingDirection, textAlign }]}>
                 {t('lessons.horse')}{' '}
                 <Text style={[styles.lessonValue, { writingDirection, textAlign }]}>{getHorseName(item.horseId)}</Text>

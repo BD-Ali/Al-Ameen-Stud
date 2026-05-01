@@ -10,7 +10,7 @@ import AnimatedCard from '../components/AnimatedCard';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import { useFadeIn, usePulse } from '../utils/animations';
-import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 
 /**
@@ -139,15 +139,14 @@ const ClientHomeScreen = ({ navigation }) => {
                 <AnimatedCard index={0} delay={100} style={styles.subscriptionCard}>
                   <View style={[styles.subscriptionHeader, { flexDirection: rowDirection }]}>
                     <View style={[styles.subscriptionTitleContainer, { flexDirection: rowDirection }]}>
-                      <FontAwesome5 name="ticket-alt" size={18} color="#9B59B6" solid />
+                      <AppIcon name="ticket-outline" size={18} />
                       <RTLText style={styles.subscriptionTitle}>{t('clientHome.clinicSubscription')}</RTLText>
                     </View>
                     <View style={[styles.subscriptionStatusBadge, selectedClient.subscriptionActive && styles.subscriptionActiveBadge]}>
-                      <FontAwesome5
-                        name={selectedClient.subscriptionActive ? 'check' : 'times'}
+                      <AppIcon
+                        name={selectedClient.subscriptionActive ? 'checkmark-outline' : 'close-outline'}
                         size={10}
                         color="#fff"
-                        solid
                       />
                       <Text style={[styles.subscriptionStatusText, { writingDirection, textAlign }]}>
                         {selectedClient.subscriptionActive ? ` ${t('clientHome.active')}` : ` ${t('clientHome.expired')}`}
@@ -173,7 +172,7 @@ const ClientHomeScreen = ({ navigation }) => {
                   {selectedClient.subscriptionStartDate && (
                     <View style={styles.subscriptionFooter}>
                       <View style={[styles.subscriptionDateRow, { flexDirection: rowDirection }]}>
-                        <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                        <AppIcon name="calendar-outline" size={14} />
                         <RTLText style={[styles.subscriptionDate, { writingDirection, textAlign }]}>
                           {t('clientHome.startDate')} {formatDate(selectedClient.subscriptionStartDate)}
                         </RTLText>
@@ -188,7 +187,7 @@ const ClientHomeScreen = ({ navigation }) => {
                 <>
                   <View style={[styles.horsesHeader, { flexDirection: rowDirection }]}>
                     <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
-                      <MaterialCommunityIcons name="horse-variant" size={24} color="#F39C12" />
+                      <AppIcon name="paw-outline" size={24} />
                       <RTLText style={styles.sectionTitle}>{t('workerHome.ourHorses')}</RTLText>
                     </View>
                     <View style={styles.horsesBadge}>
@@ -211,7 +210,7 @@ const ClientHomeScreen = ({ navigation }) => {
                           />
                         ) : (
                           <View style={styles.horseImagePlaceholder}>
-                            <MaterialCommunityIcons name="horse-variant" size={40} color="#F39C12" />
+                            <AppIcon name="paw-outline" size={40} />
                           </View>
                         )}
                         <View style={styles.horseCardCompactInfo}>
@@ -227,7 +226,7 @@ const ClientHomeScreen = ({ navigation }) => {
               {/* Upcoming Lessons Section */}
               <View style={[styles.lessonsHeader, { flexDirection: rowDirection }]}>
                 <View style={[styles.sectionTitleRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="calendar-check" size={22} color="#9B59B6" solid />
+                  <AppIcon name="calendar-outline" size={22} />
                   <RTLText style={styles.sectionTitle}>{t('clientHome.upcomingLessons')}</RTLText>
                 </View>
                 <View style={styles.lessonsBadge}>
@@ -245,26 +244,26 @@ const ClientHomeScreen = ({ navigation }) => {
               <View style={styles.lessonHeader}>
                 <View style={styles.lessonDateContainer}>
                   <View style={[styles.lessonDateRow, { flexDirection: rowDirection }]}>
-                    <FontAwesome5 name="calendar-alt" size={14} color="#5DADE2" solid />
+                    <AppIcon name="calendar-outline" size={14} />
                     <Text style={[styles.lessonDate, { writingDirection, textAlign }]}>{formatDate(item.date)}</Text>
                   </View>
                   <View style={styles.scheduledBadge}>
-                    <FontAwesome5 name="hourglass-half" size={12} color="#F39C12" solid />
+                    <AppIcon name="hourglass-outline" size={12} />
                     <Text style={[styles.scheduledBadgeText, { writingDirection, textAlign }]}> {t('clientHome.scheduled')}</Text>
                   </View>
                 </View>
                 <View style={[styles.lessonTimeRow, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="clock" size={14} color="#F39C12" solid />
+                  <AppIcon name="time-outline" size={14} />
                   <Text style={[styles.lessonTime, { writingDirection, textAlign }]}>{item.time}</Text>
                 </View>
               </View>
               <View style={styles.lessonDetails}>
                 <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
-                  <MaterialCommunityIcons name="horse-variant" size={16} color="#F39C12" />
+                  <AppIcon name="paw-outline" size={16} />
                   <Text style={[styles.lessonDetailText, { writingDirection, textAlign }]}>{getHorseName(item.horseId)}</Text>
                 </View>
                 <View style={[styles.lessonDetail, { flexDirection: rowDirection }]}>
-                  <FontAwesome5 name="chalkboard-teacher" size={14} color="#3498DB" solid />
+                  <AppIcon name="school-outline" size={14} />
                   <Text style={[styles.lessonDetailText, { writingDirection, textAlign }]}>{getWorkerName(item.instructorId)}</Text>
                 </View>
               </View>
@@ -272,7 +271,7 @@ const ClientHomeScreen = ({ navigation }) => {
           )}
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <FontAwesome5 name="calendar-times" size={48} color="#95A5A6" solid />
+              <AppIcon name="calendar-clear-outline" size={48} />
               <RTLText style={[styles.emptyText, { writingDirection, textAlign }]}>{t('clientHome.noScheduledLessons')}</RTLText>
               <RTLText style={[styles.emptySubtext, { writingDirection, textAlign }]}>{t('clientHome.contactToBook')}</RTLText>
             </View>
@@ -281,7 +280,7 @@ const ClientHomeScreen = ({ navigation }) => {
         />
       ) : (
         <View style={styles.loadingContainer}>
-          <FontAwesome5 name="spinner" size={48} color="#3B82F6" />
+          <AppIcon name="sync-outline" size={48} />
           <Text style={[styles.loadingText, { writingDirection, textAlign }]}>{t('clientHome.loadingInfo')}</Text>
         </View>
       )}
@@ -293,7 +292,7 @@ const ClientHomeScreen = ({ navigation }) => {
         activeOpacity={0.8}
       >
         <Animated.View style={{ transform: [{ scale: pulseAnim }, { scaleX: I18nManager.isRTL ? -1 : 1 }] }}>
-          <FontAwesome5 name="phone" size={20} color="#fff" solid />
+          <AppIcon name="call-outline" size={20} />
         </Animated.View>
       </TouchableOpacity>
     </SafeAreaView>
