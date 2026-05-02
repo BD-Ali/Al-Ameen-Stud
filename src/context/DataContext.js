@@ -389,6 +389,13 @@ export const DataProvider = ({ children }) => {
         updatedAt: serverTimestamp()
       });
 
+      // Keep phoneNumber in sync with the users collection
+      if (updates.phoneNumber !== undefined) {
+        await updateDoc(doc(db, 'users', id), {
+          phoneNumber: updates.phoneNumber,
+        });
+      }
+
       return { success: true };
     } catch (error) {
       console.error('Error updating client:', error);

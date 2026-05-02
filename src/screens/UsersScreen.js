@@ -202,6 +202,7 @@ const UsersScreen = () => {
     if (activeTab === 'clients') {
       setEditFormData({
         quickPayment: '',
+        phoneNumber: user.phoneNumber || '',
         amountPaid: String(user.amountPaid || 0),
         amountDue: String(user.amountDue || 0),
         amountDueEdited: false,
@@ -273,6 +274,7 @@ const UsersScreen = () => {
       };
 
       const result = await updateClient(userId, {
+        phoneNumber: editFormData.phoneNumber || '',
         amountPaid: paidNum,
         amountDue: dueNum,
         lessonCount: lessonCountNum,
@@ -476,6 +478,21 @@ const UsersScreen = () => {
                 <>
                   {isEditing ? (
                     <>
+                      <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
+                        <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                          <AppIcon name="call-outline" size={14} />
+                          <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.phoneNumber')}</Text>
+                        </View>
+                        <TextInput
+                          value={editFormData.phoneNumber}
+                          onChangeText={(text) => setEditFormData({ ...editFormData, phoneNumber: text })}
+                          keyboardType="phone-pad"
+                          style={[styles.editInput, { textAlign }]}
+                          placeholder={t('users.enterPhone')}
+                          placeholderTextColor={colors.text.muted}
+                        />
+                      </View>
+
                       <View style={styles.quickPaymentSection}>
                         <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                           <AppIcon name="add-circle-outline" size={14} />
