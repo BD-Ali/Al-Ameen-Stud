@@ -13,6 +13,7 @@ import VisitorHomeScreen from './src/screens/VisitorHomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import UserHistoryScreen from './src/screens/UserHistoryScreen';
 import InAppNotificationBanner from './src/components/InAppNotificationBanner';
+import ErrorBoundary from './src/components/ErrorBoundary';
 import notificationService from './src/services/notificationService';
 import lessonReminderService from './src/services/lessonReminderService';
 import { ActivityIndicator, View, StyleSheet, I18nManager, Animated } from 'react-native';
@@ -238,15 +239,17 @@ function AppNavigator() {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <DataProvider>
-            <AppNavigator />
-          </DataProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <DataProvider>
+              <AppNavigator />
+            </DataProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }
 
