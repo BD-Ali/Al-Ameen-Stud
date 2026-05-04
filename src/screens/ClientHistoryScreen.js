@@ -1,5 +1,7 @@
-﻿import React, { useContext, useMemo } from 'react';
-import { View, Text, SectionList, StyleSheet, Platform, I18nManager } from 'react-native';
+﻿import React, { useContext, useMemo, useState } from 'react';
+import { View, Text, SectionList, StyleSheet, Platform, I18nManager, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import ScreenBackground from '../components/ScreenBackground';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
@@ -22,6 +24,7 @@ const ClientHistoryScreen = ({ navigation }) => {
   const { rowDirection, textAlign, writingDirection } = useRTL();
 
   const selectedClient = clients.find((c) => c.id === user?.uid);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Get completed and cancelled lessons
   const confirmedLessons = getConfirmedLessons ? getConfirmedLessons(user?.uid) : [];
@@ -93,6 +96,25 @@ const ClientHistoryScreen = ({ navigation }) => {
     navigation.navigate('Profile');
   };
 
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const lessonRows = lessonHistory.length > 0
+        ? lessonHistory.map(l => `<tr><td>${formatDate(l.date)}</td><td>${l.time || '-'}</td><td>${getHorseName(l.horseId)}</td><td>${l.confirmed ? 'Completed' : (l.status === 'cancelled' ? 'Cancelled' : l.status || '-')}</td></tr>`).join('')
+        : '<tr><td colspan="4" style="text-align:center;color:#999">No records</td></tr>';
+      const paymentRows = clientPayments.length > 0
+        ? clientPayments.map(p => `<tr><td>${formatDate(p.date)}</td><td>&#8362;${p.amount || 0}</td><td>&#8362;${p.totalAfter ?? '-'}</td></tr>`).join('')
+        : '<tr><td colspan="3" style="text-align:center;color:#999">No records</td></tr>';
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>Client History</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#1a1a2e}h1{font-size:22px;margin-bottom:4px}h2{font-size:16px;margin:20px 0 8px;border-bottom:2px solid #2563EB;padding-bottom:4px;color:#2563EB}.summary{display:flex;gap:32px;margin-bottom:8px}.summary-item{text-align:center}.summary-label{font-size:12px;color:#666}.summary-value{font-size:22px;font-weight:bold}.paid{color:#27AE60}.due{color:#E74C3C}table{width:100%;border-collapse:collapse;margin-bottom:8px}th{background:#2563EB;color:white;padding:8px;text-align:left;font-size:13px}td{padding:7px 8px;font-size:12px;border-bottom:1px solid #eee}tr:nth-child(even) td{background:#f7f9fc}</style></head><body><h1>${selectedClient?.name || 'Client'}</h1><h2>Payment Summary</h2><div class="summary"><div class="summary-item"><div class="summary-label">Amount Paid</div><div class="summary-value paid">&#8362;${selectedClient?.amountPaid || 0}</div></div><div class="summary-item"><div class="summary-label">Amount Due</div><div class="summary-value due">&#8362;${selectedClient?.amountDue || 0}</div></div></div><h2>Lesson History (${lessonHistory.length})</h2><table><thead><tr><th>Date</th><th>Time</th><th>Horse</th><th>Status</th></tr></thead><tbody>${lessonRows}</tbody></table><h2>Payment History (${clientPayments.length})</h2><table><thead><tr><th>Date</th><th>Amount</th><th>Total Paid</th></tr></thead><tbody>${paymentRows}</tbody></table></body></html>`;
+      const { uri } = await Print.printToFileAsync({ html });
+      await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf', dialogTitle: `${selectedClient?.name || 'Client'} History` });
+    } catch (err) {
+      Alert.alert('Error', err.message || 'Failed to export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const renderSectionHeader = ({ section }) => {
     if (section.title === 'paymentSummary') return null;
 
@@ -151,6 +173,17 @@ const ClientHistoryScreen = ({ navigation }) => {
               <Text style={[styles.paymentAmountDue, { writingDirection, textAlign }]}>₪{selectedClient?.amountDue || 0}</Text>
             </View>
           </View>
+          <TouchableOpacity
+            style={styles.exportButton}
+            onPress={handleExportPDF}
+            disabled={isExporting}
+            activeOpacity={0.7}
+          >
+            {isExporting
+              ? <ActivityIndicator size="small" color={colors.text.primary} />
+              : <AppIcon name="share-outline" size={16} color={colors.text.primary} />}
+            <Text style={styles.exportButtonText}>{isExporting ? t('common.loading') : t('common.export')}</Text>
+          </TouchableOpacity>
         </AnimatedCard>
       );
     }
@@ -569,6 +602,22 @@ const styles = StyleSheet.create({
     fontSize: typography.size.md,
     color: colors.text.secondary,
     marginTop: spacing.md,
+  },
+  exportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.base,
+    backgroundColor: colors.primary.main,
+    borderRadius: borderRadius.lg,
+  },
+  exportButtonText: {
+    color: colors.text.primary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.semibold,
   },
 });
 

@@ -5,7 +5,11 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
+import * as Print from 'expo-print';
+import * as Sharing from 'expo-sharing';
 import ScreenBackground from '../components/ScreenBackground';
 import AppIcon from '../components/AppIcon';
 import { DataContext } from '../context/DataContext';
@@ -34,6 +38,7 @@ const UserHistoryScreen = ({ route }) => {
   // Active filter tab
   const [activeFilter, setActiveFilter] = useState('all'); // all | lessons | missions | schedules
   const [expandedDates, setExpandedDates] = useState(new Set());
+  const [isExporting, setIsExporting] = useState(false);
 
   const toggleDate = (date) => {
     setExpandedDates(prev => {
@@ -277,6 +282,37 @@ const UserHistoryScreen = ({ route }) => {
     }
     return base;
   }, [userType, stats]);
+
+  // ── PDF export ──────────────────────────────────────────────────────
+  const handleExportPDF = async () => {
+    setIsExporting(true);
+    try {
+      const lessonItems = timeline.filter(i => i.type === 'lesson');
+      const paymentItems = timeline.filter(i => i.type === 'payment');
+      const missionItems = timeline.filter(i => i.type === 'mission');
+
+      const lessonRows = lessonItems.length > 0
+        ? lessonItems.map(l => `<tr><td>${fmtDate(l.date)}</td><td>${l.time || '-'}</td><td>${l.horseName || '-'}</td><td>${l.partnerName || '-'}</td><td>${l.confirmed || l.status === 'completed' ? 'Completed' : (l.status === 'cancelled' ? 'Cancelled' : l.status || '-')}</td></tr>`).join('')
+        : '<tr><td colspan="5" style="text-align:center;color:#999">No records</td></tr>';
+
+      const paymentRows = paymentItems.length > 0
+        ? paymentItems.map(p => `<tr><td>${fmtDate(p.date)}</td><td>&#8362;${p.amount || 0}</td><td>&#8362;${p.totalAfter ?? '-'}</td></tr>`).join('')
+        : '<tr><td colspan="3" style="text-align:center;color:#999">No records</td></tr>';
+
+      const missionRows = missionItems.length > 0
+        ? missionItems.map(m => `<tr><td>${fmtDate(m.date)}</td><td>${m.title || '-'}</td><td>${m.completed ? 'Done' : 'Pending'}</td></tr>`).join('')
+        : '';
+
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8"/><title>User History</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#1a1a2e}h1{font-size:22px;margin-bottom:4px}h2{font-size:16px;margin:20px 0 8px;border-bottom:2px solid #2563EB;padding-bottom:4px;color:#2563EB}table{width:100%;border-collapse:collapse;margin-bottom:8px}th{background:#2563EB;color:white;padding:8px;text-align:left;font-size:13px}td{padding:7px 8px;font-size:12px;border-bottom:1px solid #eee}tr:nth-child(even) td{background:#f7f9fc}</style></head><body><h1>${userName || 'User'}</h1><p style="color:#666;font-size:13px">${userType === 'client' ? 'Client' : 'Worker'}</p><h2>Lessons (${lessonItems.length})</h2><table><thead><tr><th>Date</th><th>Time</th><th>Horse</th><th>${userType === 'client' ? 'Instructor' : 'Client'}</th><th>Status</th></tr></thead><tbody>${lessonRows}</tbody></table>${userType === 'client' ? `<h2>Payments (${paymentItems.length})</h2><table><thead><tr><th>Date</th><th>Amount</th><th>Total Paid</th></tr></thead><tbody>${paymentRows}</tbody></table>` : (missionItems.length > 0 ? `<h2>Missions (${missionItems.length})</h2><table><thead><tr><th>Date</th><th>Title</th><th>Status</th></tr></thead><tbody>${missionRows}</tbody></table>` : '')}</body></html>`;
+
+      const { uri } = await Print.printToFileAsync({ html });
+      await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf', dialogTitle: `${userName || 'User'} History` });
+    } catch (err) {
+      Alert.alert('Error', err.message || 'Failed to export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // ── day key helper ─────────────────────────────────────────────────
   const translateDay = (dayKey) => {
@@ -525,6 +561,19 @@ const UserHistoryScreen = ({ route }) => {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Export button */}
+        <TouchableOpacity
+          style={styles.exportButton}
+          onPress={handleExportPDF}
+          disabled={isExporting}
+          activeOpacity={0.7}
+        >
+          {isExporting
+            ? <ActivityIndicator size="small" color={colors.text.primary} />
+            : <AppIcon name="share-outline" size={16} color={colors.text.primary} />}
+          <Text style={styles.exportButtonText}>{isExporting ? t('common.loading') : t('common.export')}</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Timeline list */}
@@ -782,6 +831,22 @@ const styles = StyleSheet.create({
     color: colors.text.muted,
     textAlign: 'center',
     paddingHorizontal: spacing.xxl,
+  },
+  exportButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.base,
+    backgroundColor: colors.primary.main,
+    borderRadius: borderRadius.lg,
+  },
+  exportButtonText: {
+    color: colors.text.primary,
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.semibold,
   },
 });
 
