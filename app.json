@@ -10,11 +10,11 @@
     ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#3498db"
+      "backgroundColor": "#0A0F1E"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -26,6 +26,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.alameenstud.com",
       "buildNumber": "2",
+      "deploymentTarget": "16.0",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "This app requires access to your camera to upload horse photos and user profile pictures.",
@@ -85,6 +86,9 @@
       },
       "permissions": [
         "INTERNET",
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "POST_NOTIFICATIONS",
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE"
       ],
