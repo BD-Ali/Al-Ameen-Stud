@@ -285,7 +285,12 @@
     "reminderAdded": "تم إضافة التذكير وجدولة الإشعار بنجاح",
     "reminderAddFailed": "فشل إضافة التذكير",
     "reminderDeleted": "تم حذف التذكير وإلغاء الإشعار بنجاح",
-    "addReminderFor": "إضافة تذكير لـ {{name}}"
+    "addReminderFor": "إضافة تذكير لـ {{name}}",
+    "editHorse": "تعديل بيانات الحصان",
+    "horseUpdated": "تم تحديث بيانات الحصان بنجاح",
+    "horseUpdateFailed": "فشل تحديث بيانات الحصان",
+    "saveChanges": "حفظ التغييرات",
+    "changeImage": "تغيير الصورة"
   },
   "lessons": {
     "title": "الدروس",

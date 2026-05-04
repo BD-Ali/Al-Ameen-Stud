@@ -285,7 +285,12 @@
     "reminderAdded": "Reminder added and notification scheduled successfully",
     "reminderAddFailed": "Failed to add reminder",
     "reminderDeleted": "Reminder deleted and notification cancelled successfully",
-    "addReminderFor": "Add Reminder for {{name}}"
+    "addReminderFor": "Add Reminder for {{name}}",
+    "editHorse": "Edit Horse",
+    "horseUpdated": "Horse updated successfully",
+    "horseUpdateFailed": "Failed to update horse",
+    "saveChanges": "Save Changes",
+    "changeImage": "Change Image"
   },
   "lessons": {
     "title": "Lessons",

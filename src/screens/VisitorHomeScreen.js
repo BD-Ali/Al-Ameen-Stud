@@ -111,15 +111,17 @@ const VisitorHomeScreen = () => {
                   <AppIcon name="paw-outline" size={20} />
                   <RTLText style={styles.horseName}>{item.name}</RTLText>
                 </View>
-                <RTLRow
-                  icon={<AppIcon name="paw-outline" size={14} />}
-                  label={t('horses.breed')}
-                  value={item.breed}
-                  showColon={false}
-                  labelStyle={styles.breedLabel}
-                  valueStyle={styles.breedValue}
-                  style={styles.breedRow}
-                />
+                {!!item.breed && (
+                  <RTLRow
+                    icon={<AppIcon name="paw-outline" size={14} />}
+                    label={t('horses.breed')}
+                    value={item.breed}
+                    showColon={false}
+                    labelStyle={styles.breedLabel}
+                    valueStyle={styles.breedValue}
+                    style={styles.breedRow}
+                  />
+                )}
               </View>
             </AnimatedCard>
           ))

@@ -1161,7 +1161,7 @@ const styles = StyleSheet.create({
   },
   clearButtonText: {
     fontSize: typography.size.base,
-    color: colors.text.muted,
+    color: colors.text.tertiary,
   },
   contentContainer: {
     padding: spacing.base,
@@ -1438,7 +1438,7 @@ const styles = StyleSheet.create({
   },
   moreText: {
     fontSize: typography.size.sm,
-    color: colors.text.muted,
+    color: colors.text.tertiary,
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: spacing.xs,
@@ -1657,7 +1657,7 @@ const styles = StyleSheet.create({
   },
   helpText: {
     fontSize: typography.size.xs,
-    color: colors.text.muted,
+    color: colors.text.tertiary,
     fontStyle: 'italic',
     marginTop: spacing.xs,
   },
@@ -1722,7 +1722,7 @@ const styles = StyleSheet.create({
   },
   subscriptionDate: {
     fontSize: typography.size.xs,
-    color: colors.text.muted,
+    color: colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },

@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   placeholderText: {
-    color: colors.text.muted,
+    color: colors.text.tertiary,
   },
   dropdownArrow: {
     fontSize: 16,
@@ -781,7 +781,7 @@ const styles = StyleSheet.create({
   },
   helpText: {
     fontSize: typography.size.xs,
-    color: colors.text.muted,
+    color: colors.text.tertiary,
     fontStyle: 'italic',
     marginTop: spacing.xs,
   },
@@ -885,7 +885,7 @@ const styles = StyleSheet.create({
   },
   emptyPickerText: {
     fontSize: typography.size.sm,
-    color: colors.text.muted,
+    color: colors.text.tertiary,
     fontWeight: typography.weight.semibold,
   },
   emptyPickerSubtext: {

@@ -26,7 +26,7 @@ Notifications.setNotificationHandler({
 const HorsesScreen = () => {
   const { t } = useTranslation();
   const { isRTL, rowDirection, textAlign, writingDirection } = useRTL();
-  const { horses, addHorse, removeHorse, reminders, addReminder, removeReminder } = useContext(DataContext);
+  const { horses, addHorse, removeHorse, updateHorse, reminders, addReminder, removeReminder } = useContext(DataContext);
 
   const [name, setName] = useState('');
   const [breed, setBreed] = useState('');
@@ -36,6 +36,17 @@ const HorsesScreen = () => {
   const [imageUri, setImageUri] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [expandedHorseId, setExpandedHorseId] = useState(null);
+
+  // Edit modal states
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editingHorse, setEditingHorse] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editBreed, setEditBreed] = useState('');
+  const [editOwner, setEditOwner] = useState('');
+  const [editFeedSchedule, setEditFeedSchedule] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+  const [editImageUri, setEditImageUri] = useState('');
+  const [editUploadingImage, setEditUploadingImage] = useState(false);
 
   // Reminder modal states
   const [reminderModalVisible, setReminderModalVisible] = useState(false);
@@ -315,6 +326,84 @@ const HorsesScreen = () => {
     return reminders.filter(r => r.horseId === horseId);
   };
 
+  const openEditModal = (horse) => {
+    setEditingHorse(horse);
+    setEditName(horse.name || '');
+    setEditBreed(horse.breed || '');
+    setEditOwner(horse.owner || '');
+    setEditFeedSchedule(horse.feedSchedule || '');
+    setEditNotes(horse.notes || '');
+    setEditImageUri('');
+    setEditModalVisible(true);
+  };
+
+  const pickEditImage = async (useCamera = false) => {
+    try {
+      if (useCamera) {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') { Alert.alert(t('common.error'), t('horses.needCameraPermission')); return; }
+      } else {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') { Alert.alert(t('common.error'), t('horses.needGalleryPermission')); return; }
+      }
+      const result = useCamera
+        ? await ImagePicker.launchCameraAsync({ allowsEditing: true, aspect: [4, 3], quality: 0.8 })
+        : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [4, 3], quality: 0.8 });
+      if (!result.canceled && result.assets?.[0]) setEditImageUri(result.assets[0].uri);
+    } catch { Alert.alert(t('common.error'), t('horses.imagePickError')); }
+  };
+
+  const showEditImagePickerOptions = () => {
+    Alert.alert(
+      t('horses.chooseHorseImage'),
+      t('horses.imageSourceQuestion'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('horses.camera'), onPress: () => pickEditImage(true) },
+        { text: t('horses.gallery'), onPress: () => pickEditImage(false) },
+      ]
+    );
+  };
+
+  const handleEditHorse = async () => {
+    if (!editName.trim()) {
+      Alert.alert(t('common.error'), t('horses.enterHorseNameRequired'));
+      return;
+    }
+    setEditUploadingImage(true);
+    try {
+      let imageUrl = editingHorse.imageUrl || '';
+      if (editImageUri) {
+        const uploadResult = await uploadImageToCloudinary(editImageUri, 'horses');
+        if (uploadResult.success) {
+          imageUrl = uploadResult.url;
+        } else {
+          Alert.alert(t('common.error'), t('horses.uploadFailed') + uploadResult.error);
+          setEditUploadingImage(false);
+          return;
+        }
+      }
+      const result = await updateHorse(editingHorse.id, {
+        name: editName.trim(),
+        breed: editBreed.trim(),
+        owner: editOwner.trim(),
+        feedSchedule: editFeedSchedule.trim(),
+        notes: editNotes.trim(),
+        imageUrl,
+      });
+      if (result.success) {
+        Alert.alert(t('common.success'), t('horses.horseUpdated'));
+        setEditModalVisible(false);
+      } else {
+        Alert.alert(t('common.error'), result.error || t('horses.horseUpdateFailed'));
+      }
+    } catch {
+      Alert.alert(t('common.error'), t('common.unexpectedError'));
+    } finally {
+      setEditUploadingImage(false);
+    }
+  };
+
   const handleDateChange = (event, selectedDate) => {
     if (Platform.OS === 'android' && event.type === 'dismissed') {
       setShowDatePicker(false);
@@ -402,21 +491,20 @@ const HorsesScreen = () => {
                       resizeMode="cover"
                     />
                   )}
-                  <View style={[styles.cardRow, { flexDirection: rowDirection, justifyContent: 'flex-start', gap: 8 }]}>
-                    <AppIcon name="paw-outline" size={16} />
-                    <Text style={[styles.cardLabel, { writingDirection, textAlign }]}>{t('horses.breed')} </Text>
-                    <Text style={[styles.cardValue, { writingDirection, textAlign }]}>{item.breed || t('common.notSpecified')}</Text>
-                  </View>
-                  <View style={[styles.cardRow, { flexDirection: rowDirection, justifyContent: 'flex-start', gap: 8 }]}>
-                    <AppIcon name="person-outline" size={14} />
-                    <Text style={[styles.cardLabel, { writingDirection, textAlign }]}>{t('horses.owner')} </Text>
-                    <Text style={[styles.cardValue, { writingDirection, textAlign }]}>{item.owner || t('common.notSpecified')}</Text>
-                  </View>
-                  <View style={[styles.cardRow, { flexDirection: rowDirection, justifyContent: 'flex-start', gap: 8 }]}>
-                    <AppIcon name="nutrition-outline" size={14} />
-                    <Text style={[styles.cardLabel, { writingDirection, textAlign }]}>{t('horses.feedLabel')} </Text>
-                    <Text style={[styles.cardValue, { writingDirection, textAlign }]}>{item.feedSchedule || t('common.notSpecified')}</Text>
-                  </View>
+                  {!!item.breed && (
+                    <View style={[styles.cardRow, { flexDirection: rowDirection, justifyContent: 'flex-start', gap: 8 }]}>
+                      <AppIcon name="paw-outline" size={16} />
+                      <Text style={[styles.cardLabel, { writingDirection, textAlign }]}>{t('horses.breed')} </Text>
+                      <Text style={[styles.cardValue, { writingDirection, textAlign }]}>{item.breed}</Text>
+                    </View>
+                  )}
+                  {!!item.owner && (
+                    <View style={[styles.cardRow, { flexDirection: rowDirection, justifyContent: 'flex-start', gap: 8 }]}>
+                      <AppIcon name="person-outline" size={14} />
+                      <Text style={[styles.cardLabel, { writingDirection, textAlign }]}>{t('horses.owner')} </Text>
+                      <Text style={[styles.cardValue, { writingDirection, textAlign }]}>{item.owner}</Text>
+                    </View>
+                  )}
                   {item.notes && (
                     <View style={styles.notesSection}>
                       <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
@@ -472,10 +560,16 @@ const HorsesScreen = () => {
                     )}
                   </View>
 
-                  <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveHorse(item.id)}>
-                    <AppIcon name="trash-outline" size={14} />
-                    <Text style={styles.removeButtonText}>{t('horses.deleteHorse')}</Text>
-                  </TouchableOpacity>
+                  <View style={[styles.cardActionsRow, { flexDirection: rowDirection }]}>
+                    <TouchableOpacity style={styles.editButton} onPress={() => openEditModal(item)}>
+                      <AppIcon name="create-outline" size={14} />
+                      <Text style={styles.editButtonText}>{t('common.edit')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.removeButton} onPress={() => handleRemoveHorse(item.id)}>
+                      <AppIcon name="trash-outline" size={14} />
+                      <Text style={styles.removeButtonText}>{t('horses.deleteHorse')}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               )}
             </AnimatedCard>
@@ -758,6 +852,149 @@ const HorsesScreen = () => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
+      {/* Edit Horse Modal */}
+      <Modal
+        visible={editModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setEditModalVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={[styles.modalTitleRow, { flexDirection: rowDirection }]}>
+                  <AppIcon name="create-outline" size={20} />
+                  <RTLText style={styles.modalTitle}>{t('horses.editHorse')}</RTLText>
+                </View>
+
+                {/* Name */}
+                <View style={styles.modalInputGroup}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                    <AppIcon name="paw-outline" size={14} />
+                    <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.horseName')}</Text>
+                  </View>
+                  <TextInput
+                    value={editName}
+                    onChangeText={setEditName}
+                    style={[styles.modalInput, { textAlign }]}
+                    placeholder={t('horses.enterHorseName')}
+                    placeholderTextColor={colors.text.muted}
+                  />
+                </View>
+
+                {/* Image */}
+                <View style={styles.modalInputGroup}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                    <AppIcon name="camera-outline" size={14} />
+                    <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.horseImage')}</Text>
+                  </View>
+                  {editImageUri ? (
+                    <View style={styles.imagePreviewContainer}>
+                      <Image source={{ uri: editImageUri }} style={styles.imagePreview} resizeMode="cover" />
+                      <TouchableOpacity style={styles.removeImageButton} onPress={() => setEditImageUri('')}>
+                        <AppIcon name="trash-outline" size={12} />
+                        <Text style={styles.removeImageText}> {t('horses.removeImage')}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : editingHorse?.imageUrl ? (
+                    <View style={styles.imagePreviewContainer}>
+                      <Image source={{ uri: getOptimizedImageUrl(editingHorse.imageUrl, { width: 400, height: 260 }) }} style={styles.imagePreview} resizeMode="cover" />
+                      <TouchableOpacity style={styles.removeImageButton} onPress={showEditImagePickerOptions}>
+                        <AppIcon name="create-outline" size={12} />
+                        <Text style={styles.removeImageText}> {t('horses.changeImage')}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity style={styles.imageUploadButton} onPress={showEditImagePickerOptions}>
+                      <AppIcon name="camera-outline" size={18} />
+                      <Text style={styles.imageUploadText}> {t('horses.chooseImage')}</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
+                {/* Breed */}
+                <View style={styles.modalInputGroup}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                    <AppIcon name="paw-outline" size={14} />
+                    <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.breedLabel')}</Text>
+                  </View>
+                  <TextInput
+                    value={editBreed}
+                    onChangeText={setEditBreed}
+                    style={[styles.modalInput, { textAlign }]}
+                    placeholder={t('horses.breedPlaceholder')}
+                    placeholderTextColor={colors.text.muted}
+                  />
+                </View>
+
+                {/* Owner */}
+                <View style={styles.modalInputGroup}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                    <AppIcon name="person-outline" size={14} />
+                    <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.ownerLabel')}</Text>
+                  </View>
+                  <TextInput
+                    value={editOwner}
+                    onChangeText={setEditOwner}
+                    style={[styles.modalInput, { textAlign }]}
+                    placeholder={t('horses.ownerPlaceholder')}
+                    placeholderTextColor={colors.text.muted}
+                  />
+                </View>
+
+                {/* Feed Schedule */}
+                <View style={styles.modalInputGroup}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                    <AppIcon name="nutrition-outline" size={14} />
+                    <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.feedScheduleLabel')}</Text>
+                  </View>
+                  <TextInput
+                    value={editFeedSchedule}
+                    onChangeText={setEditFeedSchedule}
+                    style={[styles.modalInput, { textAlign }]}
+                    placeholder={t('horses.enterFeedSchedule')}
+                    placeholderTextColor={colors.text.muted}
+                    multiline
+                  />
+                </View>
+
+                {/* Notes */}
+                <View style={styles.modalInputGroup}>
+                  <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
+                    <AppIcon name="document-outline" size={14} />
+                    <Text style={[styles.modalLabel, { writingDirection, textAlign }]}>{t('horses.notesLabel')}</Text>
+                  </View>
+                  <TextInput
+                    value={editNotes}
+                    onChangeText={setEditNotes}
+                    style={[styles.modalInput, styles.modalNotesInput, { textAlign }]}
+                    placeholder={t('horses.notesPlaceholder')}
+                    placeholderTextColor={colors.text.muted}
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                  />
+                </View>
+
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity style={styles.modalCancelButton} onPress={() => setEditModalVisible(false)}>
+                    <AppIcon name="close-outline" size={14} />
+                    <Text style={styles.modalCancelButtonText}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.modalSaveButton} onPress={handleEditHorse} disabled={editUploadingImage}>
+                    {editUploadingImage
+                      ? <ActivityIndicator size="small" color={colors.text.primary} />
+                      : <AppIcon name="checkmark-outline" size={14} />}
+                    <Text style={styles.modalSaveButtonText}>{editUploadingImage ? t('horses.uploading') : t('horses.saveChanges')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
     </ScreenBackground>
   );
@@ -974,7 +1211,7 @@ const styles = StyleSheet.create({
   },
   noRemindersText: {
     fontSize: typography.size.xs,
-    color: colors.text.muted,
+    color: colors.text.tertiary,
     fontStyle: 'italic',
     paddingVertical: spacing.sm,
   },
@@ -1037,7 +1274,28 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
     fontWeight: typography.weight.bold,
   },
+  cardActionsRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  editButton: {
+    flex: 1,
+    backgroundColor: colors.primary.main,
+    paddingVertical: spacing.sm,
+    borderRadius: borderRadius.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.xs,
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: typography.size.sm,
+    fontWeight: typography.weight.bold,
+  },
   removeButton: {
+    flex: 1,
     backgroundColor: colors.status.error,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.sm,
@@ -1045,7 +1303,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.xs,
-    marginTop: spacing.sm,
   },
   removeButtonText: {
     color: '#fff',

@@ -143,13 +143,8 @@ const ClientHomeScreen = ({ navigation }) => {
                       <RTLText style={styles.subscriptionTitle}>{t('clientHome.clinicSubscription')}</RTLText>
                     </View>
                     <View style={[styles.subscriptionStatusBadge, selectedClient.subscriptionActive && styles.subscriptionActiveBadge]}>
-                      <AppIcon
-                        name={selectedClient.subscriptionActive ? 'checkmark-outline' : 'close-outline'}
-                        size={10}
-                        color="#fff"
-                      />
                       <Text style={[styles.subscriptionStatusText, { writingDirection, textAlign }]}>
-                        {selectedClient.subscriptionActive ? ` ${t('clientHome.active')}` : ` ${t('clientHome.expired')}`}
+                        {selectedClient.subscriptionActive ? t('clientHome.active') : t('clientHome.expired')}
                       </Text>
                     </View>
                   </View>
@@ -519,7 +514,7 @@ const styles = StyleSheet.create({
   },
   subscriptionDate: {
     fontSize: typography.size.xs,
-    color: colors.text.muted,
+    color: colors.text.secondary,
     textAlign: 'center',
     fontStyle: 'italic',
   },

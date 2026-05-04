@@ -285,7 +285,12 @@
     "reminderAdded": "התזכורת נוספה וההתראה תוזמנה בהצלחה",
     "reminderAddFailed": "הוספת התזכורת נכשלה",
     "reminderDeleted": "התזכורת נמחקה וההתראה בוטלה בהצלחה",
-    "addReminderFor": "הוספת תזכורת ל-{{name}}"
+    "addReminderFor": "הוספת תזכורת ל-{{name}}",
+    "editHorse": "עריכת פרטי הסוס",
+    "horseUpdated": "פרטי הסוס עודכנו בהצלחה",
+    "horseUpdateFailed": "עדכון פרטי הסוס נכשל",
+    "saveChanges": "שמירת שינויים",
+    "changeImage": "שינוי תמונה"
   },
   "lessons": {
     "title": "שיעורים",

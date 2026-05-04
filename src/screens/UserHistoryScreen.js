@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
   },
   weekIdText: {
     fontSize: typography.size.xs,
-    color: colors.text.muted,
+    color: colors.text.tertiary,
     fontStyle: 'italic',
   },
   cardRow: {
@@ -828,7 +828,7 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: typography.size.sm,
-    color: colors.text.muted,
+    color: colors.text.tertiary,
     textAlign: 'center',
     paddingHorizontal: spacing.xxl,
   },
