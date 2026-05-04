@@ -1,5 +1,6 @@
 ﻿import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AppIcon from './AppIcon';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import { useTranslation } from '../i18n/LanguageContext';
@@ -19,6 +20,7 @@ const CompactHeader = ({
 }) => {
   const [pressAnim] = useState(new Animated.Value(1));
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   // Get greeting
   const getGreeting = () => {
@@ -80,7 +82,7 @@ const CompactHeader = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + spacing.xs }]}>
       <View style={styles.content}>
         {/* Left: Avatar + User Info */}
         <TouchableOpacity
@@ -142,10 +144,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background.secondary,
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
-    paddingTop: spacing.md,
     paddingBottom: spacing.md,
     paddingHorizontal: spacing.base,
-    // Subtle top highlight for depth
     borderTopWidth: 0,
   },
   content: {

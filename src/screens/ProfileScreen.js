@@ -13,7 +13,7 @@ import {
   LayoutAnimation,
   UIManager,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenBackground from '../components/ScreenBackground';
 import AppIcon from '../components/AppIcon';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
@@ -488,7 +488,7 @@ const ProfileScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenBackground edges={['bottom']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoid}
@@ -827,14 +827,13 @@ const ProfileScreen = ({ navigation }) => {
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   keyboardAvoid: {
     flex: 1,
@@ -929,10 +928,10 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.lg,
     marginBottom: spacing.lg,
     padding: spacing.lg,
-    backgroundColor: colors.background.tertiary,
-    borderRadius: borderRadius.lg,
-    borderWidth: 2,
-    borderColor: colors.border.medium,
+    backgroundColor: 'rgba(15, 23, 42, 0.68)',
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.09)',
     ...shadows.sm,
   },
   cardTitle: {
@@ -953,10 +952,10 @@ const styles = StyleSheet.create({
   infoItemFrame: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.background.tertiary,
-    borderWidth: 2,
-    borderColor: colors.border.medium,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.62)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: borderRadius.xl,
     padding: spacing.base,
     paddingHorizontal: spacing.lg,
     ...shadows.sm,
@@ -1067,12 +1066,12 @@ const styles = StyleSheet.create({
   securityNote: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
     padding: spacing.lg,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.xl,
     marginTop: spacing.lg,
     borderWidth: 1,
-    borderColor: colors.border.medium,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     ...shadows.sm,
     gap: spacing.sm,
   },

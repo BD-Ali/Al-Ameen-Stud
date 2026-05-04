@@ -1,6 +1,6 @@
 ﻿import React, { useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Alert, Linking, Animated, I18nManager, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenBackground from '../components/ScreenBackground';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnnouncementsFeed from '../components/AnnouncementsFeed';
@@ -66,7 +66,7 @@ const VisitorHomeScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.wrapper}>
+    <ScreenBackground edges={['bottom']}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
@@ -141,18 +141,16 @@ const VisitorHomeScreen = () => {
           <AppIcon name="call-outline" size={20} />
         </Animated.View>
       </TouchableOpacity>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   contentContainer: {
     padding: spacing.base,
@@ -222,9 +220,11 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   card: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
     marginBottom: spacing.md,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
     overflow: 'hidden',

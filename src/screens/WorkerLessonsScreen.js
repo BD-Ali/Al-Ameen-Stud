@@ -1,6 +1,6 @@
 ﻿import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Alert, FlatList, TouchableOpacity, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenBackground from '../components/ScreenBackground';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -239,7 +239,7 @@ const WorkerLessonsScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenBackground noSafeArea>
       <CompactHeader
         userName={currentWorker?.name || user?.email || t('roles.worker')}
         userRole="worker"
@@ -254,14 +254,13 @@ const WorkerLessonsScreen = ({ navigation }) => {
         renderItem={renderItem}
         contentContainerStyle={styles.content}
       />
-    </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   content: {
     padding: spacing.base,
@@ -305,10 +304,12 @@ const styles = StyleSheet.create({
 
   // ── Lesson Cards ─────────────────────────────────────────────────
   lessonCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.base,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
     ...shadows.md,
@@ -423,11 +424,13 @@ const styles = StyleSheet.create({
 
   // ── Empty State ──────────────────────────────────────────────────
   emptyState: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    borderRadius: borderRadius.xl,
     padding: spacing.xl,
     alignItems: 'center',
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     ...shadows.sm,
   },
   emptyText: {

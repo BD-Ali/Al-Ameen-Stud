@@ -1,6 +1,6 @@
 ﻿import React, { useContext } from 'react';
 import { View, Text, StyleSheet, Alert, FlatList, TouchableOpacity, Linking, Image, ScrollView, Animated, I18nManager, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenBackground from '../components/ScreenBackground';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -319,7 +319,7 @@ const WorkerHomeScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenBackground noSafeArea>
       {/* Compact Header */}
       <CompactHeader
         userName={currentWorker?.name || user?.email || t('roles.worker')}
@@ -347,14 +347,13 @@ const WorkerHomeScreen = ({ navigation }) => {
           <AppIcon name="call-outline" size={20} />
         </Animated.View>
       </TouchableOpacity>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   content: {
     flex: 1,
@@ -387,9 +386,11 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   scheduleCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.base,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
     ...shadows.md,
@@ -430,10 +431,12 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   emptyState: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    borderRadius: borderRadius.xl,
     padding: spacing.xl,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     ...shadows.sm,
   },
   emptyText: {
@@ -483,8 +486,10 @@ const styles = StyleSheet.create({
   horseCardCompact: {
     width: 160,
     marginEnd: spacing.md,
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     overflow: 'hidden',
     ...shadows.sm,
   },

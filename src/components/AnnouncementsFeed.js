@@ -346,8 +346,7 @@ const AnnouncementsFeed = ({ userRole = 'visitor', highlightId = null }) => {
 const styles = StyleSheet.create({
   container: {
     // Removed flex: 1 to allow proper nesting in other ScrollViews/FlatLists
-    minHeight: 100, // Ensure minimum height so it's visible in FlatList
-    backgroundColor: colors.background.primary, // Explicit background color
+    minHeight: 100,
   },
   loadingContainer: {
     justifyContent: 'center',
@@ -373,11 +372,13 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   card: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
     marginHorizontal: spacing.base,
     marginBottom: spacing.md,
     padding: spacing.base,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
     ...shadows.sm,
@@ -472,14 +473,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   loadMoreButton: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
     marginHorizontal: spacing.base,
     marginVertical: spacing.md,
     paddingVertical: spacing.md,
-    borderRadius: borderRadius.md,
+    borderRadius: borderRadius.xl,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: colors.border.light,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   loadMoreText: {
     fontSize: typography.size.base,

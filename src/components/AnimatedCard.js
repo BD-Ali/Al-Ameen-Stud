@@ -36,12 +36,12 @@ const AnimatedCard = ({ children, index = 0, delay = 0, style, ...props }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     overflow: 'hidden',
     ...shadows.md,
     borderWidth: 1,
-    borderColor: colors.border.light,
+    borderColor: 'rgba(255, 255, 255, 0.09)',
   },
   reflection: {
     position: 'absolute',

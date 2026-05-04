@@ -16,7 +16,7 @@ import {
   Animated,
   I18nManager,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenBackground from '../components/ScreenBackground';
 import AppIcon from '../components/AppIcon';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -103,8 +103,8 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
+    <ScreenBackground>
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -275,15 +275,14 @@ const LoginScreen = ({ navigation }) => {
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
-      </SafeAreaView>
     </TouchableWithoutFeedback>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   keyboardView: {
     flex: 1,

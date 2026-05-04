@@ -23,6 +23,7 @@ import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import { useFadeIn } from '../utils/animations';
 import { useTranslation } from '../i18n/LanguageContext';
+import ScreenBackground from '../components/ScreenBackground';
 
 const WeeklyScheduleScreen = () => {
   const { weeklySchedules, workerUsers, addWeeklySchedule, updateWeeklySchedule, removeWeeklySchedule, lessons, isWorkerAvailable } = useContext(DataContext);
@@ -375,6 +376,7 @@ const WeeklyScheduleScreen = () => {
 
 
   return (
+    <ScreenBackground noSafeArea>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -607,19 +609,19 @@ const WeeklyScheduleScreen = () => {
         </View>
       </Modal>
     </View>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   header: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(15, 23, 42, 0.88)',
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border.light,
+    borderBottomColor: 'rgba(255, 255, 255, 0.07)',
     ...shadows.sm,
   },
   weekInfo: {
@@ -672,10 +674,12 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   timeSlotCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.border.medium,
     ...shadows.sm,
@@ -865,14 +869,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   workerCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginEnd: spacing.sm,
     alignItems: 'center',
     minWidth: 80,
     borderWidth: 2,
-    borderColor: colors.border.light,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   workerCardSelected: {
     borderColor: colors.status.success,

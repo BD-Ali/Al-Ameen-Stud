@@ -6,7 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenBackground from '../components/ScreenBackground';
 import AppIcon from '../components/AppIcon';
 import { DataContext } from '../context/DataContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -476,7 +476,7 @@ const UserHistoryScreen = ({ route }) => {
 
   // ── main render ─────────────────────────────────────────────────────
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenBackground edges={['bottom']}>
       {/* User header */}
       <View style={styles.header}>
         <View style={styles.avatarRow}>
@@ -542,7 +542,7 @@ const UserHistoryScreen = ({ route }) => {
           </View>
         }
       />
-    </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
@@ -550,7 +550,6 @@ const UserHistoryScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   header: {
     backgroundColor: colors.background.secondary,

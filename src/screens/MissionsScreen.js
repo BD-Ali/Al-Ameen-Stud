@@ -7,6 +7,7 @@ import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
+import ScreenBackground from '../components/ScreenBackground';
 
 const MissionsScreen = () => {
   const { t } = useTranslation();
@@ -152,6 +153,7 @@ const MissionsScreen = () => {
   );
 
   return (
+    <ScreenBackground noSafeArea>
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       {/* Today's Missions */}
       <View style={styles.section}>
@@ -224,13 +226,13 @@ const MissionsScreen = () => {
         </View>
       )}
     </ScrollView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   scrollContent: {
     paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
@@ -278,10 +280,12 @@ const styles = StyleSheet.create({
     fontSize: typography.size.sm,
   },
   missionCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
     ...shadows.sm,
@@ -291,10 +295,12 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   upcomingCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.status.warning,
     ...shadows.sm,
@@ -390,8 +396,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: spacing.xxxl,
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
   },
   emptyIcon: {
     fontSize: 40,

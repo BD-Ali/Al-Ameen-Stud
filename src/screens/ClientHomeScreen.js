@@ -1,6 +1,6 @@
 ﻿import React, { useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Linking, Image, ScrollView, Animated, I18nManager, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenBackground from '../components/ScreenBackground';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -115,7 +115,7 @@ const ClientHomeScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenBackground noSafeArea>
       {/* Compact Header */}
       <CompactHeader
         userName={selectedClient?.name}
@@ -295,14 +295,13 @@ const ClientHomeScreen = ({ navigation }) => {
           <AppIcon name="call-outline" size={20} />
         </Animated.View>
       </TouchableOpacity>
-    </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   content: {
     padding: spacing.base,
@@ -354,10 +353,12 @@ const styles = StyleSheet.create({
     fontSize: typography.size.sm,
   },
   lessonCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
     ...shadows.sm,
@@ -440,8 +441,8 @@ const styles = StyleSheet.create({
   },
   // Subscription card styles
   subscriptionCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.base,
     marginBottom: spacing.base,
     borderWidth: 2,

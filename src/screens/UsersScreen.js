@@ -20,6 +20,7 @@ import AnimatedCard from '../components/AnimatedCard';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
+import ScreenBackground from '../components/ScreenBackground';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useNavigation } from '@react-navigation/native';
 
@@ -850,6 +851,7 @@ const UsersScreen = () => {
   };
 
   return (
+    <ScreenBackground noSafeArea>
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -1079,21 +1081,23 @@ const UsersScreen = () => {
         </Animated.View>
       )}
     </KeyboardAvoidingView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   header: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(15, 23, 42, 0.90)',
     paddingTop: spacing.lg,
     paddingHorizontal: spacing.base,
     paddingBottom: spacing.md,
     borderBottomLeftRadius: borderRadius.xl,
     borderBottomRightRadius: borderRadius.xl,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
     ...shadows.lg,
   },
   pageTitle: {
@@ -1164,10 +1168,12 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl,
   },
   card: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.base,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 4,
     borderStartColor: colors.status.info,
     ...shadows.md,
@@ -1402,10 +1408,12 @@ const styles = StyleSheet.create({
     color: colors.text.primary,
   },
   lessonItem: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.sm,
+    backgroundColor: 'rgba(15, 23, 42, 0.55)',
+    borderRadius: borderRadius.lg,
     padding: spacing.sm,
     marginBottom: spacing.xs,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
   },
@@ -1464,11 +1472,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   newUserForm: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.72)',
+    borderRadius: borderRadius.xl,
     padding: spacing.lg,
     borderWidth: 2,
-    borderColor: colors.border.light,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
     ...shadows.md,
   },
   formTitle: {
@@ -1567,12 +1575,14 @@ const styles = StyleSheet.create({
     top: 60,
     left: spacing.lg,
     right: spacing.lg,
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(15, 23, 42, 0.92)',
     padding: spacing.base,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.xl,
     ...shadows.lg,
     zIndex: 1001,
     borderStartWidth: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.10)',
   },
   toastSuccess: {
     borderStartColor: colors.status.success,

@@ -1,12 +1,13 @@
 ﻿import React, { useContext } from 'react';
 import { View, Text, FlatList, StyleSheet, Platform } from 'react-native';
 import { DataContext } from '../context/DataContext';
+import { useTranslation } from '../i18n/LanguageContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
 import AnimatedCard from '../components/AnimatedCard';
 import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
-import { useTranslation } from '../i18n/LanguageContext';
+import ScreenBackground from '../components/ScreenBackground';
 
 /**
  * FeedScreen shows a consolidated list of feeding plans for all horses.
@@ -17,6 +18,7 @@ const FeedScreen = () => {
   const { rowDirection, textAlign, writingDirection } = useRTL();
 
   return (
+    <ScreenBackground noSafeArea>
     <View style={styles.container}>
       <FlatList
         data={horses}
@@ -59,13 +61,13 @@ const FeedScreen = () => {
         }
       />
     </View>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   contentContainer: {
     padding: spacing.base,
@@ -101,10 +103,12 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
   },
   card: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.accent.amber,
     ...shadows.md,

@@ -1,6 +1,6 @@
 ﻿import React, { useContext, useMemo } from 'react';
 import { View, Text, SectionList, StyleSheet, Platform, I18nManager } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import ScreenBackground from '../components/ScreenBackground';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
@@ -270,7 +270,7 @@ const ClientHistoryScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenBackground noSafeArea>
       <CompactHeader
         userName={selectedClient?.name}
         userRole="client"
@@ -294,14 +294,13 @@ const ClientHistoryScreen = ({ navigation }) => {
           <Text style={[styles.loadingText, { writingDirection, textAlign }]}>{t('clientHome.loadingInfo')}</Text>
         </View>
       )}
-    </SafeAreaView>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   content: {
     padding: spacing.base,
@@ -343,10 +342,12 @@ const styles = StyleSheet.create({
 
   // ── Payment Summary Card ─────────────────────────────────────────
   paymentSummaryCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.lg,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.base,
     marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     ...shadows.md,
   },
   paymentHeader: {
@@ -392,10 +393,12 @@ const styles = StyleSheet.create({
 
   // ── Lesson History Cards ─────────────────────────────────────────
   lessonCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
     ...shadows.sm,
@@ -483,10 +486,12 @@ const styles = StyleSheet.create({
 
   // ── Payment History Cards ────────────────────────────────────────
   paymentCard: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: '#27AE60',
     ...shadows.sm,

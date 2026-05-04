@@ -12,6 +12,7 @@ import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
+import ScreenBackground from '../components/ScreenBackground';
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -352,6 +353,7 @@ const HorsesScreen = () => {
   };
 
   return (
+    <ScreenBackground noSafeArea>
     <View style={styles.container}>
       <FlatList
         data={horses}
@@ -757,13 +759,13 @@ const HorsesScreen = () => {
         </TouchableWithoutFeedback>
       </Modal>
     </View>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   contentContainer: {
     padding: spacing.base,
@@ -804,9 +806,11 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
   },
   card: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.primary.main,
     overflow: 'hidden',
@@ -930,9 +934,11 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   reminderItem: {
-    backgroundColor: colors.background.secondary,
+    backgroundColor: 'rgba(15, 23, 42, 0.55)',
     padding: spacing.sm,
-    borderRadius: borderRadius.sm,
+    borderRadius: borderRadius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -973,10 +979,12 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   formSection: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.base,
     marginTop: spacing.base,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   formTitleRow: {
     flexDirection: 'row',

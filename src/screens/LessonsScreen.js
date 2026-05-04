@@ -9,6 +9,7 @@ import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
+import ScreenBackground from '../components/ScreenBackground';
 
 /**
  * LessonsScreen lists all scheduled lessons and allows the administrator to add
@@ -150,6 +151,7 @@ const LessonsScreen = () => {
   };
 
   return (
+    <ScreenBackground noSafeArea>
     <View style={styles.container}>
       <FlatList
         data={lessons}
@@ -559,13 +561,13 @@ const LessonsScreen = () => {
         }
       />
     </View>
+    </ScreenBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
   },
   contentContainer: {
     padding: spacing.base,
@@ -601,10 +603,12 @@ const styles = StyleSheet.create({
     fontSize: typography.size.base,
   },
   card: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.md,
     marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderStartWidth: 3,
     borderStartColor: colors.accent.purple,
     ...shadows.md,
@@ -662,10 +666,12 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
   },
   formSection: {
-    backgroundColor: colors.background.secondary,
-    borderRadius: borderRadius.md,
+    backgroundColor: 'rgba(15, 23, 42, 0.70)',
+    borderRadius: borderRadius.xl,
     padding: spacing.base,
     marginTop: spacing.base,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   formTitleRow: {
     flexDirection: 'row',
