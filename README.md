@@ -166,17 +166,19 @@ Al-Ameen Stud is a professional stud management system that streamlines day-to-d
 ## 🛠 Technology Stack
 
 ### Frontend
-- **React Native (0.81.4)** — Cross-platform mobile framework
+- **React Native (0.81.5)** — Cross-platform mobile framework
 - **React (19.1.0)** — UI library
-- **Expo (~54.0.0)** — Development platform
+- **Expo (~54.0.34)** — Development platform
 - **React Navigation (^6.x)** — Navigation (Native Stack + Bottom Tabs)
-- **Expo Notifications (^0.32.12)** — Push and local notifications
-- **Expo Image Picker (^17.0.8)** — Camera and gallery access
+- **Expo Notifications (~0.32.17)** — Push and local notifications
+- **Expo Image Picker (~17.0.11)** — Camera and gallery access
+- **Expo Font (~14.0.11)** — Font loading
 - **@expo/vector-icons** — FontAwesome5 icon library
 - **AsyncStorage (2.2.0)** — Local data persistence
 - **React Native Gesture Handler (~2.28.0)** — Touch interactions
 - **React Native Reanimated (~4.1.1)** — Smooth animations
-- **DateTimePicker (^8.4.5)** — Date and time selection
+- **React Native SVG (15.12.1)** — SVG support
+- **DateTimePicker (8.4.4)** — Date and time selection
 - **react-native-safe-area-context** — Safe area handling
 
 ### Backend & Services
@@ -196,7 +198,9 @@ Al-Ameen Stud is a professional stud management system that streamlines day-to-d
 Al-Ameen-Stable/
 ├── App.js                          # Main app entry point
 ├── app.json                        # Expo configuration
-├── package.json                    # Dependencies (v1.2.0)
+├── package.json                    # Dependencies (v1.3.0)
+├── .npmrc                          # npm config (legacy-peer-deps)
+├── .easignore                      # EAS upload exclusions
 ├── babel.config.js                 # Babel config (console removal in prod)
 ├── metro.config.js                 # Metro bundler config
 ├── eas.json                        # EAS build config (auto-increment)
@@ -208,9 +212,14 @@ Al-Ameen-Stable/
     │   ├── AnimatedButton.js      # Animated button component
     │   ├── AnimatedCard.js        # Animated card component
     │   ├── AnnouncementsFeed.js   # Announcements feed component
+    │   ├── AppIcon.js             # Unified icon component (FontAwesome5)
+    │   ├── ClientTabs.js          # Bottom tab navigation for clients
     │   ├── CompactHeader.js       # Header with text-based logout
     │   ├── InAppNotificationBanner.js  # Notification banner (FontAwesome5)
-    │   └── LanguageSwitcher.js    # Language selection component
+    │   ├── LanguageSwitcher.js    # Language selection component
+    │   ├── RTLRow.js              # RTL-aware row layout
+    │   ├── RTLText.js             # RTL-aware text component
+    │   └── WorkerTabs.js          # Bottom tab navigation for workers
     ├── config/
     │   ├── cloudinaryConfig.js    # Cloudinary setup
     │   └── firebaseConfig.js      # Firebase setup
@@ -222,20 +231,24 @@ Al-Ameen-Stable/
     │   ├── ar.json                # Arabic translations
     │   ├── he.json                # Hebrew translations
     │   └── LanguageContext.js     # Language context provider
+    ├── hooks/
+    │   └── useTabBottomPadding.js # Dynamic bottom padding for tab screens
     ├── screens/
     │   ├── LoginScreen.js         # Login interface
     │   ├── AnnouncementsScreen.js # Announcements management
+    │   ├── ClientHistoryScreen.js # Client payment/lesson history
     │   ├── ClientHomeScreen.js    # Client dashboard
     │   ├── FeedScreen.js          # Announcements feed (admin)
     │   ├── HorsesScreen.js        # Horse management
     │   ├── LessonsScreen.js       # Lesson scheduling
     │   ├── MissionsScreen.js      # Task management
     │   ├── ProfileScreen.js       # User profile
-    │   ├── UserHistoryScreen.js   # Client payment/lesson history
+    │   ├── UserHistoryScreen.js   # Client payment/lesson history (admin view)
     │   ├── UsersScreen.js         # User management
     │   ├── VisitorHomeScreen.js   # Public interface
     │   ├── WeeklyScheduleScreen.js # Weekly schedule (multi-worker)
-    │   └── WorkerHomeScreen.js    # Worker dashboard
+    │   ├── WorkerHomeScreen.js    # Worker dashboard
+    │   └── WorkerLessonsScreen.js # Worker lessons view
     ├── services/
     │   ├── lessonCleanupService.js     # Auto-cleanup old lessons
     │   ├── lessonReminderService.js    # Lesson notifications
@@ -361,7 +374,7 @@ For bug reports, please include: device type/OS, app version, steps to reproduce
 
 ## 📊 Project Statistics
 
-- **Total Screens:** 13
+- **Total Screens:** 15
 - **User Roles:** 4 (Admin, Client, Worker, Visitor)
 - **Database Collections:** 10
 - **Supported Platforms:** iOS, Android
@@ -369,6 +382,19 @@ For bug reports, please include: device type/OS, app version, steps to reproduce
 - **Dependencies:** 20+ npm packages
 
 ## 📝 Version History
+
+### Version 1.3.0 (May 2026)
+- Android edge-to-edge layout support (Android 15+)
+- Dynamic bottom padding using `useBottomTabBarHeight()` across all 11 tab screens — prevents content being hidden behind the floating tab bar on any device
+- Bottom sheet modal safe area fix in WeeklyScheduleScreen (system nav bar no longer overlaps modal)
+- Fixed invisible text on dark cards (`text.muted` → `text.tertiary/secondary`) across HorsesScreen, LessonsScreen, UsersScreen, UserHistoryScreen, ClientHomeScreen
+- Removed duplicate checkmark from active subscription badge in ClientHomeScreen
+- Conditional breed display in VisitorHomeScreen (hidden when empty)
+- LoginScreen dead area fix — removed excessive vertical padding inside SafeAreaView
+- Dependency updates: all SDK 54 packages updated to latest patch versions
+- Added `expo-font`, `react-native-svg`, `react-native-worklets` peer dependencies
+- Removed invalid `app.json` fields (`ios.deploymentTarget`, `android.useNextNotificationsApi`)
+- Added `.npmrc` and `.easignore` for reliable EAS builds
 
 ### Version 1.2.0 (March 2026)
 - Full internationalization (English, Arabic, Hebrew) with RTL support
