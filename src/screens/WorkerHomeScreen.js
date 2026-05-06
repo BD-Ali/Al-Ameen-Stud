@@ -11,11 +11,13 @@ import useRTL from '../hooks/useRTL';
 import { useFadeIn, usePulse } from '../utils/animations';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 /**
  * WorkerHomeScreen displays a worker's assigned tasks and schedule
  */
 const WorkerHomeScreen = ({ navigation }) => {
+  const bottomPadding = useTabBottomPadding();
   const { schedules, horses, workers, weeklySchedules, loading } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
@@ -331,8 +333,7 @@ const WorkerHomeScreen = ({ navigation }) => {
 
       <FlatList
         style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-        data={sections}
+        contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
         keyExtractor={(item) => item.id}
         renderItem={renderSection}
       />

@@ -12,6 +12,7 @@ import useRTL from '../hooks/useRTL';
 import { useFadeIn, usePulse } from '../utils/animations';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 /**
  * ClientHomeScreen displays announcements, upcoming scheduled lessons,
@@ -19,6 +20,7 @@ import { useTranslation } from '../i18n/LanguageContext';
  * the ClientHistoryScreen (second tab).
  */
 const ClientHomeScreen = ({ navigation }) => {
+  const bottomPadding = useTabBottomPadding();
   const { clients, horses, workers, getScheduledLessons } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
@@ -271,7 +273,7 @@ const ClientHomeScreen = ({ navigation }) => {
               <RTLText style={[styles.emptySubtext, { writingDirection, textAlign }]}>{t('clientHome.contactToBook')}</RTLText>
             </View>
           }
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
         />
       ) : (
         <View style={styles.loadingContainer}>

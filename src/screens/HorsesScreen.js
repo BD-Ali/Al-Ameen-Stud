@@ -13,6 +13,7 @@ import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 import ScreenBackground from '../components/ScreenBackground';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -24,6 +25,7 @@ Notifications.setNotificationHandler({
 });
 
 const HorsesScreen = () => {
+  const bottomPadding = useTabBottomPadding();
   const { t } = useTranslation();
   const { isRTL, rowDirection, textAlign, writingDirection } = useRTL();
   const { horses, addHorse, removeHorse, updateHorse, reminders, addReminder, removeReminder } = useContext(DataContext);
@@ -714,7 +716,7 @@ const HorsesScreen = () => {
             </TouchableOpacity>
           </View>
         }
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <AppIcon name="paw-outline" size={64} />

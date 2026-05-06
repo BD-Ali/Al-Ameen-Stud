@@ -8,11 +8,13 @@ import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import ScreenBackground from '../components/ScreenBackground';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 /**
  * FeedScreen shows a consolidated list of feeding plans for all horses.
  */
 const FeedScreen = () => {
+  const bottomPadding = useTabBottomPadding();
   const { horses } = useContext(DataContext);
   const { t } = useTranslation();
   const { rowDirection, textAlign, writingDirection } = useRTL();
@@ -51,7 +53,7 @@ const FeedScreen = () => {
             </View>
           </AnimatedCard>
         )}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <AppIcon name="nutrition-outline" size={48} />

@@ -12,12 +12,14 @@ import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 /**
  * ClientHistoryScreen displays the client's lesson history (completed/cancelled)
  * and payment history, each with dates. Tab 2 of the client bottom tabs.
  */
 const ClientHistoryScreen = ({ navigation }) => {
+  const bottomPadding = useTabBottomPadding();
   const { clients, horses, workers, getConfirmedLessons, getCancelledLessons, paymentHistory } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
@@ -318,7 +320,7 @@ const ClientHistoryScreen = ({ navigation }) => {
           keyExtractor={(item, index) => (typeof item === 'string' ? item : item.id || `item-${index}`)}
           renderItem={renderItem}
           renderSectionHeader={renderSectionHeader}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
           stickySectionHeadersEnabled={false}
         />
       ) : (

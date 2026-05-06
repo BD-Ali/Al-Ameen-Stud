@@ -9,12 +9,14 @@ import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 /**
  * WorkerLessonsScreen – Tab 2 for workers.
  * Shows today's lessons (with confirm/cancel actions) and upcoming lessons.
  */
 const WorkerLessonsScreen = ({ navigation }) => {
+  const bottomPadding = useTabBottomPadding();
   const { lessons, horses, clients, workers, loading, confirmLesson, cancelLesson } = useContext(DataContext);
   const { user, logOut } = useContext(AuthContext);
   const { t } = useTranslation();
@@ -252,7 +254,7 @@ const WorkerLessonsScreen = ({ navigation }) => {
         data={buildData()}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomPadding }]}
       />
     </ScreenBackground>
   );

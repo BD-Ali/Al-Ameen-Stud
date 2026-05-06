@@ -10,12 +10,14 @@ import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 import ScreenBackground from '../components/ScreenBackground';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 /**
  * LessonsScreen lists all scheduled lessons and allows the administrator to add
  * new lessons.
  */
 const LessonsScreen = () => {
+  const bottomPadding = useTabBottomPadding();
   const { t } = useTranslation();
   const { rowDirection, textAlign, writingDirection } = useRTL();
   const { lessons, addLesson, removeLesson, horses, clients, workers, workerUsers } = useContext(DataContext);
@@ -551,7 +553,7 @@ const LessonsScreen = () => {
             </TouchableOpacity>
           </View>
         }
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <AppIcon name="book-outline" size={64} />

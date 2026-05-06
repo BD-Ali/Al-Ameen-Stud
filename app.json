@@ -2,7 +2,7 @@
   "expo": {
     "name": "Al-Ameen Stud",
     "slug": "al-ameen-stable",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "platforms": [
       "ios",
       "android",
@@ -26,7 +26,6 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.alameenstud.com",
       "buildNumber": "2",
-      "deploymentTarget": "16.0",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSCameraUsageDescription": "This app requires access to your camera to upload horse photos and user profile pictures.",
@@ -91,8 +90,7 @@
         "POST_NOTIFICATIONS",
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE"
-      ],
-      "useNextNotificationsApi": true
+      ]
     },
     "web": {
       "favicon": "./assets/icon.png",
@@ -115,7 +113,9 @@
           "color": "#3498db",
           "sounds": []
         }
-      ]
+      ],
+      "expo-font",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

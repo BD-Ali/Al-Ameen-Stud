@@ -8,8 +8,10 @@ import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
 import ScreenBackground from '../components/ScreenBackground';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 const MissionsScreen = () => {
+  const bottomPadding = useTabBottomPadding();
   const { t } = useTranslation();
   const { rowDirection, textAlign, writingDirection } = useRTL();
   const { reminders, updateReminder } = useContext(DataContext);
@@ -154,7 +156,7 @@ const MissionsScreen = () => {
 
   return (
     <ScreenBackground noSafeArea>
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
+    <ScrollView style={styles.container} contentContainerStyle={[styles.scrollContent, { paddingBottom: bottomPadding }]}>
       {/* Today's Missions */}
       <View style={styles.section}>
         <View style={[styles.sectionHeader, { flexDirection: rowDirection }]}>

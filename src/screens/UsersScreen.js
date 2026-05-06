@@ -23,12 +23,14 @@ import AppIcon from '../components/AppIcon';
 import ScreenBackground from '../components/ScreenBackground';
 import { useTranslation } from '../i18n/LanguageContext';
 import { useNavigation } from '@react-navigation/native';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 /**
  * UsersScreen - Unified section for managing both Clients and Workers
  * Features: Tabs, Search/Filter, Collapsible items, Create/Edit/Delete for both types
  */
 const UsersScreen = () => {
+  const bottomPadding = useTabBottomPadding();
   const { t } = useTranslation();
   const navigation = useNavigation();
   const { rowDirection, textAlign, writingDirection } = useRTL();
@@ -909,8 +911,7 @@ const UsersScreen = () => {
         data={currentData}
         keyExtractor={(item) => item.id}
         renderItem={renderUserCard}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={true}
+        contentContainerStyle={[styles.contentContainer, { paddingBottom: bottomPadding }]}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
         nestedScrollEnabled={true}

@@ -32,6 +32,7 @@ import RTLText from '../components/RTLText';
 import useRTL from '../hooks/useRTL';
 import AppIcon from '../components/AppIcon';
 import { useTranslation } from '../i18n/LanguageContext';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 /**
  * Toast Notification Component
@@ -88,6 +89,7 @@ const Toast = ({ visible, message, type, onHide }) => {
  * Features: Create, Edit, Delete, Schedule, Target audiences, Pin posts, Image upload, Notifications
  */
 const AnnouncementsScreen = () => {
+  const bottomPadding = useTabBottomPadding();
   const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useContext(DataContext);
   const { user } = useContext(AuthContext);
   const { t } = useTranslation();
@@ -517,7 +519,7 @@ const AnnouncementsScreen = () => {
         }
         contentContainerStyle={[
           sortedAnnouncements.length === 0 && styles.emptyContainer,
-          { paddingBottom: Platform.OS === 'android' ? 100 : spacing.xl },
+          { paddingBottom: bottomPadding },
         ]}
       />
 

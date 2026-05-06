@@ -24,8 +24,12 @@ import useRTL from '../hooks/useRTL';
 import { useFadeIn } from '../utils/animations';
 import { useTranslation } from '../i18n/LanguageContext';
 import ScreenBackground from '../components/ScreenBackground';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
 const WeeklyScheduleScreen = () => {
+  const bottomPadding = useTabBottomPadding();
+  const insets = useSafeAreaInsets();
   const { weeklySchedules, workerUsers, addWeeklySchedule, updateWeeklySchedule, removeWeeklySchedule, lessons, isWorkerAvailable } = useContext(DataContext);
   const { t } = useTranslation();
   const { rowDirection, textAlign, writingDirection } = useRTL();
@@ -429,7 +433,7 @@ const WeeklyScheduleScreen = () => {
       {/* Schedule Grid - Using FlatList instead of ScrollView */}
       <FlatList
         style={styles.scheduleContainer}
-        contentContainerStyle={styles.timeSlotsList}
+        contentContainerStyle={[styles.timeSlotsList, { paddingBottom: bottomPadding }]}
         data={timeSlots}
         keyExtractor={(item) => item}
         renderItem={({ item: timeSlot }) => {
@@ -513,7 +517,7 @@ const WeeklyScheduleScreen = () => {
         onRequestClose={closeModal}
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { paddingBottom: insets.bottom + spacing.xl }]}>
             <View style={[styles.modalHeader, { flexDirection: rowDirection }]}>
               <Text style={[styles.modalTitle, { writingDirection, textAlign }]}>
                 {editMode ? t('weeklySchedule.editTaskTitle') : t('weeklySchedule.assignWork')}
