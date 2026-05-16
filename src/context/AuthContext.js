@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
       await setDoc(doc(db, 'users', user.uid), {
         email,
         name,
-        phone,
+        phoneNumber: phone,
         role,
         createdAt: new Date().toISOString(),
       });
@@ -53,9 +53,15 @@ export const AuthProvider = ({ children }) => {
         await setDoc(doc(db, 'clients', user.uid), {
           name,
           email,
-          phone,
+          phoneNumber: phone,
           amountPaid: 0,
           amountDue: 0,
+          lessonCount: 0,
+          hasSubscription: false,
+          subscriptionActive: false,
+          subscriptionLessons: 0,
+          subscriptionUsedLessons: 0,
+          subscriptionTotalLessons: 0,
           createdAt: new Date().toISOString(),
         });
       }

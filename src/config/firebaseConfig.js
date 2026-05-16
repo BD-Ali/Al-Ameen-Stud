@@ -7,7 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
  * Firebase configuration for Al-Ameen Stable app.
  * Connected to project: al-ameen-stable
  */
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyB6xWP-IIN1Jephs0h1bWjBtEDlnqXFom4",
   authDomain: "al-ameen-stable.firebaseapp.com",
   projectId: "al-ameen-stable",

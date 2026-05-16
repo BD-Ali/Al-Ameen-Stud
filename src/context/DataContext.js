@@ -13,9 +13,9 @@ import {
   getDocs,
   writeBatch
 } from 'firebase/firestore';
-import { db } from '../config/firebaseConfig';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../config/firebaseConfig';
+import { db, firebaseConfig } from '../config/firebaseConfig';
+import { createUserWithEmailAndPassword, getAuth, signOut as firebaseSignOut } from 'firebase/auth';
+import { initializeApp, deleteApp } from 'firebase/app';
 import notificationService from '../services/notificationService';
 import lessonReminderService from '../services/lessonReminderService';
 import lessonCleanupService from '../services/lessonCleanupService';
@@ -261,11 +261,17 @@ export const DataProvider = ({ children }) => {
    * Create a new user account with Firebase Auth and store in Firestore
    */
   const createUserAccount = async (name, email, phoneNumber, role = 'client', subscriptionData = null) => {
+    let secondaryApp = null;
     try {
       // Create auth user with phone number as password (remove dashes from phone number)
       const passwordFromPhone = phoneNumber.replace(/-/g, '');
-      const userCredential = await createUserWithEmailAndPassword(auth, email, passwordFromPhone);
+      // Use a secondary Firebase app so the admin's auth session is not replaced
+      secondaryApp = initializeApp(firebaseConfig, `secondary-${Date.now()}`);
+      const secondaryAuth = getAuth(secondaryApp);
+      const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, passwordFromPhone);
       const user = userCredential.user;
+      // Sign out from secondary app immediately — does not affect the admin session
+      await firebaseSignOut(secondaryAuth);
 
       // Store user profile in Firestore
       await setDoc(doc(db, 'users', user.uid), {
@@ -324,6 +330,10 @@ export const DataProvider = ({ children }) => {
     } catch (error) {
       console.error('Error creating user account:', error);
       return { success: false, error: error.message };
+    } finally {
+      if (secondaryApp) {
+        try { await deleteApp(secondaryApp); } catch (_) {}
+      }
     }
   };
 

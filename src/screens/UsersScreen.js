@@ -423,14 +423,14 @@ const UsersScreen = () => {
               <View style={styles.userHeaderInfo}>
                 <RTLText style={styles.userName}>{item.name}</RTLText>
                 <View style={[styles.userMetaRow, { flexDirection: rowDirection }]}>
-                  {item.phoneNumber && (
+                  {(item.phoneNumber || item.phone) && (
                     <TouchableOpacity
                       style={[styles.phoneRow, { flexDirection: rowDirection }]}
-                      onPress={() => handlePhoneCall(item.phoneNumber)}
+                      onPress={() => handlePhoneCall(item.phoneNumber || item.phone)}
                       activeOpacity={0.7}
                     >
                       <AppIcon name="call-outline" size={12} color={colors.primary.main} />
-                      <Text style={[styles.userMetaText, styles.phoneLink, { writingDirection, textAlign }]}>{item.phoneNumber}</Text>
+                      <Text style={[styles.userMetaText, styles.phoneLink, { writingDirection, textAlign }]}>{item.phoneNumber || item.phone}</Text>
                     </TouchableOpacity>
                   )}
                   {isClient && item.amountDue > 0 && (
@@ -465,14 +465,14 @@ const UsersScreen = () => {
                 </View>
               )}
 
-              {item.phoneNumber && (
+              {(item.phoneNumber || item.phone) && (
                 <View style={[styles.detailRow, { flexDirection: rowDirection }]}>
                   <View style={[styles.labelRow, { flexDirection: rowDirection }]}>
                     <AppIcon name="call-outline" size={14} />
                     <Text style={[styles.detailLabel, { writingDirection, textAlign }]}>{t('users.phoneNumber')}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => handlePhoneCall(item.phoneNumber)}>
-                    <Text style={[styles.detailValue, styles.phoneLink, { writingDirection, textAlign }]}>{item.phoneNumber}</Text>
+                  <TouchableOpacity onPress={() => handlePhoneCall(item.phoneNumber || item.phone)}>
+                    <Text style={[styles.detailValue, styles.phoneLink, { writingDirection, textAlign }]}>{item.phoneNumber || item.phone}</Text>
                   </TouchableOpacity>
                 </View>
               )}
