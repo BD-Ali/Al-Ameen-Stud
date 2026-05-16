@@ -7,6 +7,31 @@ import {
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebaseConfig';
+import { translate } from '../i18n/LanguageContext';
+
+/**
+ * Maps a Firebase Auth error to a user-friendly translated message.
+ */
+const getAuthErrorMessage = (error) => {
+  switch (error?.code) {
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+      return translate('auth.invalidCredentials');
+    case 'auth/email-already-in-use':
+      return translate('auth.emailInUse');
+    case 'auth/invalid-email':
+      return translate('auth.invalidEmail');
+    case 'auth/weak-password':
+      return translate('auth.weakPassword');
+    case 'auth/too-many-requests':
+      return translate('profile.tooManyAttempts');
+    case 'auth/network-request-failed':
+      return translate('common.networkError');
+    default:
+      return translate('common.unexpectedError');
+  }
+};
 
 export const AuthContext = createContext();
 
@@ -69,7 +94,7 @@ export const AuthProvider = ({ children }) => {
       setUserRole(role);
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: getAuthErrorMessage(error) };
     }
   };
 
@@ -86,7 +111,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: getAuthErrorMessage(error) };
     }
   };
 

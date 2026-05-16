@@ -329,7 +329,24 @@ export const DataProvider = ({ children }) => {
       return { success: true, userId: user.uid };
     } catch (error) {
       console.error('Error creating user account:', error);
-      return { success: false, error: error.message };
+      const code = error?.code || '';
+      let friendlyMessage;
+      if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found'].includes(code)) {
+        friendlyMessage = t('auth.invalidCredentials');
+      } else if (code === 'auth/email-already-in-use') {
+        friendlyMessage = t('auth.emailInUse');
+      } else if (code === 'auth/invalid-email') {
+        friendlyMessage = t('auth.invalidEmail');
+      } else if (code === 'auth/weak-password') {
+        friendlyMessage = t('auth.weakPassword');
+      } else if (code === 'auth/too-many-requests') {
+        friendlyMessage = t('profile.tooManyAttempts');
+      } else if (code === 'auth/network-request-failed') {
+        friendlyMessage = t('common.networkError');
+      } else {
+        friendlyMessage = t('common.unexpectedError');
+      }
+      return { success: false, error: friendlyMessage };
     } finally {
       if (secondaryApp) {
         try { await deleteApp(secondaryApp); } catch (_) {}
