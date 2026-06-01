@@ -1,11 +1,15 @@
 /**
  * Cloudinary Configuration and Upload Service
  * Handles image uploads to Cloudinary
+ *
+ * Values are loaded from environment variables defined in .env
+ * (EXPO_PUBLIC_* variables are inlined at build time by Expo/Metro).
+ * Copy .env.example → .env and fill in your credentials.
  */
 
-const CLOUDINARY_CLOUD_NAME = 'dtbynupyx';
-const CLOUDINARY_API_KEY = '696232838498944';
-const CLOUDINARY_UPLOAD_PRESET = 'al-ameen-stable'; // You'll need to create this in Cloudinary dashboard
+const CLOUDINARY_CLOUD_NAME = process.env.EXPO_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_API_KEY = process.env.EXPO_PUBLIC_CLOUDINARY_API_KEY;
+const CLOUDINARY_UPLOAD_PRESET = process.env.EXPO_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 /**
  * Upload an image to Cloudinary

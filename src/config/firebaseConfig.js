@@ -6,15 +6,19 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 /**
  * Firebase configuration for Al-Ameen Stable app.
  * Connected to project: al-ameen-stable
+ *
+ * Values are loaded from environment variables defined in .env
+ * (EXPO_PUBLIC_* variables are inlined at build time by Expo/Metro).
+ * Copy .env.example → .env and fill in your credentials.
  */
 export const firebaseConfig = {
-  apiKey: "AIzaSyB6xWP-IIN1Jephs0h1bWjBtEDlnqXFom4",
-  authDomain: "al-ameen-stable.firebaseapp.com",
-  projectId: "al-ameen-stable",
-  storageBucket: "al-ameen-stable.firebasestorage.app",
-  messagingSenderId: "941395916267",
-  appId: "1:941395916267:web:cd92dc8061b3f226a1d5ae",
-  measurementId: "G-JPGEYFT1JS"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
