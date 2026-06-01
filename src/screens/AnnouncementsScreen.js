@@ -19,7 +19,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ScreenBackground from '../components/ScreenBackground';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DataContext } from '../context/DataContext';
 import { AuthContext } from '../context/AuthContext';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -544,7 +543,6 @@ const AnnouncementsScreen = () => {
           }
         }}
       >
-        <SafeAreaProvider>
         <SafeAreaView style={styles.modalContainer}>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -915,7 +913,6 @@ const AnnouncementsScreen = () => {
             )}
           </KeyboardAvoidingView>
         </SafeAreaView>
-        </SafeAreaProvider>
       </Modal>
     </View>
     </ScreenBackground>

@@ -634,5 +634,10 @@
     "arabic": "العربية",
     "hebrew": "עברית",
     "english": "English"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "The app encountered an unexpected error. Please tap the button below to try again.",
+    "tryAgain": "Try Again"
   }
 }

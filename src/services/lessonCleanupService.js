@@ -154,10 +154,15 @@ class LessonCleanupService {
     try {
       const now = new Date();
 
-      // Find all lessons whose date+time has passed
+      // Find all lessons whose date+time has passed AND that are not confirmed/completed.
+      // Confirmed and completed lessons must be preserved for client history.
+      // Only unconfirmed or explicitly cancelled lessons are eligible for cleanup.
       const expiredLessons = lessons.filter(lesson => {
         const lessonDate = this.parseLessonDate(lesson.date, lesson.time);
-        return lessonDate && lessonDate < now;
+        if (!lessonDate || lessonDate >= now) return false;
+        if (lesson.status === 'confirmed' || lesson.status === 'completed') return false;
+        if (lesson.confirmed === true) return false;
+        return true;
       });
 
       if (expiredLessons.length === 0) {

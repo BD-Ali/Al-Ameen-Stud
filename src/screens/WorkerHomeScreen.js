@@ -137,7 +137,7 @@ const WorkerHomeScreen = ({ navigation }) => {
         {
           text: t('visitorHome.sendEmail'),
           onPress: () => {
-            Linking.openURL('mailto:badarne3li@gmail.com').catch(() => {
+            Linking.openURL('mailto:Lina.b.96@hotmail.com').catch(() => {
               Alert.alert(t('common.error'), t('visitorHome.cannotOpenEmail'));
             });
           }
@@ -145,7 +145,7 @@ const WorkerHomeScreen = ({ navigation }) => {
         {
           text: t('visitorHome.phoneCall'),
           onPress: () => {
-            Linking.openURL('tel:0503653429').catch(() => {
+            Linking.openURL('tel:0526913008').catch(() => {
               Alert.alert(t('common.error'), t('visitorHome.cannotMakeCall'));
             });
           }

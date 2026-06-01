@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { I18nManager } from 'react-native';
+import * as Updates from 'expo-updates';
 import ar from './ar.json';
 import he from './he.json';
 import en from './en.json';
@@ -66,20 +67,23 @@ export const LanguageProvider = ({ children }) => {
 
   const setLanguage = useCallback(async (lang) => {
     if (translations[lang]) {
+      const shouldBeRTL = RTL_LANGUAGES.includes(lang);
+      const rtlChanged = I18nManager.isRTL !== shouldBeRTL;
+
       setLanguageState(lang);
       currentLanguage = lang;
-
-      // Update RTL based on language
-      const shouldBeRTL = RTL_LANGUAGES.includes(lang);
-      if (I18nManager.isRTL !== shouldBeRTL) {
-        I18nManager.allowRTL(shouldBeRTL);
-        I18nManager.forceRTL(shouldBeRTL);
-      }
 
       try {
         await AsyncStorage.setItem(LANGUAGE_KEY, lang);
       } catch (e) {
         console.error('Failed to persist language:', e);
+      }
+
+      if (rtlChanged) {
+        I18nManager.allowRTL(shouldBeRTL);
+        I18nManager.forceRTL(shouldBeRTL);
+        // Language/direction persisted; reload so native components pick up the new RTL setting.
+        await Updates.reloadAsync();
       }
     }
   }, []);

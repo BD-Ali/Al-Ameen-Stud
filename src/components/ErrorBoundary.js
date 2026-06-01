@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import { colors, typography, spacing, borderRadius, shadows } from '../styles/theme';
+import { translate } from '../i18n/LanguageContext';
 
 /**
  * ErrorBoundary — catches unhandled JS errors anywhere in the tree and
@@ -51,12 +52,11 @@ class ErrorBoundary extends React.Component {
             resizeMode="contain"
           />
 
-          <Text style={styles.title}>حدث خطأ ما</Text>
-          <Text style={styles.subtitle}>Something went wrong</Text>
+          <Text style={styles.title}>{translate('errorBoundary.title')}</Text>
 
           <View style={styles.card}>
             <Text style={styles.description}>
-              The app encountered an unexpected error. Please tap the button below to try again.
+              {translate('errorBoundary.description')}
             </Text>
 
             {__DEV__ && this.state.error ? (
@@ -73,7 +73,7 @@ class ErrorBoundary extends React.Component {
             onPress={this.handleReset}
             activeOpacity={0.8}
           >
-            <Text style={styles.buttonText}>Try Again / حاول مجدداً</Text>
+            <Text style={styles.buttonText}>{translate('errorBoundary.tryAgain')}</Text>
           </TouchableOpacity>
         </ScrollView>
       </View>
@@ -105,16 +105,7 @@ const styles = StyleSheet.create({
     fontWeight: typography.weight.bold,
     color: colors.text.primary,
     textAlign: 'center',
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    fontSize: typography.size.lg,
-    fontWeight: typography.weight.semibold,
-    color: colors.text.secondary,
-    textAlign: 'center',
     marginBottom: spacing.xl,
-  },
-  card: {
     width: '100%',
     backgroundColor: 'rgba(15, 23, 42, 0.70)',
     borderRadius: borderRadius.xl,

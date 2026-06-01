@@ -231,7 +231,7 @@ function AppNavigator() {
         body={bannerData?.body || ''}
         onPress={handleBannerPress}
         onDismiss={() => setBannerVisible(false)}
-        type="announcement"
+        type={bannerData?.type || 'announcement'}
       />
     </>
   );

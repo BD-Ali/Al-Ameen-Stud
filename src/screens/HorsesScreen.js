@@ -15,15 +15,6 @@ import { useTranslation } from '../i18n/LanguageContext';
 import ScreenBackground from '../components/ScreenBackground';
 import useTabBottomPadding from '../hooks/useTabBottomPadding';
 
-// Configure notification handler
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
-
 const HorsesScreen = () => {
   const bottomPadding = useTabBottomPadding();
   const { t } = useTranslation();

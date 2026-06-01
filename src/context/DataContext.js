@@ -447,6 +447,30 @@ export const DataProvider = ({ children }) => {
   };
 
   /**
+   * Update an existing worker's profile fields.
+   */
+  const updateWorker = async (id, updates) => {
+    try {
+      await updateDoc(doc(db, 'workers', id), {
+        ...updates,
+        updatedAt: serverTimestamp()
+      });
+
+      // Keep phoneNumber in sync with the users collection
+      if (updates.phoneNumber !== undefined) {
+        await updateDoc(doc(db, 'users', id), {
+          phoneNumber: updates.phoneNumber,
+        });
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating worker:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
    * Check if worker is available at the given date and time
    */
   const isWorkerAvailable = (workerId, date, time, excludeLessonId = null) => {
@@ -457,7 +481,8 @@ export const DataProvider = ({ children }) => {
     const workerLessons = lessons.filter(l =>
       l.instructorId === workerId &&
       l.date === date &&
-      l.id !== excludeLessonId
+      l.id !== excludeLessonId &&
+      l.status !== 'cancelled'
     );
 
     for (const existingLesson of workerLessons) {
@@ -488,7 +513,8 @@ export const DataProvider = ({ children }) => {
     const horseLessons = lessons.filter(l =>
       l.horseId === horseId &&
       l.date === date &&
-      l.id !== excludeLessonId
+      l.id !== excludeLessonId &&
+      l.status !== 'cancelled'
     );
 
     for (const existingLesson of horseLessons) {
@@ -2183,6 +2209,7 @@ export const DataProvider = ({ children }) => {
         removeClient,
         workers,
         addWorker,
+        updateWorker,
         removeWorker,
         workerUsers,
         lessons,
