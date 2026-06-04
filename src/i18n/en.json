@@ -580,7 +580,8 @@
     "october": "October",
     "november": "November",
     "december": "December",
-    "workerHasLesson": "{{name}} already has a lesson at: {{slots}}. Please choose a different time or worker."
+    "workerHasLesson": "{{name}} already has a lesson at: {{slots}}. Please choose a different time or worker.",
+    "repeatTask": "Repeat every week"
   },
   "dataContext": {
     "lessonWithClient": "Lesson with client",

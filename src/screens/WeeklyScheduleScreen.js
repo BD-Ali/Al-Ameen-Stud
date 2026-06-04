@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Switch,
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
@@ -44,6 +45,8 @@ const WeeklyScheduleScreen = () => {
   const [editMode, setEditMode] = useState(false);
   const [editingScheduleId, setEditingScheduleId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [recurring, setRecurring] = useState(false);
+  const [editingIsRecurring, setEditingIsRecurring] = useState(false);
 
   // Days of the week (Saturday to Friday)
   const daysOfWeek = [
@@ -156,10 +159,11 @@ const WeeklyScheduleScreen = () => {
     return `${day} ${monthName}`;
   };
 
-  // Get all schedules for specific day and time (supports multiple workers per slot)
+  // Get all schedules for specific day and time (supports multiple workers per slot).
+  // Also includes recurring entries (weekId:'recurring') which appear in every week.
   const getSchedulesForSlot = (day, timeSlot) => {
     return weeklySchedules?.filter(
-      (s) => s.weekId === currentWeekId && s.day === day && s.timeSlot === timeSlot
+      (s) => (s.weekId === currentWeekId || s.recurring === true) && s.day === day && s.timeSlot === timeSlot
     ) || [];
   };
 
@@ -214,6 +218,8 @@ const WeeklyScheduleScreen = () => {
           setSelectedSlots([timeSlot]);
           setSelectedWorker(schedule.workerId);
           setWorkDescription(schedule.description || '');
+          setRecurring(schedule.recurring === true);
+          setEditingIsRecurring(schedule.recurring === true);
           setModalVisible(true);
         },
       });
@@ -299,11 +305,20 @@ const WeeklyScheduleScreen = () => {
       }
 
       if (editMode) {
-        // Update existing schedule
-        const result = await updateWeeklySchedule(editingScheduleId, {
+        const updates = {
           workerId: selectedWorker,
           description: workDescription.trim(),
-        });
+          recurring,
+        };
+        // Handle transitions between recurring and one-time
+        if (!editingIsRecurring && recurring) {
+          updates.weekId = 'recurring';
+          updates.weekStart = null;
+        } else if (editingIsRecurring && !recurring) {
+          updates.weekId = currentWeekId;
+          updates.weekStart = currentWeekStart;
+        }
+        const result = await updateWeeklySchedule(editingScheduleId, updates);
 
         if (result.success) {
           Alert.alert(t('common.success'), t('weeklySchedule.taskUpdated'));
@@ -315,12 +330,13 @@ const WeeklyScheduleScreen = () => {
         // Add new schedules for all selected slots
         for (const timeSlot of selectedSlots) {
           const result = await addWeeklySchedule({
-            weekId: currentWeekId,
-            weekStart: currentWeekStart,
+            weekId: recurring ? 'recurring' : currentWeekId,
+            ...(recurring ? {} : { weekStart: currentWeekStart }),
             day: selectedDay,
             timeSlot,
             workerId: selectedWorker,
             description: workDescription.trim(),
+            recurring,
           });
 
           if (!result.success) {
@@ -371,6 +387,8 @@ const WeeklyScheduleScreen = () => {
     setWorkDescription('');
     setEditMode(false);
     setEditingScheduleId(null);
+    setRecurring(false);
+    setEditingIsRecurring(false);
   };
 
   // Clear all selections
@@ -477,6 +495,9 @@ const WeeklyScheduleScreen = () => {
                         <Text style={[styles.workerName, { writingDirection, textAlign }]}>
                           {getWorkerName(schedule.workerId)}
                         </Text>
+                        {schedule.recurring && (
+                          <AppIcon name="repeat-outline" size={12} color={colors.primary.main} />
+                        )}
                       </View>
                       <RTLText style={styles.workDescription} numberOfLines={1}>
                         {schedule.description}
@@ -591,6 +612,19 @@ const WeeklyScheduleScreen = () => {
                     numberOfLines={4}
                     textAlignVertical="top"
                   />
+
+                  {/* Recurring Toggle */}
+                  <View style={[styles.recurringRow, { flexDirection: rowDirection }]}>
+                    <Text style={[styles.inputLabel, { writingDirection, textAlign, marginBottom: 0 }]}>
+                      {t('weeklySchedule.repeatTask')}
+                    </Text>
+                    <Switch
+                      value={recurring}
+                      onValueChange={setRecurring}
+                      trackColor={{ false: colors.border.medium, true: colors.primary.main }}
+                      thumbColor="#fff"
+                    />
+                  </View>
 
                   {/* Save Button */}
                   <TouchableOpacity
@@ -909,6 +943,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
     borderWidth: 1,
     borderColor: colors.border.light,
+  },
+  recurringRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.md,
+    marginTop: spacing.xs,
   },
   saveButton: {
     backgroundColor: colors.primary.main,

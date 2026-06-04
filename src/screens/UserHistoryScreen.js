@@ -129,7 +129,7 @@ const UserHistoryScreen = ({ route }) => {
       });
 
       // --- Weekly schedule tasks (workers) ---
-      const userWeekly = weeklySchedules.filter(s => s.workerId === userId && s.type !== 'lesson');
+      const userWeekly = weeklySchedules.filter(s => s.workerId === userId && s.type !== 'lesson' && !s.recurring);
       userWeekly.forEach(s => {
         items.push({
           id: `weekly-${s.id}`,

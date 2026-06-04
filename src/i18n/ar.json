@@ -580,7 +580,8 @@
     "october": "أكتوبر",
     "november": "نوفمبر",
     "december": "ديسمبر",
-    "workerHasLesson": "{{name}} لديه درس في: {{slots}}. اختر وقتاً أو عاملاً آخر."
+    "workerHasLesson": "{{name}} لديه درس في: {{slots}}. اختر وقتاً أو عاملاً آخر.",
+    "repeatTask": "تكرار كل أسبوع"
   },
   "dataContext": {
     "lessonWithClient": "درس مع عميل",

@@ -580,7 +580,8 @@
     "october": "אוקטובר",
     "november": "נובמבר",
     "december": "דצמבר",
-    "workerHasLesson": "ל-{{name}} כבר יש שיעור ב: {{slots}}. בחר שעה או עובד אחר."
+    "workerHasLesson": "ל-{{name}} כבר יש שיעור ב: {{slots}}. בחר שעה או עובד אחר.",
+    "repeatTask": "חזור כל שבוע"
   },
   "dataContext": {
     "lessonWithClient": "שיעור עם לקוח",

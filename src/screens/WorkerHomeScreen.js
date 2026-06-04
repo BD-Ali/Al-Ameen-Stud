@@ -74,7 +74,7 @@ const WorkerHomeScreen = ({ navigation }) => {
   // Filter weekly schedules for this worker for today
   const myTodayWeeklySchedules = weeklySchedules?.filter((s) =>
     s.workerId === user?.uid &&
-    s.weekId === currentWeekId &&
+    (s.weekId === currentWeekId || s.recurring === true) &&
     s.day === currentDayName
   ) || [];
 
