@@ -40,7 +40,7 @@ const LoginScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { textAlign, writingDirection } = useRTL();
 
   // Animation values
@@ -122,7 +122,15 @@ const LoginScreen = ({ navigation }) => {
                 resizeMode="contain"
               />
             </View>
-            <Text style={styles.title}>{t('auth.brandName')}</Text>
+            <Text
+              key={language}
+              style={styles.title}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              allowFontScaling={false}
+            >
+              {t('auth.brandName')}
+            </Text>
             <RTLText style={styles.subtitle}>
               {isSignUp ? t('auth.createClientAccount') : t('auth.welcomeBack')}
             </RTLText>
@@ -332,6 +340,9 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     fontStyle: 'italic',
     textAlign: 'center',
+    alignSelf: 'stretch',
+    paddingHorizontal: spacing.sm,
+    includeFontPadding: false,
     textShadowColor: 'rgba(0, 0, 0, 0.3)',
     textShadowOffset: { width: 2, height: 3 },
     textShadowRadius: 6,
